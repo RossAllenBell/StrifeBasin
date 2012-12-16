@@ -20,6 +20,11 @@ public class Window extends JFrame {
         canvas = new Canvas(new Renderer(game));
         getContentPane().add(canvas);
         
+        InputListener inputListener = new InputListener(game, canvas.renderer);
+        addMouseListener(inputListener);
+        addMouseWheelListener(inputListener);
+        addKeyListener(inputListener);
+        
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
     
