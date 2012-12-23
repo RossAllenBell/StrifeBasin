@@ -10,19 +10,23 @@ import javax.swing.JComponent;
 @SuppressWarnings("serial")
 public class Canvas extends JComponent {
     
-    Renderer renderer;
+    private final Renderer renderer;
     
     public Canvas(Renderer aRenderer){
         renderer = aRenderer;
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                if(renderer != null) renderer.setViewDimensions(getSize());
+                if(getRenderer() != null) getRenderer().setViewDimensions(getSize());
             }
         });
     }
     
     public void paintComponent(Graphics g) {
-        if(renderer != null) renderer.render((Graphics2D) g);
+        if(getRenderer() != null) getRenderer().render((Graphics2D) g);
+    }
+
+    public Renderer getRenderer() {
+        return renderer;
     }
     
 }

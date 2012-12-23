@@ -13,7 +13,7 @@ public class StrifeBasin {
     public static void main(String[] args){
         game = new Game();
         window = new Window(game);        
-        gameLoop = new GameLoop(window.getCanvas());
+        gameLoop = new GameLoop(game, window.getCanvas());
         new Thread(gameLoop).start();        
     }
     

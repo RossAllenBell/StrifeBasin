@@ -1,13 +1,16 @@
 package com.rossallenbell.strifebasin.threads;
 
+import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.ui.Canvas;
 
 public class GameLoop implements Runnable {
     
-    Canvas canvas;
+    private final Canvas canvas;
+    private Game game;
     
-    public GameLoop(Canvas canvas) {
+    public GameLoop(Game game, Canvas canvas) {
         this.canvas = canvas;
+        this.game = game;
     }
     
     @Override
@@ -15,6 +18,7 @@ public class GameLoop implements Runnable {
         while (true) {
             long loopStartTime = System.currentTimeMillis();
             
+            game.update(loopStartTime);
             canvas.repaint();
             
             long loopStopTime = System.currentTimeMillis();

@@ -8,15 +8,18 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import com.rossallenbell.strifebasin.domain.Game;
+import com.rossallenbell.strifebasin.ui.menus.Menu;
 
 public class InputListener implements MouseListener, KeyListener, MouseWheelListener {
     
     private Game game;
-    private Renderer renderer;
+    private final Renderer renderer;
+    private Menu buildMenu;
     
-    public InputListener(Game game, Renderer renderer) {
+    public InputListener(Game game, Renderer renderer, Menu buildMenu) {
         this.game = game;
         this.renderer = renderer;
+        this.buildMenu = buildMenu;
     }
     
     @Override
@@ -34,6 +37,7 @@ public class InputListener implements MouseListener, KeyListener, MouseWheelList
     public void keyPressed(KeyEvent event) {
         game.keyPressed(event.getKeyCode());
         renderer.keyPressed(event.getKeyCode());
+        buildMenu.keyPressed(event.getKeyCode());
     }
     
     @Override

@@ -3,11 +3,16 @@ package com.rossallenbell.strifebasin.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Game;
+import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.ui.menus.Menu;
 
 public class Renderer {
     
@@ -17,8 +22,10 @@ public class Renderer {
     private static final int PIXELS_PER_PAN_TICK = 20;
     
     private final Game game;
+    private final Menu buildMenu;
     private final BufferedImage image;
     private final BufferedImage background;
+    private final Window window;
     
     private Dimension viewDimensions;
     private int viewCornerPixelX;
@@ -29,29 +36,35 @@ public class Renderer {
     private boolean panningSouth = false;
     private boolean panningWest = false;
     
-    public Renderer(Game game) {
+    private Point mousePos;
+    
+    public Renderer(Game game, Menu buildMenu, Window window) {
         this.game = game;
-        
-        viewCornerPixelX = 0;
-        viewCornerPixelY = 0;
+        this.buildMenu = buildMenu;
+        this.window = window;
         
         image = new BufferedImage(Game.BOARD_WIDTH * PIXELS_PER_BOARD_UNIT, Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT, BufferedImage.TYPE_INT_ARGB);
         background = buildBackground();
+        
+        viewCornerPixelX = 0;
+        viewCornerPixelY = 0;
     }
     
     public void render(Graphics2D destinationGraphics) {
         if (viewDimensions != null) {
+            mousePos = window.getMousePositionOnCanvas();
+            
             Graphics2D graphics = image.createGraphics();
             
-            if(panningNorth){
+            if (panningNorth) {
                 viewCornerPixelY = Math.max(0, viewCornerPixelY - PIXELS_PER_PAN_TICK);
-            } else if(panningSouth){
+            } else if (panningSouth) {
                 viewCornerPixelY = Math.min(image.getHeight() - viewDimensions.height, viewCornerPixelY + PIXELS_PER_PAN_TICK);
             }
             
-            if(panningEast){
+            if (panningEast) {
                 viewCornerPixelX = Math.min(image.getWidth() - viewDimensions.width, viewCornerPixelX + PIXELS_PER_PAN_TICK);
-            } else if(panningWest){
+            } else if (panningWest) {
                 viewCornerPixelX = Math.max(0, viewCornerPixelX - PIXELS_PER_PAN_TICK);
             }
             
@@ -86,6 +99,52 @@ public class Renderer {
         int minimapViewWidth = (int) ((double) viewDimensions.width / image.getWidth() * MINIMAP_WIDTH_PIXELS);
         int minimapViewHeight = (int) ((double) viewDimensions.height / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
         graphics.drawRect(minimapViewX, minimapViewY, minimapViewWidth, minimapViewHeight);
+        
+        FontMetrics fm = graphics.getFontMetrics();
+        
+        graphics.setColor(new Color(0, 255, 0));
+        String moneyString = "Money: " + game.getMe().getMoney();
+        graphics.drawString(moneyString, 10, fm.getHeight());
+        
+        List<List<String>> buildMenuDisplayStrings = buildMenu.getDisplayStrings();
+        int nextX = 10;
+        int num = 1;
+        for (List<String> strings : buildMenuDisplayStrings) {
+            int nextY = viewDimensions.height - 10;
+            int thisColumnX = nextX;
+            for (String string : strings) {
+                graphics.drawString(string, thisColumnX, nextY);
+                if (fm.stringWidth(string) + thisColumnX > nextX) {
+                    nextX = fm.stringWidth(string) + thisColumnX;
+                }
+                nextY -= fm.getHeight();
+            }
+            
+            if (num < buildMenuDisplayStrings.size()) {
+                num++;
+                graphics.drawString(" > ", nextX, viewDimensions.height - 10);
+                nextX += fm.stringWidth(" > ");
+            }
+        }
+        
+        Class<? extends Building> clazz = buildMenu.getCursorEvent();
+        if(clazz != null && mousePos != null){
+            try {
+                Building building = clazz.newInstance();
+                Dimension dimension = building.getShape();
+                graphics.setColor(new Color(0, 255, 0, 128));
+                
+                int x = mousePos.x;
+                x -= mousePos.x % PIXELS_PER_BOARD_UNIT;
+                
+                int y = mousePos.y;
+                y -= mousePos.y % PIXELS_PER_BOARD_UNIT;
+                
+                graphics.fillRect(x, y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     public void setViewDimensions(Dimension viewDimensions) {

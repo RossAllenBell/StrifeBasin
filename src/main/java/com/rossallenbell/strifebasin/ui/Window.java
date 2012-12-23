@@ -1,8 +1,11 @@
 package com.rossallenbell.strifebasin.ui;
 
+import java.awt.Point;
+
 import javax.swing.JFrame;
 
 import com.rossallenbell.strifebasin.domain.Game;
+import com.rossallenbell.strifebasin.ui.menus.Build;
 
 @SuppressWarnings("serial")
 public class Window extends JFrame {
@@ -17,10 +20,11 @@ public class Window extends JFrame {
         
         setSize(640, 480);
         
-        canvas = new Canvas(new Renderer(game));
+        Build buildMenu = new Build(game);
+        canvas = new Canvas(new Renderer(game, buildMenu, this));
         getContentPane().add(canvas);
         
-        InputListener inputListener = new InputListener(game, canvas.renderer);
+        InputListener inputListener = new InputListener(game, canvas.getRenderer(), buildMenu);
         addMouseListener(inputListener);
         addMouseWheelListener(inputListener);
         addKeyListener(inputListener);
@@ -30,6 +34,10 @@ public class Window extends JFrame {
     
     public Canvas getCanvas() {
         return canvas;
+    }
+
+    public Point getMousePositionOnCanvas() {
+        return canvas.getMousePosition();
     }
     
 }
