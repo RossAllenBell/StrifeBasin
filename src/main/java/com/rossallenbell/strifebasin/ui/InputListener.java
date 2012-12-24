@@ -53,7 +53,7 @@ public class InputListener implements MouseListener, KeyListener, MouseWheelList
     
     @Override
     public void mouseClicked(MouseEvent e) {
-        
+        renderer.mouseClicked(e);
     }
     
     @Override

@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -128,23 +129,35 @@ public class Renderer {
         }
         
         Class<? extends Building> clazz = buildMenu.getCursorEvent();
-        if(clazz != null && mousePos != null){
+        if (clazz != null && mousePos != null) {
             try {
                 Building building = clazz.newInstance();
                 Dimension dimension = building.getShape();
                 graphics.setColor(new Color(0, 255, 0, 128));
                 
-                int x = mousePos.x;
-                x -= mousePos.x % PIXELS_PER_BOARD_UNIT;
+                Point selectionPoint = getDisplayGridPointByMousePos(mousePos);
                 
-                int y = mousePos.y;
-                y -= mousePos.y % PIXELS_PER_BOARD_UNIT;
-                
-                graphics.fillRect(x, y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
+                graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+    
+    public Point getDisplayGridPointByMousePos(Point point) {
+        Point gameGrid = getGameGridUnitByMousePos(point);
+        
+        return new Point(gameGrid.x * PIXELS_PER_BOARD_UNIT - viewCornerPixelX, gameGrid.y * PIXELS_PER_BOARD_UNIT - viewCornerPixelY);
+    }
+    
+    public Point getGameGridUnitByMousePos(Point point) {
+        int x = point.x + viewCornerPixelX;
+        int y = point.y + viewCornerPixelY;
+        
+        x /= PIXELS_PER_BOARD_UNIT;
+        y /= PIXELS_PER_BOARD_UNIT;
+        
+        return new Point(x, y);
     }
     
     public void setViewDimensions(Dimension viewDimensions) {
@@ -208,6 +221,14 @@ public class Renderer {
             case KeyEvent.VK_A:
                 panningWest = false;
                 break;
+        }
+    }
+    
+    public void mouseClicked(MouseEvent e) {
+        Class<? extends Building> buildMenuItem = buildMenu.getCursorEvent();
+        if (buildMenuItem != null) {
+            Point buildLocation = getGameGridUnitByMousePos(window.getMousePositionOnCanvas());
+            System.out.println(buildLocation.x + " " + buildLocation.y);
         }
     }
     
