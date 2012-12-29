@@ -1,10 +1,7 @@
 package com.rossallenbell.strifebasin.domain;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.util.List;
-
-import org.javatuples.Pair;
 
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
@@ -30,10 +27,6 @@ public class Game {
         Sanctuary mySantuary = new Sanctuary();
         mySantuary.setLocation(0, BOARD_HEIGHT/2-new Sanctuary().getShape().height);
         me.addBuilding(mySantuary);
-        
-        Sanctuary theirSantuary = new Sanctuary();
-        theirSantuary.setLocation(BOARD_WIDTH-new Sanctuary().getShape().width, BOARD_HEIGHT/2-new Sanctuary().getShape().height);
-        them.addBuilding(theirSantuary);
     }
     
     public Player getMe(){

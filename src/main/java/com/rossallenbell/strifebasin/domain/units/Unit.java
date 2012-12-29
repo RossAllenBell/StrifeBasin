@@ -20,8 +20,7 @@ public abstract class Unit {
     }
     
     public void setLocation(double x, double y) {
-        location.x = x;
-        location.y = y;
+        location.setLocation(x, y);
     }
     
     public double getSize() {

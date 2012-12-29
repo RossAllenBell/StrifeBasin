@@ -15,8 +15,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import org.javatuples.Pair;
-
+import static com.rossallenbell.strifebasin.StrifeBasin.game;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
@@ -30,7 +29,6 @@ public class Renderer {
     private static final int PIXELS_PER_BOARD_UNIT = 10;
     private static final int PIXELS_PER_PAN_TICK = 20;
     
-    private final Game game;
     private final Menu buildMenu;
     private final BufferedImage image;
     private final BufferedImage background;
@@ -47,8 +45,7 @@ public class Renderer {
     
     private Point mousePos;
     
-    public Renderer(Game game, Menu buildMenu, Window window) {
-        this.game = game;
+    public Renderer(Menu buildMenu, Window window) {
         this.buildMenu = buildMenu;
         this.window = window;
         

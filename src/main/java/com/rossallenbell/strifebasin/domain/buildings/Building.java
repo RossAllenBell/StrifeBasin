@@ -16,8 +16,7 @@ public abstract class Building {
     }
     
     public void setLocation(int x, int y) {
-        location.x = x;
-        location.y = y;
+        location.setLocation(x, y);
     }
     
     public abstract Dimension getShape();
