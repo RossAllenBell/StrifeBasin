@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.reflections.Reflections;
 
-import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
@@ -18,8 +17,6 @@ public class Build extends Menu {
     
     private static enum State {CLOSED, TYPE, BASIC, ADVANCED};
     
-    private Game game;
-    
     private List<Class<? extends BuildableBuilding>> basicBuildings;
     private List<Class<? extends BuildableBuilding>> advancedBuildings;
     
@@ -27,10 +24,8 @@ public class Build extends Menu {
     private int numSelected;
     
     @SuppressWarnings("unchecked")
-    public Build(Game game){
+    public Build(){
         state = State.CLOSED;
-        
-        this.game = game;
         
         basicBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
         advancedBuildings = new ArrayList<Class<? extends BuildableBuilding>>();

@@ -20,7 +20,7 @@ public class Window extends JFrame {
         
         setSize(640, 480);
         
-        Build buildMenu = new Build(game);
+        Build buildMenu = new Build();
         canvas = new Canvas(new Renderer(game, buildMenu, this));
         getContentPane().add(canvas);
         
