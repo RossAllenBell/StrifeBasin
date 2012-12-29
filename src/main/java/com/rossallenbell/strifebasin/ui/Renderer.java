@@ -20,7 +20,6 @@ import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
-import com.rossallenbell.strifebasin.ui.menus.Menu;
 
 public class Renderer {
     
@@ -29,7 +28,7 @@ public class Renderer {
     private static final int PIXELS_PER_BOARD_UNIT = 10;
     private static final int PIXELS_PER_PAN_TICK = 20;
     
-    private final Menu buildMenu;
+    private final BuildMenu buildMenu;
     private final BufferedImage image;
     private final BufferedImage background;
     private final Game game;
@@ -67,7 +66,7 @@ public class Renderer {
     
     public void render(Graphics2D destinationGraphics) {
         if (viewDimensions != null) {
-            mousePos = Window.getInstance().getMousePositionOnCanvas();
+            mousePos = Canvas.getInstance().getMousePosition();
             
             Graphics2D graphics = image.createGraphics();
             
@@ -275,7 +274,7 @@ public class Renderer {
     public void mouseClicked(MouseEvent e) {
         Class<? extends BuildableBuilding> buildMenuItem = buildMenu.getCursorEvent();
         if (buildMenuItem != null) {
-            Point buildLocation = getGameGridUnitByMousePos(Window.getInstance().getMousePositionOnCanvas());
+            Point buildLocation = getGameGridUnitByMousePos(Canvas.getInstance().getMousePosition());
             try {
                 BuildableBuilding building = buildMenuItem.newInstance();
                 building.setLocation(buildLocation.x, buildLocation.y);

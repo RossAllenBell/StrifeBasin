@@ -55,7 +55,7 @@ public class ConnectionToOpponent {
             URL whatismyip;
             whatismyip = new URL("http://checkip.amazonaws.com/");
             BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));            
-            return in.readLine(); // you get the IP as a String
+            return in.readLine();
         } catch (Exception e) {
             e.printStackTrace();
         }

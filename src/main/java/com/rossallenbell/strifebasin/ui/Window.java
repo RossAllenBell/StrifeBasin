@@ -1,7 +1,6 @@
 package com.rossallenbell.strifebasin.ui;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -60,10 +59,6 @@ public class Window extends JFrame {
         addKeyListener(inputListener);
         
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-    }
-    
-    public Point getMousePositionOnCanvas() {
-        return canvas.getMousePosition();
     }
     
 }
