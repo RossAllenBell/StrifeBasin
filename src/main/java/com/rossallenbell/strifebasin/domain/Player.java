@@ -1,10 +1,7 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.javatuples.Pair;
 
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.units.Unit;
@@ -16,13 +13,13 @@ public class Player {
     private long lastIncomeTime;
     
     private List<Building> buildings;
-    private List<Pair<Unit, Point2D.Double>> units;
+    private List<Unit> units;
     
     public Player() {
         money = 0;
         income = Game.STARTING_INCOME;
         buildings = new ArrayList<Building>();
-        units = new ArrayList<Pair<Unit, Point2D.Double>>();
+        units = new ArrayList<Unit>();
     }
     
     public int getMoney() {
@@ -61,11 +58,11 @@ public class Player {
         return buildings;
     }
     
-    public void addUnit(Unit unit, Point2D.Double spawnLocation) {
-        units.add(new Pair<Unit, Point2D.Double>(unit, spawnLocation));
+    public void addUnit(Unit unit) {
+        units.add(unit);
     }
     
-    public List<Pair<Unit, Point2D.Double>> getUnits() {
+    public List<Unit> getUnits() {
         return units;
     }
     

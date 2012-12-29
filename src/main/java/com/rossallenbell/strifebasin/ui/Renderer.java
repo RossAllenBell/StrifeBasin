@@ -105,20 +105,18 @@ public class Renderer {
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        List<Pair<Unit, Point2D.Double>> myUnits = game.getMyUnits();
+        List<Unit> myUnits = game.getMyUnits();
         graphics.setColor(new Color(0, 255, 0));
-        for(Pair<Unit, Point2D.Double> ownedUnit : myUnits){
-            Unit unit = ownedUnit.getValue0();
-            Point2D.Double location = ownedUnit.getValue1();
+        for(Unit unit : myUnits){
+            Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.fill(circle);
         }
         
-        List<Pair<Unit, Point2D.Double>> theirUnits = game.getTheirUnits();
-        graphics.setColor(new Color(255, 0, 0));
-        for(Pair<Unit, Point2D.Double> ownedUnit : theirUnits){
-            Unit unit = ownedUnit.getValue0();
-            Point2D.Double location = ownedUnit.getValue1();
+        List<Unit> theirUnits = game.getTheirUnits();
+        graphics.setColor(new Color(0, 255, 0));
+        for(Unit unit : theirUnits){
+            Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.fill(circle);
         }

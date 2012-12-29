@@ -74,7 +74,8 @@ public class Game {
                     Unit spawnedUnit = spawner.spawn(updateTime);
                     double x = buildingLocation.getX() + building.getShape().width;
                     double y = buildingLocation.getY() + ((double) building.getShape().height / 2);
-                    me.addUnit(spawnedUnit, new Point2D.Double(x,y));
+                    spawnedUnit.setLocation(x, y);
+                    me.addUnit(spawnedUnit);
                 }
             }
         }
@@ -96,11 +97,11 @@ public class Game {
         return them.getBuildings();
     }
 
-    public List<Pair<Unit, Point2D.Double>> getMyUnits() {
+    public List<Unit> getMyUnits() {
         return me.getUnits();
     }
 
-    public List<Pair<Unit, Point2D.Double>> getTheirUnits() {
+    public List<Unit> getTheirUnits() {
         return them.getUnits();
     }
     
