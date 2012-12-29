@@ -2,6 +2,8 @@ package com.rossallenbell.strifebasin.ui.menus;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.reflections.Reflections;
@@ -40,6 +42,9 @@ public class Build extends Menu {
         for(Class<?> clazz : reflections.getTypesAnnotatedWith(AdvancedBuilding.class)){
             advancedBuildings.add((Class<? extends BuildableBuilding>) clazz);
         }
+        
+        Collections.sort(basicBuildings, new CostComparator());
+        Collections.sort(advancedBuildings, new CostComparator());
     }
     
     @Override
@@ -126,6 +131,18 @@ public class Build extends Menu {
         }
         
         return null;
+    }
+    
+    public class CostComparator implements Comparator<Class<? extends BuildableBuilding>> {
+        @Override
+        public int compare(Class<? extends BuildableBuilding> o1, Class<? extends BuildableBuilding> o2) {
+            try {
+                return new Integer(o1.newInstance().cost()).compareTo(o2.newInstance().cost());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return 0;
+        }
     }
     
 }
