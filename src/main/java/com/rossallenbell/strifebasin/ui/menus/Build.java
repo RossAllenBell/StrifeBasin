@@ -7,9 +7,9 @@ import java.util.List;
 import org.reflections.Reflections;
 
 import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.buildings.AdvancedBuilding;
-import com.rossallenbell.strifebasin.domain.buildings.BasicBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 
 public class Build extends Menu {
     
@@ -31,10 +31,10 @@ public class Build extends Menu {
         basicBuildings = new ArrayList<Class<? extends Building>>();
         advancedBuildings = new ArrayList<Class<? extends Building>>();
         
-        Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.basic");
+        Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable.basic");
         basicBuildings.addAll(reflections.getSubTypesOf(BasicBuilding.class));
         
-        reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.advanced");
+        reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable.advanced");
         advancedBuildings.addAll(reflections.getSubTypesOf(AdvancedBuilding.class));
     }
     

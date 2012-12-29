@@ -1,5 +1,13 @@
 package com.rossallenbell.strifebasin.domain;
 
+import java.awt.Point;
+import java.util.List;
+
+import org.javatuples.Pair;
+
+import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
+
 
 public class Game {
     
@@ -10,13 +18,16 @@ public class Game {
     
     private final Player me;
     private final Player them;
-    private long lastUpdateTime;
     
     public Game() {
         me = new Player();
         them = new Player();
         
-        lastUpdateTime = System.currentTimeMillis();
+        Point HQLocation = new Point(0,BOARD_HEIGHT/2-new Sanctuary().getShape().height);
+        me.addBuilding(new Sanctuary(), HQLocation);
+        
+        Point theirHQLocation = new Point(BOARD_WIDTH-new Sanctuary().getShape().width,HQLocation.y);
+        them.addBuilding(new Sanctuary(), theirHQLocation);
     }
     
     public Player getMe(){
@@ -48,8 +59,22 @@ public class Game {
             me.income();
             me.setLastIncomeTime(updateTime);
         }
+    }
+
+    public void buildingPlaced(Building building, Point buildLocation) {
+        if(me.getMoney() >= building.cost()){
+            me.alterMoney(-1 * building.cost());
+            me.addBuilding(building, buildLocation);
+        }
         
-        lastUpdateTime = updateTime;
+    }
+
+    public List<Pair<Building, Point>> getMyBuildings() {
+        return me.getBuildings();
+    }
+
+    public List<Pair<Building, Point>> getTheirBuildings() {
+        return them.getBuildings();
     }
     
 }

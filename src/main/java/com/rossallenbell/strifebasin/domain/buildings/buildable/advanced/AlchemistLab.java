@@ -1,8 +1,8 @@
-package com.rossallenbell.strifebasin.domain.buildings.advanced;
+package com.rossallenbell.strifebasin.domain.buildings.buildable.advanced;
 
 import java.awt.Dimension;
 
-import com.rossallenbell.strifebasin.domain.buildings.AdvancedBuilding;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 
 public class AlchemistLab extends AdvancedBuilding {
 

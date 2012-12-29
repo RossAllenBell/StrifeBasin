@@ -1,8 +1,8 @@
-package com.rossallenbell.strifebasin.domain.buildings.basic;
+package com.rossallenbell.strifebasin.domain.buildings.buildable.basic;
 
 import java.awt.Dimension;
 
-import com.rossallenbell.strifebasin.domain.buildings.BasicBuilding;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 
 public class Barracks extends BasicBuilding {
 

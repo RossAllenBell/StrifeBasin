@@ -1,7 +1,9 @@
 package com.rossallenbell.strifebasin.ui;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -10,6 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
+
+import org.javatuples.Pair;
 
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
@@ -83,14 +87,34 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
+        List<Pair<Building, Point>> myBuildings = game.getMyBuildings();
+        graphics.setColor(new Color(0, 255, 0));
+        for(Pair<Building, Point> placedBuilding : myBuildings){
+            Building building = placedBuilding.getValue0();
+            Point location = placedBuilding.getValue1();
+            graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+        }
         
+        List<Pair<Building, Point>> theirBuildings = game.getTheirBuildings();
+        graphics.setColor(new Color(255, 0, 0));
+        for(Pair<Building, Point> placedBuilding : theirBuildings){
+            Building building = placedBuilding.getValue0();
+            Point location = placedBuilding.getValue1();
+            graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+        }
     }
     
     private void drawOverlay(Graphics2D graphics) {
         // minimap border
-        graphics.setColor(new Color(255, 255, 255, 128));
+        graphics.setColor(new Color(255, 255, 255, 64));
         graphics.setStroke(new BasicStroke(3));
         graphics.drawRect((viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS);
+        
+        //minimap
+        Composite composite = graphics.getComposite();
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        graphics.drawImage(image, (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2) + MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS, 0, 0, image.getWidth(), image.getHeight(), null);
+        graphics.setComposite(composite);
         
         // minimap view indicator
         graphics.setColor(new Color(0, 128, 255, 255));
@@ -228,7 +252,11 @@ public class Renderer {
         Class<? extends Building> buildMenuItem = buildMenu.getCursorEvent();
         if (buildMenuItem != null) {
             Point buildLocation = getGameGridUnitByMousePos(window.getMousePositionOnCanvas());
-            System.out.println(buildLocation.x + " " + buildLocation.y);
+            try {
+                game.buildingPlaced(buildMenuItem.newInstance(), buildLocation);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
         }
     }
     
