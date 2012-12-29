@@ -10,6 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -17,6 +19,8 @@ import org.javatuples.Pair;
 
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
+import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.ui.menus.Menu;
 
 public class Renderer {
@@ -101,6 +105,24 @@ public class Renderer {
             Building building = placedBuilding.getValue0();
             Point location = placedBuilding.getValue1();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+        }
+        
+        List<Pair<Unit, Point2D.Double>> myUnits = game.getMyUnits();
+        graphics.setColor(new Color(0, 255, 0));
+        for(Pair<Unit, Point2D.Double> ownedUnit : myUnits){
+            Unit unit = ownedUnit.getValue0();
+            Point2D.Double location = ownedUnit.getValue1();
+            Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
+            graphics.fill(circle);
+        }
+        
+        List<Pair<Unit, Point2D.Double>> theirUnits = game.getTheirUnits();
+        graphics.setColor(new Color(255, 0, 0));
+        for(Pair<Unit, Point2D.Double> ownedUnit : theirUnits){
+            Unit unit = ownedUnit.getValue0();
+            Point2D.Double location = ownedUnit.getValue1();
+            Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
+            graphics.fill(circle);
         }
     }
     
@@ -249,7 +271,7 @@ public class Renderer {
     }
     
     public void mouseClicked(MouseEvent e) {
-        Class<? extends Building> buildMenuItem = buildMenu.getCursorEvent();
+        Class<? extends BuildableBuilding> buildMenuItem = buildMenu.getCursorEvent();
         if (buildMenuItem != null) {
             Point buildLocation = getGameGridUnitByMousePos(window.getMousePositionOnCanvas());
             try {

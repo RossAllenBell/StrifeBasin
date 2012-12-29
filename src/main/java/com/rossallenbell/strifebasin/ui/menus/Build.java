@@ -10,6 +10,7 @@ import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 
 public class Build extends Menu {
     
@@ -17,25 +18,28 @@ public class Build extends Menu {
     
     private Game game;
     
-    private List<Class<? extends Building>> basicBuildings;
-    private List<Class<? extends Building>> advancedBuildings;
+    private List<Class<? extends BuildableBuilding>> basicBuildings;
+    private List<Class<? extends BuildableBuilding>> advancedBuildings;
     
     private State state;
     private int numSelected;
     
+    @SuppressWarnings("unchecked")
     public Build(Game game){
         state = State.CLOSED;
         
         this.game = game;
         
-        basicBuildings = new ArrayList<Class<? extends Building>>();
-        advancedBuildings = new ArrayList<Class<? extends Building>>();
+        basicBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
+        advancedBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
         
-        Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable.basic");
-        basicBuildings.addAll(reflections.getSubTypesOf(BasicBuilding.class));
-        
-        reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable.advanced");
-        advancedBuildings.addAll(reflections.getSubTypesOf(AdvancedBuilding.class));
+        Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable");
+        for(Class<?> clazz : reflections.getTypesAnnotatedWith(BasicBuilding.class)){
+            basicBuildings.add((Class<? extends BuildableBuilding>) clazz);
+        }
+        for(Class<?> clazz : reflections.getTypesAnnotatedWith(AdvancedBuilding.class)){
+            advancedBuildings.add((Class<? extends BuildableBuilding>) clazz);
+        }
     }
     
     @Override
@@ -111,7 +115,7 @@ public class Build extends Menu {
     }
 
     @Override
-    public Class<? extends Building> getCursorEvent() {
+    public Class<? extends BuildableBuilding> getCursorEvent() {
         if(numSelected != -1){
             if(state == State.BASIC){
                 return basicBuildings.get(numSelected - 1);

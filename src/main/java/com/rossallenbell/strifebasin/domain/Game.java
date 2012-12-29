@@ -1,12 +1,16 @@
 package com.rossallenbell.strifebasin.domain;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.javatuples.Pair;
 
 import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning.UnitSpawingBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
+import com.rossallenbell.strifebasin.domain.units.Unit;
 
 
 public class Game {
@@ -59,9 +63,23 @@ public class Game {
             me.income();
             me.setLastIncomeTime(updateTime);
         }
+        
+        for(Pair<Building, Point> ownedBuilding : me.getBuildings()){
+            Building building = ownedBuilding.getValue0();
+            Point buildingLocation = ownedBuilding.getValue1();
+            if(UnitSpawingBuilding.class.isAssignableFrom(building.getClass())){
+                UnitSpawingBuilding spawner = (UnitSpawingBuilding) building;
+                if(spawner.getLastSpawnTime() + spawner.getSpawnCooldown() <= updateTime){
+                    Unit spawnedUnit = spawner.spawn(updateTime);
+                    double x = buildingLocation.getX() + building.getShape().width;
+                    double y = buildingLocation.getY() + ((double) building.getShape().height / 2);
+                    me.addUnit(spawnedUnit, new Point2D.Double(x,y));
+                }
+            }
+        }
     }
 
-    public void buildingPlaced(Building building, Point buildLocation) {
+    public void buildingPlaced(BuildableBuilding building, Point buildLocation) {
         if(me.getMoney() >= building.cost()){
             me.alterMoney(-1 * building.cost());
             me.addBuilding(building, buildLocation);
@@ -75,6 +93,14 @@ public class Game {
 
     public List<Pair<Building, Point>> getTheirBuildings() {
         return them.getBuildings();
+    }
+
+    public List<Pair<Unit, Point2D.Double>> getMyUnits() {
+        return me.getUnits();
+    }
+
+    public List<Pair<Unit, Point2D.Double>> getTheirUnits() {
+        return them.getUnits();
     }
     
 }

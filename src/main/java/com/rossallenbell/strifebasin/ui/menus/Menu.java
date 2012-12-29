@@ -2,7 +2,7 @@ package com.rossallenbell.strifebasin.ui.menus;
 
 import java.util.List;
 
-import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 
 public abstract class Menu {
     
@@ -10,6 +10,6 @@ public abstract class Menu {
     
     public abstract List<List<String>> getDisplayStrings();
     
-    public abstract Class<? extends Building> getCursorEvent();
+    public abstract Class<? extends BuildableBuilding> getCursorEvent();
     
 }
