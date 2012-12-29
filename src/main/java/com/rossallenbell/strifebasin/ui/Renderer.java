@@ -91,19 +91,17 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        List<Pair<Building, Point>> myBuildings = game.getMyBuildings();
+        List<Building> myBuildings = game.getMyBuildings();
         graphics.setColor(new Color(0, 255, 0));
-        for(Pair<Building, Point> placedBuilding : myBuildings){
-            Building building = placedBuilding.getValue0();
-            Point location = placedBuilding.getValue1();
+        for(Building building : myBuildings){
+            Point location = building.getLocation();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        List<Pair<Building, Point>> theirBuildings = game.getTheirBuildings();
+        List<Building> theirBuildings = game.getTheirBuildings();
         graphics.setColor(new Color(255, 0, 0));
-        for(Pair<Building, Point> placedBuilding : theirBuildings){
-            Building building = placedBuilding.getValue0();
-            Point location = placedBuilding.getValue1();
+        for(Building building : theirBuildings){
+            Point location = building.getLocation();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
@@ -275,7 +273,9 @@ public class Renderer {
         if (buildMenuItem != null) {
             Point buildLocation = getGameGridUnitByMousePos(window.getMousePositionOnCanvas());
             try {
-                game.buildingPlaced(buildMenuItem.newInstance(), buildLocation);
+                BuildableBuilding building = buildMenuItem.newInstance();
+                building.setLocation(buildLocation.x, buildLocation.y);
+                game.buildingPlaced(building);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }

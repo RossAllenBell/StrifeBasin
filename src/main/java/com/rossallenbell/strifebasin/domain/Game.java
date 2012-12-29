@@ -27,11 +27,13 @@ public class Game {
         me = new Player();
         them = new Player();
         
-        Point HQLocation = new Point(0,BOARD_HEIGHT/2-new Sanctuary().getShape().height);
-        me.addBuilding(new Sanctuary(), HQLocation);
+        Sanctuary mySantuary = new Sanctuary();
+        mySantuary.setLocation(0, BOARD_HEIGHT/2-new Sanctuary().getShape().height);
+        me.addBuilding(mySantuary);
         
-        Point theirHQLocation = new Point(BOARD_WIDTH-new Sanctuary().getShape().width,HQLocation.y);
-        them.addBuilding(new Sanctuary(), theirHQLocation);
+        Sanctuary theirSantuary = new Sanctuary();
+        theirSantuary.setLocation(BOARD_WIDTH-new Sanctuary().getShape().width, BOARD_HEIGHT/2-new Sanctuary().getShape().height);
+        them.addBuilding(theirSantuary);
     }
     
     public Player getMe(){
@@ -64,12 +66,11 @@ public class Game {
             me.setLastIncomeTime(updateTime);
         }
         
-        for(Pair<Building, Point> ownedBuilding : me.getBuildings()){
-            Building building = ownedBuilding.getValue0();
-            Point buildingLocation = ownedBuilding.getValue1();
+        for(Building building : me.getBuildings()){
             if(UnitSpawingBuilding.class.isAssignableFrom(building.getClass())){
                 UnitSpawingBuilding spawner = (UnitSpawingBuilding) building;
                 if(spawner.getLastSpawnTime() + spawner.getSpawnCooldown() <= updateTime){
+                    Point buildingLocation = building.getLocation();
                     Unit spawnedUnit = spawner.spawn(updateTime);
                     double x = buildingLocation.getX() + building.getShape().width;
                     double y = buildingLocation.getY() + ((double) building.getShape().height / 2);
@@ -79,19 +80,19 @@ public class Game {
         }
     }
 
-    public void buildingPlaced(BuildableBuilding building, Point buildLocation) {
+    public void buildingPlaced(BuildableBuilding building) {
         if(me.getMoney() >= building.cost()){
             me.alterMoney(-1 * building.cost());
-            me.addBuilding(building, buildLocation);
+            me.addBuilding(building);
         }
         
     }
 
-    public List<Pair<Building, Point>> getMyBuildings() {
+    public List<Building> getMyBuildings() {
         return me.getBuildings();
     }
 
-    public List<Pair<Building, Point>> getTheirBuildings() {
+    public List<Building> getTheirBuildings() {
         return them.getBuildings();
     }
 

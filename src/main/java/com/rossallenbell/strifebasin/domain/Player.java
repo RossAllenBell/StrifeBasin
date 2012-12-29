@@ -1,6 +1,5 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +15,13 @@ public class Player {
     private int income;
     private long lastIncomeTime;
     
-    private List<Pair<Building, Point>> buildings;
+    private List<Building> buildings;
     private List<Pair<Unit, Point2D.Double>> units;
     
     public Player() {
         money = 0;
         income = Game.STARTING_INCOME;
-        buildings = new ArrayList<Pair<Building, Point>>();
+        buildings = new ArrayList<Building>();
         units = new ArrayList<Pair<Unit, Point2D.Double>>();
     }
     
@@ -54,11 +53,11 @@ public class Player {
         this.lastIncomeTime = lastIncomeTime;
     }
     
-    public void addBuilding(Building building, Point buildLocation) {
-        buildings.add(new Pair<Building, Point>(building, buildLocation));
+    public void addBuilding(Building building) {
+        buildings.add(building);
     }
     
-    public List<Pair<Building, Point>> getBuildings() {
+    public List<Building> getBuildings() {
         return buildings;
     }
     
