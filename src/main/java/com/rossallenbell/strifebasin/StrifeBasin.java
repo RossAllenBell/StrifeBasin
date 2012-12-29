@@ -13,13 +13,13 @@ public class StrifeBasin {
     public static GameLoop gameLoop;
     
     public static void main(String[] args) {
-        connection = new ConnectionToOpponent();
-        window = new Window();
+        connection = ConnectionToOpponent.getInstance();
+        window = Window.getInstance();
     }
     
     public static void connectionComplete() {
-        game = new Game();
-        gameLoop = new GameLoop(window.getCanvas());
+        game = Game.getInstance();
+        gameLoop = GameLoop.getInstance();
         new Thread(gameLoop).start();
     }
     

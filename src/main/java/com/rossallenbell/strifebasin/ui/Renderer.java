@@ -15,11 +15,11 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import static com.rossallenbell.strifebasin.StrifeBasin.game;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 import com.rossallenbell.strifebasin.ui.menus.Menu;
 
 public class Renderer {
@@ -32,7 +32,7 @@ public class Renderer {
     private final Menu buildMenu;
     private final BufferedImage image;
     private final BufferedImage background;
-    private final Window window;
+    private final Game game;
     
     private Dimension viewDimensions;
     private int viewCornerPixelX;
@@ -45,9 +45,18 @@ public class Renderer {
     
     private Point mousePos;
     
-    public Renderer(Menu buildMenu, Window window) {
-        this.buildMenu = buildMenu;
-        this.window = window;
+    private static Renderer theInstance;
+    
+    public static Renderer  getInstance() {
+        if(theInstance == null){
+            theInstance = new Renderer();
+        }
+        return theInstance;
+    }
+    
+    private Renderer() {
+        game = Game.getInstance();
+        buildMenu = BuildMenu.getInstance();
         
         image = new BufferedImage(Game.BOARD_WIDTH * PIXELS_PER_BOARD_UNIT, Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT, BufferedImage.TYPE_INT_ARGB);
         background = buildBackground();
@@ -58,7 +67,7 @@ public class Renderer {
     
     public void render(Graphics2D destinationGraphics) {
         if (viewDimensions != null) {
-            mousePos = window.getMousePositionOnCanvas();
+            mousePos = Window.getInstance().getMousePositionOnCanvas();
             
             Graphics2D graphics = image.createGraphics();
             
@@ -266,7 +275,7 @@ public class Renderer {
     public void mouseClicked(MouseEvent e) {
         Class<? extends BuildableBuilding> buildMenuItem = buildMenu.getCursorEvent();
         if (buildMenuItem != null) {
-            Point buildLocation = getGameGridUnitByMousePos(window.getMousePositionOnCanvas());
+            Point buildLocation = getGameGridUnitByMousePos(Window.getInstance().getMousePositionOnCanvas());
             try {
                 BuildableBuilding building = buildMenuItem.newInstance();
                 building.setLocation(buildLocation.x, buildLocation.y);

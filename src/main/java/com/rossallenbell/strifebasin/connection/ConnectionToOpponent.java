@@ -12,6 +12,19 @@ public class ConnectionToOpponent {
     
     private ServerSocket socket;
     
+    private static ConnectionToOpponent theInstance;
+    
+    public static ConnectionToOpponent getInstance() {
+        if(theInstance == null){
+            theInstance = new ConnectionToOpponent();
+        }
+        return theInstance;
+    }
+    
+    private ConnectionToOpponent() {
+        
+    }
+    
     public void reservePort(int port) {
         try {
             socket = new ServerSocket(port);

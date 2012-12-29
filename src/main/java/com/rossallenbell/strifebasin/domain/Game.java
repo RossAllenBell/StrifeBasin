@@ -20,7 +20,16 @@ public class Game {
     private final Player me;
     private final Player them;
     
-    public Game() {
+    private static Game theInstance;
+    
+    public static Game  getInstance() {
+        if(theInstance == null){
+            theInstance = new Game();
+        }
+        return theInstance;
+    }
+    
+    private Game() {
         me = new Player();
         them = new Player();
         

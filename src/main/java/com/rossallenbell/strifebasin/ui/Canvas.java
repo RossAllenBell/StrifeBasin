@@ -12,21 +12,26 @@ public class Canvas extends JComponent {
     
     private final Renderer renderer;
     
-    public Canvas(Renderer aRenderer){
-        renderer = aRenderer;
+    private static Canvas theInstance;
+    
+    public static Canvas  getInstance() {
+        if(theInstance == null){
+            theInstance = new Canvas();
+        }
+        return theInstance;
+    }
+    
+    private Canvas(){
+        renderer = Renderer.getInstance();
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                if(getRenderer() != null) getRenderer().setViewDimensions(getSize());
+                if(renderer != null) renderer.setViewDimensions(getSize());
             }
         });
     }
     
     public void paintComponent(Graphics g) {
-        if(getRenderer() != null) getRenderer().render((Graphics2D) g);
-    }
-
-    public Renderer getRenderer() {
-        return renderer;
+        if(renderer != null) renderer.render((Graphics2D) g);
     }
     
 }

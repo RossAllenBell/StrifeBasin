@@ -13,9 +13,11 @@ import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 
-public class Build extends Menu {
+public class BuildMenu extends Menu {
     
-    private static enum State {CLOSED, TYPE, BASIC, ADVANCED};
+    private static enum State {
+        CLOSED, TYPE, BASIC, ADVANCED
+    };
     
     private List<Class<? extends BuildableBuilding>> basicBuildings;
     private List<Class<? extends BuildableBuilding>> advancedBuildings;
@@ -23,18 +25,27 @@ public class Build extends Menu {
     private State state;
     private int numSelected;
     
+    private static BuildMenu theInstance;
+    
+    public static BuildMenu getInstance() {
+        if (theInstance == null) {
+            theInstance = new BuildMenu();
+        }
+        return theInstance;
+    }
+    
     @SuppressWarnings("unchecked")
-    public Build(){
+    private BuildMenu() {
         state = State.CLOSED;
         
         basicBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
         advancedBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
         
         Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable");
-        for(Class<?> clazz : reflections.getTypesAnnotatedWith(BasicBuilding.class)){
+        for (Class<?> clazz : reflections.getTypesAnnotatedWith(BasicBuilding.class)) {
             basicBuildings.add((Class<? extends BuildableBuilding>) clazz);
         }
-        for(Class<?> clazz : reflections.getTypesAnnotatedWith(AdvancedBuilding.class)){
+        for (Class<?> clazz : reflections.getTypesAnnotatedWith(AdvancedBuilding.class)) {
             advancedBuildings.add((Class<? extends BuildableBuilding>) clazz);
         }
         
@@ -43,32 +54,32 @@ public class Build extends Menu {
     }
     
     @Override
-    public List<List<String>> getDisplayStrings(){
+    public List<List<String>> getDisplayStrings() {
         List<List<String>> displayStrings = new ArrayList<List<String>>();
         
         List<String> base = new ArrayList<String>();
         base.add("(B) Build");
         displayStrings.add(base);
         
-        if(state != State.CLOSED) {
+        if (state != State.CLOSED) {
             List<String> type = new ArrayList<String>();
             type.add("(1) Basic");
             type.add("(2) Advanced");
             displayStrings.add(type);
         }
         
-        if(state == State.BASIC){
+        if (state == State.BASIC) {
             List<String> basicBuildingNames = new ArrayList<String>();
             int num = 1;
-            for(Class<? extends Building> clazz : basicBuildings){
+            for (Class<? extends Building> clazz : basicBuildings) {
                 basicBuildingNames.add("(" + num + ") " + clazz.getSimpleName());
                 num++;
             }
             displayStrings.add(basicBuildingNames);
-        } else if(state == State.ADVANCED){
+        } else if (state == State.ADVANCED) {
             List<String> advancedBuildingNames = new ArrayList<String>();
             int num = 1;
-            for(Class<? extends Building> clazz : advancedBuildings){
+            for (Class<? extends Building> clazz : advancedBuildings) {
                 advancedBuildingNames.add("(" + num + ") " + clazz.getSimpleName());
                 num++;
             }
@@ -77,7 +88,7 @@ public class Build extends Menu {
         
         return displayStrings;
     }
-
+    
     @Override
     public void keyPressed(int keyCode) {
         switch (keyCode) {
@@ -90,13 +101,13 @@ public class Build extends Menu {
                 numSelected = -1;
                 break;
             case KeyEvent.VK_1:
-                if(state == State.TYPE){
+                if (state == State.TYPE) {
                     state = State.BASIC;
                     numSelected = -1;
                     break;
                 }
             case KeyEvent.VK_2:
-                if(state == State.TYPE){
+                if (state == State.TYPE) {
                     state = State.ADVANCED;
                     numSelected = -1;
                     break;
@@ -113,14 +124,14 @@ public class Build extends Menu {
                 break;
         }
     }
-
+    
     @Override
     public Class<? extends BuildableBuilding> getCursorEvent() {
-        if(numSelected != -1){
-            if(state == State.BASIC){
+        if (numSelected != -1) {
+            if (state == State.BASIC) {
                 return basicBuildings.get(numSelected - 1);
             }
-            if(state == State.ADVANCED){
+            if (state == State.ADVANCED) {
                 return advancedBuildings.get(numSelected - 1);
             }
         }

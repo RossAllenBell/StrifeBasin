@@ -1,14 +1,25 @@
 package com.rossallenbell.strifebasin.threads;
 
-import static com.rossallenbell.strifebasin.StrifeBasin.game;
+import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.ui.Canvas;
 
 public class GameLoop implements Runnable {
     
     private final Canvas canvas;
+    private final Game game;
     
-    public GameLoop(Canvas canvas) {
-        this.canvas = canvas;
+    private static GameLoop theInstance;
+    
+    public static GameLoop getInstance() {
+        if (theInstance == null) {
+            theInstance = new GameLoop();
+        }
+        return theInstance;
+    }
+    
+    private GameLoop() {
+        canvas = Canvas.getInstance();
+        game = Game.getInstance();
     }
     
     @Override

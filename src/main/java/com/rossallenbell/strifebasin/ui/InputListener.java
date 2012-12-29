@@ -1,7 +1,5 @@
 package com.rossallenbell.strifebasin.ui;
 
-import static com.rossallenbell.strifebasin.StrifeBasin.game;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -9,16 +7,28 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import com.rossallenbell.strifebasin.ui.menus.Menu;
+import com.rossallenbell.strifebasin.domain.Game;
+import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 
 public class InputListener implements MouseListener, KeyListener, MouseWheelListener {
     
-    private final Renderer renderer;
-    private Menu buildMenu;
+    private Renderer renderer;
+    private BuildMenu buildMenu;
+    private Game game;
     
-    public InputListener(Renderer renderer, Menu buildMenu) {
-        this.renderer = renderer;
-        this.buildMenu = buildMenu;
+    private static InputListener theInstance;
+    
+    public static InputListener  getInstance() {
+        if(theInstance == null){
+            theInstance = new InputListener();
+        }
+        return theInstance;
+    }
+    
+    public InputListener() {
+        game = Game.getInstance();
+        renderer = Renderer.getInstance();
+        buildMenu = BuildMenu.getInstance();
     }
     
     @Override

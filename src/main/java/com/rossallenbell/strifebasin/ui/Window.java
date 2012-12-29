@@ -1,7 +1,5 @@
 package com.rossallenbell.strifebasin.ui;
 
-import static com.rossallenbell.strifebasin.StrifeBasin.connection;
-
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
@@ -9,19 +7,33 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import com.rossallenbell.strifebasin.ui.menus.Build;
+import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 
 @SuppressWarnings("serial")
 public class Window extends JFrame {
     
+    private ConnectionPanel connPanel;
     private Canvas canvas;
+    private ConnectionToOpponent connection;
     
-    public Window() {
+    private static Window theInstance;
+    
+    public static Window getInstance() {
+        if (theInstance == null) {
+            theInstance = new Window();
+        }
+        return theInstance;
+    }
+    
+    private Window() {
         super("Strife Basin");
+        
+        connection = ConnectionToOpponent.getInstance();
+        connPanel = ConnectionPanel.getInstance();
         
         setVisible(true);
         
-        getContentPane().add(new ConnectionPanel());
+        getContentPane().add(connPanel);
         
         Dimension size = new Dimension(640, 480);
         setPreferredSize(size);
@@ -30,7 +42,7 @@ public class Window extends JFrame {
         
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if(connection != null) {
+                if (connection != null) {
                     connection.cleanup();
                 }
                 dispose();
@@ -39,20 +51,15 @@ public class Window extends JFrame {
     }
     
     public void buildGameDisplay() {
-        Build buildMenu = new Build();
-        canvas = new Canvas(new Renderer(buildMenu, this));
+        canvas = Canvas.getInstance();
         getContentPane().add(canvas);
         
-        InputListener inputListener = new InputListener(canvas.getRenderer(), buildMenu);
+        InputListener inputListener = InputListener.getInstance();
         addMouseListener(inputListener);
         addMouseWheelListener(inputListener);
         addKeyListener(inputListener);
         
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-    }
-    
-    public Canvas getCanvas() {
-        return canvas;
     }
     
     public Point getMousePositionOnCanvas() {

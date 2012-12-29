@@ -11,11 +11,10 @@ import javax.swing.JTextField;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 
-import static com.rossallenbell.strifebasin.StrifeBasin.window;
-import static com.rossallenbell.strifebasin.StrifeBasin.connection;
-
 @SuppressWarnings("serial")
 public class ConnectionPanel extends JPanel implements ActionListener{
+    
+    private ConnectionToOpponent connection;
     
     private JButton reservePortButton;
     private JTextField myPortInput;
@@ -27,8 +26,19 @@ public class ConnectionPanel extends JPanel implements ActionListener{
     private JButton acceptButton;
     private JLabel incomingIP;
     private JLabel incomingPort;
+    
+    private static ConnectionPanel theInstance;
+    
+    public static ConnectionPanel  getInstance() {
+        if(theInstance == null){
+            theInstance = new ConnectionPanel();
+        }
+        return theInstance;
+    }
 
-    public ConnectionPanel() {
+    private ConnectionPanel() {
+        connection = ConnectionToOpponent.getInstance();
+        
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JPanel reservePortPanel = new JPanel();
@@ -85,7 +95,7 @@ public class ConnectionPanel extends JPanel implements ActionListener{
         
         add(acceptPanel);
         
-        window.pack();
+        Window.getInstance().pack();
     }
 
     @Override
