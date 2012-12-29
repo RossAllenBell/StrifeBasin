@@ -1,1 +1,0 @@
-mvn clean package && java -jar target/StrifeBasin-1.0.jar

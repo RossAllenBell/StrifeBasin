@@ -103,7 +103,17 @@ public class ConnectionPanel extends JPanel implements ActionListener{
         if("reservePort".equals(action.getActionCommand())){
             connection.reservePort(Integer.parseInt(myPortInput.getText()));
             afterPortReserved();
+        } else if("invite".equals(action.getActionCommand())){
+            connection.invite(theirIP.getText(), Integer.parseInt(theirPort.getText()));
+        } else if("accept".equals(action.getActionCommand())){
+            connection.accept();
         }
+    }
+
+    public void incomingConnection(String hostName, int port) {
+        incomingIP.setText(hostName);
+        incomingPort.setText(Integer.toString(port));
+        acceptButton.setEnabled(true);
     }
     
 }

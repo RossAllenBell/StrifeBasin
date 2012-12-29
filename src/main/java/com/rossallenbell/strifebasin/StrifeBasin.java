@@ -18,6 +18,7 @@ public class StrifeBasin {
     }
     
     public static void connectionComplete() {
+        window.buildGameDisplay();
         game = Game.getInstance();
         gameLoop = GameLoop.getInstance();
         new Thread(gameLoop).start();

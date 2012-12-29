@@ -8,6 +8,8 @@ public class GameLoop implements Runnable {
     private final Canvas canvas;
     private final Game game;
     
+    private boolean running;
+    
     private static GameLoop theInstance;
     
     public static GameLoop getInstance() {
@@ -20,11 +22,12 @@ public class GameLoop implements Runnable {
     private GameLoop() {
         canvas = Canvas.getInstance();
         game = Game.getInstance();
+        running = true;
     }
     
     @Override
     public void run() {
-        while (true) {
+        while (running) {
             try {
                 long loopStartTime = System.currentTimeMillis();
                 
@@ -41,6 +44,10 @@ public class GameLoop implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+    
+    public void cleanup() {
+        running = false;
     }
     
 }

@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
+import com.rossallenbell.strifebasin.threads.GameLoop;
 
 @SuppressWarnings("serial")
 public class Window extends JFrame {
@@ -44,12 +45,15 @@ public class Window extends JFrame {
                 if (connection != null) {
                     connection.cleanup();
                 }
+                GameLoop.getInstance().cleanup();
                 dispose();
             }
         });
     }
     
     public void buildGameDisplay() {
+        getContentPane().removeAll();
+        
         canvas = Canvas.getInstance();
         getContentPane().add(canvas);
         
