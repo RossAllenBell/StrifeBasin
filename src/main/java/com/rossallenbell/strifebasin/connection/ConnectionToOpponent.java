@@ -3,13 +3,14 @@ package com.rossallenbell.strifebasin.connection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 
 import com.rossallenbell.strifebasin.StrifeBasin;
+import com.rossallenbell.strifebasin.connection.protocol.ConnectionAccepted;
 import com.rossallenbell.strifebasin.threads.CommSocketListener;
 import com.rossallenbell.strifebasin.threads.ConnectionListener;
 import com.rossallenbell.strifebasin.ui.ConnectionPanel;
@@ -21,7 +22,7 @@ public class ConnectionToOpponent {
     private ServerSocket listeningSocket;
     private Socket commSocket;
     private Socket incomingSocket;
-    private PrintWriter commWriter;
+    private ObjectOutputStream commWriter;
     
     private static ConnectionToOpponent theInstance;
     
@@ -107,8 +108,8 @@ public class ConnectionToOpponent {
         new Thread(CommSocketListener.getInstance()).start();
         incomingSocket = null;
         try {
-            commWriter = new PrintWriter(commSocket.getOutputStream(), true);
-            commWriter.println("accept");
+            commWriter = new ObjectOutputStream(commSocket.getOutputStream());
+            commWriter.writeObject(new ConnectionAccepted());
             listeningSocket.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +119,7 @@ public class ConnectionToOpponent {
 
     public void theyAccepted() {
         try {
-            commWriter = new PrintWriter(commSocket.getOutputStream(), true);
+            commWriter = new ObjectOutputStream(commSocket.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }
