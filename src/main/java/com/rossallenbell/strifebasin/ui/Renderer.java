@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Game;
@@ -96,21 +97,21 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        List<Building> myBuildings = game.getMyBuildings();
+        Collection<Building> myBuildings = game.getMyBuildings().values();
         graphics.setColor(new Color(0, 255, 0));
         for(Building building : myBuildings){
             Point location = building.getLocation();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        List<Building> theirBuildings = game.getTheirBuildings();
+        Collection<Building> theirBuildings = game.getTheirBuildings().values();
         graphics.setColor(new Color(255, 0, 0));
         for(Building building : theirBuildings){
             Point location = building.getLocation();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        List<Unit> myUnits = game.getMyUnits();
+        Collection<Unit> myUnits = game.getMyUnits().values();
         graphics.setColor(new Color(0, 255, 0));
         for(Unit unit : myUnits){
             Point2D.Double location = unit.getLocation();
@@ -118,8 +119,8 @@ public class Renderer {
             graphics.fill(circle);
         }
         
-        List<Unit> theirUnits = game.getTheirUnits();
-        graphics.setColor(new Color(0, 255, 0));
+        Collection<Unit> theirUnits = game.getTheirUnits().values();
+        graphics.setColor(new Color(255, 0, 0));
         for(Unit unit : theirUnits){
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
@@ -218,13 +219,13 @@ public class Renderer {
         graphics.setColor(new Color(30, 30, 30));
         graphics.fillRect(0, 0, background.getWidth(), background.getHeight());
         
-        graphics.setColor(new Color(60, 60, 60));
-        for (int i = 1; i < Game.BOARD_WIDTH; i++) {
-            graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() - 1);
-        }
-        for (int i = 1; i < Game.BOARD_HEIGHT; i++) {
-            graphics.drawLine(0, i * background.getHeight() / Game.BOARD_HEIGHT, background.getWidth() - 1, i * background.getHeight() / Game.BOARD_HEIGHT);
-        }
+//        graphics.setColor(new Color(60, 60, 60));
+//        for (int i = 1; i < Game.BOARD_WIDTH; i++) {
+//            graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() - 1);
+//        }
+//        for (int i = 1; i < Game.BOARD_HEIGHT; i++) {
+//            graphics.drawLine(0, i * background.getHeight() / Game.BOARD_HEIGHT, background.getWidth() - 1, i * background.getHeight() / Game.BOARD_HEIGHT);
+//        }
         
         return background;
     }

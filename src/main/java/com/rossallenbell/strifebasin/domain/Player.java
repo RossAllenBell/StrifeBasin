@@ -1,7 +1,8 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.units.Unit;
@@ -12,14 +13,16 @@ public class Player {
     private int income;
     private long lastIncomeTime;
     
-    private List<Building> buildings;
-    private List<Unit> units;
+    private Map<Long, Building> buildings;
+    private Map<Long, Unit> units;
+    private long assetId;
     
     public Player() {
+        assetId = 0;
         money = 0;
         income = Game.STARTING_INCOME;
-        buildings = new ArrayList<Building>();
-        units = new ArrayList<Unit>();
+        buildings = Collections.synchronizedMap(new HashMap<Long, Building>());
+        units = Collections.synchronizedMap(new HashMap<Long, Unit>());
     }
     
     public int getMoney() {
@@ -51,19 +54,25 @@ public class Player {
     }
     
     public void addBuilding(Building building) {
-        buildings.add(building);
+        building.setAssetId(getNextAssetId());
+        buildings.put(building.getAssetId(), building);
     }
     
-    public List<Building> getBuildings() {
+    public Map<Long, Building> getBuildings() {
         return buildings;
     }
     
     public void addUnit(Unit unit) {
-        units.add(unit);
+        unit.setAssetId(getNextAssetId());
+        units.put(unit.getAssetId(), unit);
     }
     
-    public List<Unit> getUnits() {
+    public Map<Long, Unit> getUnits() {
         return units;
+    }
+    
+    public synchronized long getNextAssetId() {
+        return assetId++;
     }
     
 }

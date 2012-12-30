@@ -1,14 +1,16 @@
 package com.rossallenbell.strifebasin.threads;
 
+import com.rossallenbell.strifebasin.connection.gameupdates.UnitsAndBuildings;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.ui.Canvas;
 
-public class GameLoop implements Runnable {
+public class GameLoop extends StoppableThread {
+    
+    private static final long COMM_UPDATE_INTERVAL = 500;
     
     private final Canvas canvas;
     private final Game game;
-    
-    private boolean running;
+    private long lastCommUpdateTime;
     
     private static GameLoop theInstance;
     
@@ -20,16 +22,21 @@ public class GameLoop implements Runnable {
     }
     
     private GameLoop() {
+        super();
         canvas = Canvas.getInstance();
         game = Game.getInstance();
-        running = true;
     }
     
     @Override
     public void run() {
-        while (running) {
+        while (isRunning()) {
             try {
                 long loopStartTime = System.currentTimeMillis();
+                
+                if (lastCommUpdateTime + COMM_UPDATE_INTERVAL <= loopStartTime) {
+                    CommSocketSender.getInstance().enqueue(new UnitsAndBuildings(game.getMe()));
+                    lastCommUpdateTime = loopStartTime;
+                }
                 
                 game.update(loopStartTime);
                 canvas.repaint();
@@ -44,10 +51,6 @@ public class GameLoop implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
-    
-    public void cleanup() {
-        running = false;
     }
     
 }

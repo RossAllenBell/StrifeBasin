@@ -8,6 +8,8 @@ import com.rossallenbell.strifebasin.domain.units.Unit;
 
 @BasicBuilding
 public class ArcheryRange extends UnitSpawingBuilding {
+    
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int cost() {

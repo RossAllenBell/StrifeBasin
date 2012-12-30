@@ -3,7 +3,11 @@ package com.rossallenbell.strifebasin.domain.buildings;
 import java.awt.Dimension;
 import java.awt.Point;
 
-public abstract class Building {
+import com.rossallenbell.strifebasin.domain.Asset;
+
+public abstract class Building extends Asset {
+    
+    private static final long serialVersionUID = 1L;
     
     private Point location;
     
@@ -20,5 +24,9 @@ public abstract class Building {
     }
     
     public abstract Dimension getShape();
+
+    public void update(Building building) {
+        location.setLocation(building.location);
+    }
     
 }

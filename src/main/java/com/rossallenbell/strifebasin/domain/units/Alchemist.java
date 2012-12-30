@@ -1,6 +1,8 @@
 package com.rossallenbell.strifebasin.domain.units;
 
 public class Alchemist extends Unit {
+    
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int health() {

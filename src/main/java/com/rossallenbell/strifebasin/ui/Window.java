@@ -7,6 +7,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
+import com.rossallenbell.strifebasin.threads.CommSocketListener;
+import com.rossallenbell.strifebasin.threads.CommSocketSender;
 import com.rossallenbell.strifebasin.threads.GameLoop;
 
 @SuppressWarnings("serial")
@@ -45,7 +47,9 @@ public class Window extends JFrame {
                 if (connection != null) {
                     connection.cleanup();
                 }
-                GameLoop.getInstance().cleanup();
+                GameLoop.getInstance().stop();
+                CommSocketSender.getInstance().stop();
+                CommSocketListener.getInstance().stop();
                 dispose();
             }
         });

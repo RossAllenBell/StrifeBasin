@@ -1,8 +1,9 @@
 package com.rossallenbell.strifebasin.domain;
 
 import java.awt.Point;
-import java.util.List;
+import java.util.Map;
 
+import com.rossallenbell.strifebasin.connection.gameupdates.UnitsAndBuildings;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning.UnitSpawingBuilding;
@@ -35,6 +36,7 @@ public class Game {
         
         Sanctuary mySantuary = new Sanctuary();
         mySantuary.setLocation(0, BOARD_HEIGHT/2-new Sanctuary().getShape().height);
+        mySantuary.setAssetId(me.getNextAssetId());
         me.addBuilding(mySantuary);
     }
     
@@ -68,7 +70,7 @@ public class Game {
             me.setLastIncomeTime(updateTime);
         }
         
-        for(Building building : me.getBuildings()){
+        for(Building building : me.getBuildings().values()){
             if(UnitSpawingBuilding.class.isAssignableFrom(building.getClass())){
                 UnitSpawingBuilding spawner = (UnitSpawingBuilding) building;
                 if(spawner.getLastSpawnTime() + spawner.getSpawnCooldown() <= updateTime){
@@ -91,20 +93,58 @@ public class Game {
         
     }
 
-    public List<Building> getMyBuildings() {
+    public Map<Long, Building> getMyBuildings() {
         return me.getBuildings();
     }
 
-    public List<Building> getTheirBuildings() {
+    public Map<Long, Building> getTheirBuildings() {
         return them.getBuildings();
     }
 
-    public List<Unit> getMyUnits() {
+    public Map<Long, Unit> getMyUnits() {
         return me.getUnits();
     }
 
-    public List<Unit> getTheirUnits() {
+    public Map<Long, Unit> getTheirUnits() {
         return them.getUnits();
+    }
+
+    public void updateTheirUnitsAndBuildings(UnitsAndBuildings unitsAndBuildings) {
+        Map<Long, Building> theirOriginalBuildings = them.getBuildings();
+        Map<Long, Building> theirUpdatedBuildings = unitsAndBuildings.getBuildings();
+        for(Long assetId : theirOriginalBuildings.keySet()) {
+            if(!theirUpdatedBuildings.containsKey(assetId)) {
+                theirOriginalBuildings.remove(assetId);
+            }
+        }
+        for(Long assetId : theirUpdatedBuildings.keySet()) {
+            Building updatedBuilding = theirUpdatedBuildings.get(assetId);
+            if(!theirOriginalBuildings.containsKey(assetId)) {
+                theirOriginalBuildings.put(assetId, updatedBuilding);
+            } else {
+                Building originalBuilding = theirOriginalBuildings.get(assetId);
+                originalBuilding.update(updatedBuilding);
+            }
+            theirOriginalBuildings.get(assetId).setLocation(BOARD_WIDTH - updatedBuilding.getLocation().x - updatedBuilding.getShape().width, updatedBuilding.getLocation().y);
+        }
+        
+        Map<Long, Unit> theirOriginalUnits = them.getUnits();
+        Map<Long, Unit> theirUpdatedUnits = unitsAndBuildings.getUnits();
+        for(Long assetId : theirOriginalUnits.keySet()) {
+            if(!theirUpdatedUnits.containsKey(assetId)) {
+                theirOriginalUnits.remove(assetId);
+            }
+        }
+        for(Long assetId : theirUpdatedUnits.keySet()) {
+            Unit updatedUnit = theirUpdatedUnits.get(assetId);
+            if(!theirOriginalUnits.containsKey(assetId)) {
+                theirOriginalUnits.put(assetId, updatedUnit);
+            } else {
+                Unit originalUnit = theirOriginalUnits.get(assetId);
+                originalUnit.update(updatedUnit);
+            }
+            theirOriginalUnits.get(assetId).setLocation(BOARD_WIDTH - updatedUnit.getLocation().x, updatedUnit.getLocation().y);
+        }
     }
     
 }

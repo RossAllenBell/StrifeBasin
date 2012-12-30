@@ -2,11 +2,14 @@ package com.rossallenbell.strifebasin.threads;
 
 import java.io.EOFException;
 import java.io.ObjectInputStream;
+import java.net.SocketException;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
+import com.rossallenbell.strifebasin.connection.gameupdates.UnitsAndBuildings;
 import com.rossallenbell.strifebasin.connection.protocol.ConnectionAccepted;
+import com.rossallenbell.strifebasin.domain.Game;
 
-public class CommSocketListener implements Runnable {
+public class CommSocketListener extends StoppableThread {
     
     private static CommSocketListener theInstance;
     
@@ -18,7 +21,7 @@ public class CommSocketListener implements Runnable {
     }
     
     private CommSocketListener() {
-        
+        super();
     }
     
     @Override
@@ -26,11 +29,13 @@ public class CommSocketListener implements Runnable {
         ObjectInputStream in;
         try {
             in = new ObjectInputStream(ConnectionToOpponent.getInstance().getCommSocket().getInputStream());
-            while (!ConnectionToOpponent.getInstance().getCommSocket().isClosed()) {
+            while (isRunning() && !ConnectionToOpponent.getInstance().getCommSocket().isClosed()) {
                 Object commInput;
                 while ((commInput = in.readObject()) != null) {
                     if (commInput instanceof ConnectionAccepted) {
                         ConnectionToOpponent.getInstance().theyAccepted();
+                    } else if (commInput instanceof UnitsAndBuildings) {
+                        Game.getInstance().updateTheirUnitsAndBuildings((UnitsAndBuildings) commInput);
                     } else {
                         System.out.println("Unknown incoming data: " + commInput);
                     }
@@ -42,7 +47,7 @@ public class CommSocketListener implements Runnable {
                     e.printStackTrace();
                 }
             }
-        } catch (EOFException e) {
+        } catch (SocketException | EOFException e) {
             //somebody DCed
         } catch (Exception e) {
             e.printStackTrace();
