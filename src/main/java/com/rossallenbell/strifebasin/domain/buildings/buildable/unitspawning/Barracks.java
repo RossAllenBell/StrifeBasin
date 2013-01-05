@@ -30,5 +30,9 @@ public class Barracks extends UnitSpawingBuilding {
     protected Class<? extends Unit> getUnit() {
         return Spearman.class;
     }
+
+    public int getMaxHealth() {
+        return 0;
+    }
     
 }

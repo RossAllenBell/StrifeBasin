@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.CommObject;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Player extends CommObject {
@@ -26,6 +27,15 @@ public class Player extends CommObject {
         income = Game.STARTING_INCOME;
         buildings = Collections.synchronizedMap(new HashMap<Long, Building>());
         units = Collections.synchronizedMap(new HashMap<Long, Unit>());
+    }
+    
+    public Sanctuary getSanctuary() {
+        for(Building building : getBuildings().values()) {
+            if(building instanceof Sanctuary) {
+                return (Sanctuary) building;
+            }
+        }
+        return null;
     }
     
     public int getMoney() {

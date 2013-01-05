@@ -3,7 +3,9 @@ package com.rossallenbell.strifebasin.domain;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-public class Asset implements Serializable {
+import com.rossallenbell.strifebasin.domain.units.Unit;
+
+public abstract class Asset implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
@@ -13,9 +15,12 @@ public class Asset implements Serializable {
     
     private Point2D.Double location;
     
+    private int health;
+    
     public Asset(Player owner) {
         location = new Point2D.Double();
         this.owner = owner;
+        health = getMaxHealth();
     }
     
     public Point2D.Double getLocation() {
@@ -44,6 +49,16 @@ public class Asset implements Serializable {
     
     public void copyFrom(Asset asset) {
         setLocation(asset.getLocation());
+    }
+    
+    public abstract int getMaxHealth();
+    
+    public int getHealth() {
+        return health;
+    }
+
+    public void takeDamage(Unit unit) {
+        health -= unit.getDamage();
     }
     
 }

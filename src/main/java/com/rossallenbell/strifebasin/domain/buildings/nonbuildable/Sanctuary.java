@@ -17,5 +17,9 @@ public class Sanctuary extends Building {
     public Dimension getShape() {
         return new Dimension(6,6);
     }
+
+    public int getMaxHealth() {
+        return 0;
+    }
     
 }

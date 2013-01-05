@@ -30,5 +30,9 @@ public class ArcheryRange extends UnitSpawingBuilding {
     protected Class<? extends Unit> getUnit() {
         return Bowman.class;
     }
+
+    public int getMaxHealth() {
+        return 0;
+    }
     
 }

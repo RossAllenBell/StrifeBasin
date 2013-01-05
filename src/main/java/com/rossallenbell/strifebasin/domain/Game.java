@@ -105,7 +105,7 @@ public class Game {
         for(Building building : them.getBuildings().values()) {
             building.setLocation(BOARD_WIDTH - building.getLocation().x - building.getShape().width, building.getLocation().y);
         }
-        for(Unit unit : them.getUnits().values()) {
+        for(Asset unit : them.getUnits().values()) {
             unit.setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
         }
     }

@@ -11,7 +11,7 @@ public class Spearman extends Unit {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public int health() {
+    public int getMaxHealth() {
         return 10;
     }
     

@@ -30,5 +30,9 @@ public class AlchemistLab extends UnitSpawingBuilding {
     protected Class<? extends Unit> getUnit() {
         return Alchemist.class;
     }
+
+    public int getMaxHealth() {
+        return 0;
+    }
     
 }
