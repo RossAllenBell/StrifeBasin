@@ -16,7 +16,7 @@ public class Game {
     public static final long INCOME_COOLDOWN = 10000;
     
     private final Player me;
-    private final Player them;
+    private Player them;
     
     private static Game theInstance;
     
@@ -101,40 +101,12 @@ public class Game {
     }
 
     public void updateTheirUnitsAndBuildings(Player them) {
-        Map<Long, Building> theirOriginalBuildings = this.them.getBuildings();
-        Map<Long, Building> theirUpdatedBuildings = them.getBuildings();
-        for(Long assetId : theirOriginalBuildings.keySet()) {
-            if(!theirUpdatedBuildings.containsKey(assetId)) {
-                theirOriginalBuildings.remove(assetId);
-            }
+        this.them = them;
+        for(Building building : them.getBuildings().values()) {
+            building.setLocation(BOARD_WIDTH - building.getLocation().x - building.getShape().width, building.getLocation().y);
         }
-        for(Long assetId : theirUpdatedBuildings.keySet()) {
-            Building updatedBuilding = theirUpdatedBuildings.get(assetId);
-            if(!theirOriginalBuildings.containsKey(assetId)) {
-                theirOriginalBuildings.put(assetId, updatedBuilding);
-            } else {
-                Building originalBuilding = theirOriginalBuildings.get(assetId);
-                originalBuilding.copyFrom(updatedBuilding);
-            }
-            theirOriginalBuildings.get(assetId).setLocation(BOARD_WIDTH - updatedBuilding.getLocation().x - updatedBuilding.getShape().width, updatedBuilding.getLocation().y);
-        }
-        
-        Map<Long, Unit> theirOriginalUnits = this.them.getUnits();
-        Map<Long, Unit> theirUpdatedUnits = them.getUnits();
-        for(Long assetId : theirOriginalUnits.keySet()) {
-            if(!theirUpdatedUnits.containsKey(assetId)) {
-                theirOriginalUnits.remove(assetId);
-            }
-        }
-        for(Long assetId : theirUpdatedUnits.keySet()) {
-            Unit updatedUnit = theirUpdatedUnits.get(assetId);
-            if(!theirOriginalUnits.containsKey(assetId)) {
-                theirOriginalUnits.put(assetId, updatedUnit);
-            } else {
-                Unit originalUnit = theirOriginalUnits.get(assetId);
-                originalUnit.copyFrom(updatedUnit);
-            }
-            theirOriginalUnits.get(assetId).setLocation(BOARD_WIDTH - updatedUnit.getLocation().x, updatedUnit.getLocation().y);
+        for(Unit unit : them.getUnits().values()) {
+            unit.setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
         }
     }
     
