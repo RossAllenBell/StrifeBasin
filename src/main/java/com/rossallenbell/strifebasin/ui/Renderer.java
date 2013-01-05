@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.Collection;
 import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Game;
@@ -93,21 +92,21 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        Collection<Building> myBuildings = Game.getInstance().getMyBuildings().values();
+        List<Building> myBuildings = Game.getInstance().getMyBuildings();
         graphics.setColor(new Color(0, 255, 0));
         for(Building building : myBuildings){
             Point2D.Double location = building.getLocation();
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        Collection<Building> theirBuildings = Game.getInstance().getTheirBuildings().values();
+        List<Building> theirBuildings = Game.getInstance().getTheirBuildings();
         graphics.setColor(new Color(255, 0, 0));
         for(Building building : theirBuildings){
             Point2D.Double location = building.getLocation();
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        Collection<Unit> myUnits = Game.getInstance().getMyUnits().values();
+        List<Unit> myUnits = Game.getInstance().getMyUnits();
         graphics.setColor(new Color(0, 255, 0));
         for(Unit unit : myUnits){
             Point2D.Double location = unit.getLocation();
@@ -115,7 +114,7 @@ public class Renderer {
             graphics.fill(circle);
         }
         
-        Collection<Unit> theirUnits = Game.getInstance().getTheirUnits().values();
+        List<Unit> theirUnits = Game.getInstance().getTheirUnits();
         graphics.setColor(new Color(255, 0, 0));
         for(Unit unit : theirUnits){
             Point2D.Double location = unit.getLocation();

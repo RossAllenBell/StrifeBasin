@@ -1,8 +1,8 @@
 package com.rossallenbell.strifebasin.domain;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import com.rossallenbell.strifebasin.connection.CommObject;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
@@ -17,20 +17,20 @@ public class Player extends CommObject {
     private int income;
     private long lastIncomeTime;
     
-    private Map<Long, Building> buildings;
-    private Map<Long, Unit> units;
+    private List<Building> buildings;
+    private List<Unit> units;
     private long assetId;
     
     public Player() {
         assetId = 0;
         money = 0;
         income = Game.STARTING_INCOME;
-        buildings = Collections.synchronizedMap(new HashMap<Long, Building>());
-        units = Collections.synchronizedMap(new HashMap<Long, Unit>());
+        buildings = Collections.synchronizedList(new ArrayList<Building>());
+        units = Collections.synchronizedList(new ArrayList<Unit>());
     }
     
     public Sanctuary getSanctuary() {
-        for(Building building : getBuildings().values()) {
+        for(Building building : getBuildings()) {
             if(building instanceof Sanctuary) {
                 return (Sanctuary) building;
             }
@@ -68,19 +68,19 @@ public class Player extends CommObject {
     
     public void addBuilding(Building building) {
         building.setAssetId(getNextAssetId());
-        buildings.put(building.getAssetId(), building);
+        buildings.add(building);
     }
     
-    public Map<Long, Building> getBuildings() {
+    public List<Building> getBuildings() {
         return buildings;
     }
     
     public void addUnit(Unit unit) {
         unit.setAssetId(getNextAssetId());
-        units.put(unit.getAssetId(), unit);
+        units.add(unit);
     }
     
-    public Map<Long, Unit> getUnits() {
+    public List<Unit> getUnits() {
         return units;
     }
     

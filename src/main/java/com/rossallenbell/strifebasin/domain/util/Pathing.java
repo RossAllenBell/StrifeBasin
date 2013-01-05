@@ -26,7 +26,7 @@ public class Pathing {
     public Asset getClosestAggroableAsset(Unit unit) {
         Asset target = null;
         
-        for (Asset theirUnit : Game.getInstance().getThem().getUnits().values()) {
+        for (Asset theirUnit : Game.getInstance().getThem().getUnits()) {
             double distanceToTheirUnit = theirUnit.getLocation().distance(unit.getLocation());
             if (distanceToTheirUnit <= unit.getAggroRange()) {
                 if (target == null || target.getLocation().distance(unit.getLocation()) > theirUnit.getLocation().distance(unit.getLocation())) {
@@ -36,7 +36,7 @@ public class Pathing {
         }
         
         if (target == null) {
-            for (Asset building : Game.getInstance().getThem().getBuildings().values()) {
+            for (Asset building : Game.getInstance().getThem().getBuildings()) {
                 double distanceToTheirBuilding = building.getLocation().distance(unit.getLocation());
                 if (distanceToTheirBuilding <= unit.getAggroRange()) {
                     if (target == null || target.getLocation().distance(unit.getLocation()) > building.getLocation().distance(unit.getLocation())) {

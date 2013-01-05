@@ -1,6 +1,6 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.util.Map;
+import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
@@ -67,11 +67,11 @@ public class Game {
             me.setLastIncomeTime(updateTime);
         }
         
-        for(Building building : me.getBuildings().values()){
+        for(Building building : me.getBuildings()){
             building.update(updateTime);
         }
         
-        for(Unit unit : me.getUnits().values()){
+        for(Unit unit : me.getUnits()){
             unit.update(updateTime);
         }
     }
@@ -84,28 +84,28 @@ public class Game {
         
     }
 
-    public Map<Long, Building> getMyBuildings() {
+    public List<Building> getMyBuildings() {
         return me.getBuildings();
     }
 
-    public Map<Long, Building> getTheirBuildings() {
+    public List<Building> getTheirBuildings() {
         return them.getBuildings();
     }
 
-    public Map<Long, Unit> getMyUnits() {
+    public List<Unit> getMyUnits() {
         return me.getUnits();
     }
 
-    public Map<Long, Unit> getTheirUnits() {
+    public List<Unit> getTheirUnits() {
         return them.getUnits();
     }
 
     public void updateTheirUnitsAndBuildings(Player them) {
         this.them = them;
-        for(Building building : them.getBuildings().values()) {
+        for(Building building : them.getBuildings()) {
             building.setLocation(BOARD_WIDTH - building.getLocation().x - building.getShape().width, building.getLocation().y);
         }
-        for(Asset unit : them.getUnits().values()) {
+        for(Asset unit : them.getUnits()) {
             unit.setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
         }
     }
