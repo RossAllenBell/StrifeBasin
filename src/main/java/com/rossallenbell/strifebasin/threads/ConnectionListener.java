@@ -8,8 +8,6 @@ import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 
 public class ConnectionListener implements Runnable {
     
-    private ConnectionToOpponent connection;
-    
     private static ConnectionListener theInstance;
     
     public static ConnectionListener getInstance() {
@@ -20,15 +18,15 @@ public class ConnectionListener implements Runnable {
     }
     
     private ConnectionListener() {
-        connection = ConnectionToOpponent.getInstance();
+
     }
 
     @Override
     public void run() {
         Socket socket;
         try {
-            if((socket = connection.getListeningSocket().accept()) != null){
-                connection.incomingConnection(socket);
+            if((socket = ConnectionToOpponent.getInstance().getListeningSocket().accept()) != null){
+                ConnectionToOpponent.getInstance().incomingConnection(socket);
             }
         } catch (SocketException e) {
             //we invited somebody

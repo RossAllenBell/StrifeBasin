@@ -12,10 +12,6 @@ import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 
 public class InputListener implements MouseListener, KeyListener, MouseWheelListener {
     
-    private Renderer renderer;
-    private BuildMenu buildMenu;
-    private Game game;
-    
     private static InputListener theInstance;
     
     public static InputListener  getInstance() {
@@ -25,34 +21,32 @@ public class InputListener implements MouseListener, KeyListener, MouseWheelList
         return theInstance;
     }
     
-    public InputListener() {
-        game = Game.getInstance();
-        renderer = Renderer.getInstance();
-        buildMenu = BuildMenu.getInstance();
+    private InputListener() {
+        
     }
     
     @Override
     public void mouseWheelMoved(MouseWheelEvent event) {
         if (event.getWheelRotation() < 0) {
-            game.wheelIn();
-            renderer.wheelIn();
+            Game.getInstance().wheelIn();
+            Renderer.getInstance().wheelIn();
         } else {
-            game.wheelOut();
-            renderer.wheelOut();
+            Game.getInstance().wheelOut();
+            Renderer.getInstance().wheelOut();
         }
     }
     
     @Override
     public void keyPressed(KeyEvent event) {
-        game.keyPressed(event.getKeyCode());
-        renderer.keyPressed(event.getKeyCode());
-        buildMenu.keyPressed(event.getKeyCode());
+        Game.getInstance().keyPressed(event.getKeyCode());
+        Renderer.getInstance().keyPressed(event.getKeyCode());
+        BuildMenu.getInstance().keyPressed(event.getKeyCode());
     }
     
     @Override
     public void keyReleased(KeyEvent event) {
-        game.keyReleased(event.getKeyCode());
-        renderer.keyReleased(event.getKeyCode());
+        Game.getInstance().keyReleased(event.getKeyCode());
+        Renderer.getInstance().keyReleased(event.getKeyCode());
     }
     
     @Override
@@ -62,7 +56,7 @@ public class InputListener implements MouseListener, KeyListener, MouseWheelList
     
     @Override
     public void mouseClicked(MouseEvent e) {
-        renderer.mouseClicked(e);
+        Renderer.getInstance().mouseClicked(e);
     }
     
     @Override

@@ -29,10 +29,8 @@ public class Renderer {
     private static final int PIXELS_PER_BOARD_UNIT = 10;
     private static final int PIXELS_PER_PAN_TICK = 20;
     
-    private final BuildMenu buildMenu;
     private final BufferedImage image;
     private final BufferedImage background;
-    private final Game game;
     
     private Dimension viewDimensions;
     private int viewCornerPixelX;
@@ -55,9 +53,6 @@ public class Renderer {
     }
     
     private Renderer() {
-        game = Game.getInstance();
-        buildMenu = BuildMenu.getInstance();
-        
         image = new BufferedImage(Game.BOARD_WIDTH * PIXELS_PER_BOARD_UNIT, Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT, BufferedImage.TYPE_INT_ARGB);
         background = buildBackground();
         
@@ -97,21 +92,21 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        Collection<Building> myBuildings = game.getMyBuildings().values();
+        Collection<Building> myBuildings = Game.getInstance().getMyBuildings().values();
         graphics.setColor(new Color(0, 255, 0));
         for(Building building : myBuildings){
             Point location = building.getLocation();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        Collection<Building> theirBuildings = game.getTheirBuildings().values();
+        Collection<Building> theirBuildings = Game.getInstance().getTheirBuildings().values();
         graphics.setColor(new Color(255, 0, 0));
         for(Building building : theirBuildings){
             Point location = building.getLocation();
             graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        Collection<Unit> myUnits = game.getMyUnits().values();
+        Collection<Unit> myUnits = Game.getInstance().getMyUnits().values();
         graphics.setColor(new Color(0, 255, 0));
         for(Unit unit : myUnits){
             Point2D.Double location = unit.getLocation();
@@ -119,7 +114,7 @@ public class Renderer {
             graphics.fill(circle);
         }
         
-        Collection<Unit> theirUnits = game.getTheirUnits().values();
+        Collection<Unit> theirUnits = Game.getInstance().getTheirUnits().values();
         graphics.setColor(new Color(255, 0, 0));
         for(Unit unit : theirUnits){
             Point2D.Double location = unit.getLocation();
@@ -152,10 +147,10 @@ public class Renderer {
         FontMetrics fm = graphics.getFontMetrics();
         
         graphics.setColor(new Color(0, 255, 0));
-        String moneyString = "Money: " + game.getMe().getMoney();
+        String moneyString = "Money: " + Game.getInstance().getMe().getMoney();
         graphics.drawString(moneyString, 10, fm.getHeight());
         
-        List<List<String>> buildMenuDisplayStrings = buildMenu.getDisplayStrings();
+        List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
         int nextX = 10;
         int num = 1;
         for (List<String> strings : buildMenuDisplayStrings) {
@@ -176,7 +171,7 @@ public class Renderer {
             }
         }
         
-        Class<? extends Building> clazz = buildMenu.getCursorEvent();
+        Class<? extends Building> clazz = BuildMenu.getInstance().getCursorEvent();
         if (clazz != null && mousePos != null) {
             try {
                 Building building = clazz.newInstance();
@@ -273,13 +268,13 @@ public class Renderer {
     }
     
     public void mouseClicked(MouseEvent e) {
-        Class<? extends BuildableBuilding> buildMenuItem = buildMenu.getCursorEvent();
+        Class<? extends BuildableBuilding> buildMenuItem = BuildMenu.getInstance().getCursorEvent();
         if (buildMenuItem != null) {
             Point buildLocation = getGameGridUnitByMousePos(Canvas.getInstance().getMousePosition());
             try {
                 BuildableBuilding building = buildMenuItem.newInstance();
                 building.setLocation(buildLocation.x, buildLocation.y);
-                game.buildingPlaced(building);
+                Game.getInstance().buildingPlaced(building);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }

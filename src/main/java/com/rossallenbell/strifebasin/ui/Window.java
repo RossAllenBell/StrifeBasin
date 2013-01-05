@@ -15,7 +15,6 @@ import com.rossallenbell.strifebasin.threads.GameLoop;
 public class Window extends JFrame {
     
     private ConnectionPanel connPanel;
-    private Canvas canvas;
     private ConnectionToOpponent connection;
     
     private static Window theInstance;
@@ -58,8 +57,7 @@ public class Window extends JFrame {
     public void buildGameDisplay() {
         getContentPane().removeAll();
         
-        canvas = Canvas.getInstance();
-        getContentPane().add(canvas);
+        getContentPane().add(Canvas.getInstance());
         
         InputListener inputListener = InputListener.getInstance();
         addMouseListener(inputListener);

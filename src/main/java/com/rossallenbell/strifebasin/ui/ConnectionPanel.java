@@ -14,8 +14,6 @@ import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 @SuppressWarnings("serial")
 public class ConnectionPanel extends JPanel implements ActionListener{
     
-    private ConnectionToOpponent connection;
-    
     private JButton reservePortButton;
     private JTextField myPortInput;
     
@@ -37,8 +35,6 @@ public class ConnectionPanel extends JPanel implements ActionListener{
     }
 
     private ConnectionPanel() {
-        connection = ConnectionToOpponent.getInstance();
-        
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JPanel reservePortPanel = new JPanel();
@@ -59,8 +55,8 @@ public class ConnectionPanel extends JPanel implements ActionListener{
         
         JPanel myInfoPanel = new JPanel();
         
-        myInfoPanel.add(new JLabel("Your IP: " + connection.getIP()));
-        myInfoPanel.add(new JLabel("Your Port: " + connection.getPort()));
+        myInfoPanel.add(new JLabel("Your IP: " + ConnectionToOpponent.getInstance().getIP()));
+        myInfoPanel.add(new JLabel("Your Port: " + ConnectionToOpponent.getInstance().getPort()));
         
         add(myInfoPanel);
         
@@ -101,12 +97,12 @@ public class ConnectionPanel extends JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent action) {
         if("reservePort".equals(action.getActionCommand())){
-            connection.reservePort(Integer.parseInt(myPortInput.getText()));
+            ConnectionToOpponent.getInstance().reservePort(Integer.parseInt(myPortInput.getText()));
             afterPortReserved();
         } else if("invite".equals(action.getActionCommand())){
-            connection.invite(theirIP.getText(), Integer.parseInt(theirPort.getText()));
+            ConnectionToOpponent.getInstance().invite(theirIP.getText(), Integer.parseInt(theirPort.getText()));
         } else if("accept".equals(action.getActionCommand())){
-            connection.accept();
+            ConnectionToOpponent.getInstance().accept();
         }
     }
 

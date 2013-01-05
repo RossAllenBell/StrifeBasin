@@ -8,8 +8,6 @@ public class GameLoop extends StoppableThread {
     
     private static final long COMM_UPDATE_INTERVAL = 500;
     
-    private final Canvas canvas;
-    private final Game game;
     private long lastCommUpdateTime;
     
     private static GameLoop theInstance;
@@ -23,8 +21,6 @@ public class GameLoop extends StoppableThread {
     
     private GameLoop() {
         super();
-        canvas = Canvas.getInstance();
-        game = Game.getInstance();
     }
     
     @Override
@@ -34,12 +30,12 @@ public class GameLoop extends StoppableThread {
                 long loopStartTime = System.currentTimeMillis();
                 
                 if (lastCommUpdateTime + COMM_UPDATE_INTERVAL <= loopStartTime) {
-                    CommSocketSender.getInstance().enqueue(new UnitsAndBuildings(game.getMe()));
+                    CommSocketSender.getInstance().enqueue(new UnitsAndBuildings(Game.getInstance().getMe()));
                     lastCommUpdateTime = loopStartTime;
                 }
                 
-                game.update(loopStartTime);
-                canvas.repaint();
+                Game.getInstance().update(loopStartTime);
+                Canvas.getInstance().repaint();
                 
                 long loopStopTime = System.currentTimeMillis();
                 try {
