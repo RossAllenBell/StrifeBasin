@@ -4,10 +4,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.rossallenbell.strifebasin.connection.CommObject;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
-public class Player {
+public class Player extends CommObject {
+
+    private static final long serialVersionUID = 1L;
     
     private int money;
     private int income;

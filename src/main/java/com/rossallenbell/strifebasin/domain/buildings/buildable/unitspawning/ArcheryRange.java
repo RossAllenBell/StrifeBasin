@@ -2,6 +2,7 @@ package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
 import java.awt.Dimension;
 
+import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 import com.rossallenbell.strifebasin.domain.units.Bowman;
 import com.rossallenbell.strifebasin.domain.units.Unit;
@@ -9,6 +10,10 @@ import com.rossallenbell.strifebasin.domain.units.Unit;
 @BasicBuilding
 public class ArcheryRange extends UnitSpawingBuilding {
     
+    public ArcheryRange(Player owner) {
+        super(owner);
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override

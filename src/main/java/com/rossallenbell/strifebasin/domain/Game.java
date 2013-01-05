@@ -1,12 +1,9 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.awt.Point;
 import java.util.Map;
 
-import com.rossallenbell.strifebasin.connection.gameupdates.UnitsAndBuildings;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
-import com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning.UnitSpawingBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
@@ -34,8 +31,8 @@ public class Game {
         me = new Player();
         them = new Player();
         
-        Sanctuary mySantuary = new Sanctuary();
-        mySantuary.setLocation(0, BOARD_HEIGHT/2-new Sanctuary().getShape().height);
+        Sanctuary mySantuary = new Sanctuary(me);
+        mySantuary.setLocation(0, BOARD_HEIGHT/2-mySantuary.getShape().height);
         mySantuary.setAssetId(me.getNextAssetId());
         me.addBuilding(mySantuary);
     }
@@ -71,17 +68,11 @@ public class Game {
         }
         
         for(Building building : me.getBuildings().values()){
-            if(UnitSpawingBuilding.class.isAssignableFrom(building.getClass())){
-                UnitSpawingBuilding spawner = (UnitSpawingBuilding) building;
-                if(spawner.getLastSpawnTime() + spawner.getSpawnCooldown() <= updateTime){
-                    Point buildingLocation = building.getLocation();
-                    Unit spawnedUnit = spawner.spawn(updateTime);
-                    double x = buildingLocation.getX() + building.getShape().width;
-                    double y = buildingLocation.getY() + ((double) building.getShape().height / 2);
-                    spawnedUnit.setLocation(x, y);
-                    me.addUnit(spawnedUnit);
-                }
-            }
+            building.update(updateTime);
+        }
+        
+        for(Unit unit : me.getUnits().values()){
+            unit.update(updateTime);
         }
     }
 
@@ -109,9 +100,9 @@ public class Game {
         return them.getUnits();
     }
 
-    public void updateTheirUnitsAndBuildings(UnitsAndBuildings unitsAndBuildings) {
-        Map<Long, Building> theirOriginalBuildings = them.getBuildings();
-        Map<Long, Building> theirUpdatedBuildings = unitsAndBuildings.getBuildings();
+    public void updateTheirUnitsAndBuildings(Player them) {
+        Map<Long, Building> theirOriginalBuildings = this.them.getBuildings();
+        Map<Long, Building> theirUpdatedBuildings = them.getBuildings();
         for(Long assetId : theirOriginalBuildings.keySet()) {
             if(!theirUpdatedBuildings.containsKey(assetId)) {
                 theirOriginalBuildings.remove(assetId);
@@ -123,13 +114,13 @@ public class Game {
                 theirOriginalBuildings.put(assetId, updatedBuilding);
             } else {
                 Building originalBuilding = theirOriginalBuildings.get(assetId);
-                originalBuilding.update(updatedBuilding);
+                originalBuilding.copyFrom(updatedBuilding);
             }
             theirOriginalBuildings.get(assetId).setLocation(BOARD_WIDTH - updatedBuilding.getLocation().x - updatedBuilding.getShape().width, updatedBuilding.getLocation().y);
         }
         
-        Map<Long, Unit> theirOriginalUnits = them.getUnits();
-        Map<Long, Unit> theirUpdatedUnits = unitsAndBuildings.getUnits();
+        Map<Long, Unit> theirOriginalUnits = this.them.getUnits();
+        Map<Long, Unit> theirUpdatedUnits = them.getUnits();
         for(Long assetId : theirOriginalUnits.keySet()) {
             if(!theirUpdatedUnits.containsKey(assetId)) {
                 theirOriginalUnits.remove(assetId);
@@ -141,7 +132,7 @@ public class Game {
                 theirOriginalUnits.put(assetId, updatedUnit);
             } else {
                 Unit originalUnit = theirOriginalUnits.get(assetId);
-                originalUnit.update(updatedUnit);
+                originalUnit.copyFrom(updatedUnit);
             }
             theirOriginalUnits.get(assetId).setLocation(BOARD_WIDTH - updatedUnit.getLocation().x, updatedUnit.getLocation().y);
         }

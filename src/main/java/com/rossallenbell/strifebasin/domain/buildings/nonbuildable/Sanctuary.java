@@ -2,10 +2,15 @@ package com.rossallenbell.strifebasin.domain.buildings.nonbuildable;
 
 import java.awt.Dimension;
 
+import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 
 public class Sanctuary extends Building {
     
+    public Sanctuary(Player owner) {
+        super(owner);
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override

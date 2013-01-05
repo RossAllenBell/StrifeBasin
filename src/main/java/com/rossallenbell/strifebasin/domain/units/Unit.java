@@ -1,9 +1,7 @@
 package com.rossallenbell.strifebasin.domain.units;
 
-import java.awt.geom.Point2D;
-
 import com.rossallenbell.strifebasin.domain.Asset;
-
+import com.rossallenbell.strifebasin.domain.Player;
 
 public abstract class Unit extends Asset {
     
@@ -13,18 +11,8 @@ public abstract class Unit extends Asset {
     public static final double DEFAULT_SPEED = 2;
     public static final double DEFAULT_RANGE = 0;
     
-    private Point2D.Double location;
-    
-    public Unit() {
-        location = new Point2D.Double();
-    }
-    
-    public Point2D.Double getLocation() {
-        return location;
-    }
-    
-    public void setLocation(double x, double y) {
-        location.setLocation(x, y);
+    public Unit(Player owner) {
+        super(owner);
     }
     
     public double getSize() {
@@ -43,8 +31,8 @@ public abstract class Unit extends Asset {
     
     public abstract double getDamage();
 
-    public void update(Unit unit) {
-        location.setLocation(unit.location);
+    public void update(long updateTime) {
+        
     }
     
 }

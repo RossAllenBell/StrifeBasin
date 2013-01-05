@@ -2,6 +2,7 @@ package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
 import java.awt.Dimension;
 
+import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.units.Alchemist;
 import com.rossallenbell.strifebasin.domain.units.Unit;
@@ -9,6 +10,10 @@ import com.rossallenbell.strifebasin.domain.units.Unit;
 @AdvancedBuilding
 public class AlchemistLab extends UnitSpawingBuilding {
     
+    public AlchemistLab(Player owner) {
+        super(owner);
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override

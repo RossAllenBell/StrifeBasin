@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Game;
+import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.Unit;
@@ -95,15 +96,15 @@ public class Renderer {
         Collection<Building> myBuildings = Game.getInstance().getMyBuildings().values();
         graphics.setColor(new Color(0, 255, 0));
         for(Building building : myBuildings){
-            Point location = building.getLocation();
-            graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+            Point2D.Double location = building.getLocation();
+            graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
         Collection<Building> theirBuildings = Game.getInstance().getTheirBuildings().values();
         graphics.setColor(new Color(255, 0, 0));
         for(Building building : theirBuildings){
-            Point location = building.getLocation();
-            graphics.fillRect(location.x * PIXELS_PER_BOARD_UNIT, location.y * PIXELS_PER_BOARD_UNIT, building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+            Point2D.Double location = building.getLocation();
+            graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
         Collection<Unit> myUnits = Game.getInstance().getMyUnits().values();
@@ -174,7 +175,7 @@ public class Renderer {
         Class<? extends Building> clazz = BuildMenu.getInstance().getCursorEvent();
         if (clazz != null && mousePos != null) {
             try {
-                Building building = clazz.newInstance();
+                Building building = clazz.getConstructor(Player.class).newInstance(Game.getInstance().getMe());
                 Dimension dimension = building.getShape();
                 graphics.setColor(new Color(0, 255, 0, 128));
                 
@@ -272,7 +273,7 @@ public class Renderer {
         if (buildMenuItem != null) {
             Point buildLocation = getGameGridUnitByMousePos(Canvas.getInstance().getMousePosition());
             try {
-                BuildableBuilding building = buildMenuItem.newInstance();
+                BuildableBuilding building = buildMenuItem.getConstructor(Player.class).newInstance(Game.getInstance().getMe());
                 building.setLocation(buildLocation.x, buildLocation.y);
                 Game.getInstance().buildingPlaced(building);
             } catch (Exception e1) {

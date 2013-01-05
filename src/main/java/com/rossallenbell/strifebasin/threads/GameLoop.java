@@ -1,6 +1,5 @@
 package com.rossallenbell.strifebasin.threads;
 
-import com.rossallenbell.strifebasin.connection.gameupdates.UnitsAndBuildings;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.ui.Canvas;
 
@@ -30,7 +29,7 @@ public class GameLoop extends StoppableThread {
                 long loopStartTime = System.currentTimeMillis();
                 
                 if (lastCommUpdateTime + COMM_UPDATE_INTERVAL <= loopStartTime) {
-                    CommSocketSender.getInstance().enqueue(new UnitsAndBuildings(Game.getInstance().getMe()));
+                    CommSocketSender.getInstance().enqueue(Game.getInstance().getMe());
                     lastCommUpdateTime = loopStartTime;
                 }
                 

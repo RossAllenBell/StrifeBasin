@@ -1,7 +1,13 @@
 package com.rossallenbell.strifebasin.domain.units;
 
+import com.rossallenbell.strifebasin.domain.Player;
+
 public class Alchemist extends Unit {
     
+    public Alchemist(Player owner) {
+        super(owner);
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override

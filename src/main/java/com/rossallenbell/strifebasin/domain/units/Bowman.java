@@ -1,7 +1,13 @@
 package com.rossallenbell.strifebasin.domain.units;
 
+import com.rossallenbell.strifebasin.domain.Player;
+
 public class Bowman extends Unit {
     
+    public Bowman(Player owner) {
+        super(owner);
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override
