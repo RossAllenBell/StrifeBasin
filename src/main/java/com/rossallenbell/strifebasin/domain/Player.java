@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.rossallenbell.strifebasin.connection.CommObject;
+import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
-public class Player extends CommObject {
-
-    private static final long serialVersionUID = 1L;
+public class Player {
     
     private int money;
     private int income;
@@ -28,10 +26,10 @@ public class Player extends CommObject {
         buildings = Collections.synchronizedList(new ArrayList<Building>());
         units = Collections.synchronizedList(new ArrayList<Unit>());
     }
-    
+
     public Sanctuary getSanctuary() {
-        for(Building building : getBuildings()) {
-            if(building instanceof Sanctuary) {
+        for (Building building : getBuildings()) {
+            if (building instanceof Sanctuary) {
                 return (Sanctuary) building;
             }
         }
@@ -86,6 +84,10 @@ public class Player extends CommObject {
     
     public synchronized long getNextAssetId() {
         return assetId++;
+    }
+
+    public NetworkPlayer snapshot() {
+        return new NetworkPlayer(this);
     }
     
 }

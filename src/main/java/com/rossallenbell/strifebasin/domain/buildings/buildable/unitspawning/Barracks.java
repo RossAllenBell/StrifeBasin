@@ -14,8 +14,6 @@ public class Barracks extends UnitSpawingBuilding {
         super(owner);
     }
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public int cost() {
         return 10;
@@ -32,7 +30,7 @@ public class Barracks extends UnitSpawingBuilding {
     }
 
     public int getMaxHealth() {
-        return 0;
+        return 100;
     }
     
 }

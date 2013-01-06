@@ -15,6 +15,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
@@ -88,7 +90,8 @@ public class Renderer {
     }
     
     private void drawBackground(Graphics2D graphics) {
-        graphics.drawImage(background, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
+        //graphics.drawImage(background, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
+        graphics.drawImage(background, 0, 0, null);
     }
     
     private void drawContent(Graphics2D graphics) {
@@ -99,11 +102,11 @@ public class Renderer {
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
         }
         
-        List<Building> theirBuildings = Game.getInstance().getTheirBuildings();
+        List<NetworkAsset> theirBuildings = Game.getInstance().getTheirBuildings();
         graphics.setColor(new Color(255, 0, 0));
-        for(Building building : theirBuildings){
+        for(NetworkAsset building : theirBuildings){
             Point2D.Double location = building.getLocation();
-            graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+            graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), (int) building.getSize() * PIXELS_PER_BOARD_UNIT, (int) building.getSize() * PIXELS_PER_BOARD_UNIT);
         }
         
         List<Unit> myUnits = Game.getInstance().getMyUnits();
@@ -114,9 +117,9 @@ public class Renderer {
             graphics.fill(circle);
         }
         
-        List<Unit> theirUnits = Game.getInstance().getTheirUnits();
+        List<NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
         graphics.setColor(new Color(255, 0, 0));
-        for(Unit unit : theirUnits){
+        for(NetworkUnit unit : theirUnits){
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.fill(circle);

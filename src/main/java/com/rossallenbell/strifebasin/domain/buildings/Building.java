@@ -7,8 +7,6 @@ import com.rossallenbell.strifebasin.domain.Player;
 
 public abstract class Building extends Asset {
     
-    private static final long serialVersionUID = 1L;
-    
     public Building(Player owner) {
         super(owner);
     }
@@ -17,6 +15,11 @@ public abstract class Building extends Asset {
     
     public void update(long updateTime) {
         
+    }
+    
+    @Override
+    public double getSize() {
+        return getShape().getWidth();
     }
     
 }

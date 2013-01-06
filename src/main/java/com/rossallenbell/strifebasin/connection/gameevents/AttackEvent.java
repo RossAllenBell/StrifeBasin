@@ -1,26 +1,26 @@
 package com.rossallenbell.strifebasin.connection.gameevents;
 
 import com.rossallenbell.strifebasin.connection.CommObject;
-import com.rossallenbell.strifebasin.domain.Asset;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 
 public class AttackEvent extends CommObject {
     
     private static final long serialVersionUID = 1L;
     
-    private final Unit unit;
-    private final Asset target;
+    private final NetworkUnit unit;
+    private final NetworkAsset target;
     
-    public AttackEvent(Unit unit, Asset target) {
+    public AttackEvent(NetworkUnit unit, NetworkAsset target) {
         this.unit = unit;
         this.target = target;
     }
-
-    public Unit getUnit() {
+    
+    public NetworkUnit getUnit() {
         return unit;
     }
-
-    public Asset getTarget() {
+    
+    public NetworkAsset getTarget() {
         return target;
     }
     

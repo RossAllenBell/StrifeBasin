@@ -5,10 +5,10 @@ import java.io.ObjectInputStream;
 import java.net.SocketException;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
+import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
 import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
 import com.rossallenbell.strifebasin.connection.protocol.ConnectionAccepted;
 import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.Player;
 
 public class CommSocketListener extends StoppableThread {
     
@@ -35,11 +35,10 @@ public class CommSocketListener extends StoppableThread {
                 while ((commInput = in.readObject()) != null) {
                     if (commInput instanceof ConnectionAccepted) {
                         ConnectionToOpponent.getInstance().theyAccepted();
-                    } else if (commInput instanceof Player) {
-                        Game.getInstance().updateTheirUnitsAndBuildings((Player) commInput);
+                    } else if (commInput instanceof NetworkPlayer) {
+                        Game.getInstance().updateTheirUnitsAndBuildings((NetworkPlayer) commInput);
                     } else if (commInput instanceof AttackEvent) {
-                        AttackEvent attackEvent = (AttackEvent) commInput;
-                        attackEvent.getTarget().takeDamage(attackEvent.getUnit());
+                        Game.getInstance().attackEvent((AttackEvent) commInput);
                     } else {
                         System.out.println("Unknown incoming data: " + commInput);
                     }

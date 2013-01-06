@@ -9,8 +9,6 @@ public abstract class BuildableBuilding extends Building {
         super(owner);
     }
 
-    private static final long serialVersionUID = 1L;
-    
     public abstract int cost();
     
 }

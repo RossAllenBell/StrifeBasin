@@ -11,8 +11,6 @@ public class Sanctuary extends Building {
         super(owner);
     }
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public Dimension getShape() {
         return new Dimension(6,6);

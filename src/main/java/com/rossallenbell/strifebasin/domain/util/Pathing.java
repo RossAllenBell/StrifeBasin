@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.rossallenbell.strifebasin.domain.Asset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
@@ -23,10 +23,10 @@ public class Pathing {
         
     }
     
-    public Asset getClosestAggroableAsset(Unit unit) {
-        Asset target = null;
+    public NetworkAsset getClosestAggroableAsset(Unit unit) {
+        NetworkAsset target = null;
         
-        for (Asset theirUnit : Game.getInstance().getThem().getUnits()) {
+        for (NetworkAsset theirUnit : Game.getInstance().getThem().getUnits()) {
             double distanceToTheirUnit = theirUnit.getLocation().distance(unit.getLocation());
             if (distanceToTheirUnit <= unit.getAggroRange()) {
                 if (target == null || target.getLocation().distance(unit.getLocation()) > theirUnit.getLocation().distance(unit.getLocation())) {
@@ -36,7 +36,7 @@ public class Pathing {
         }
         
         if (target == null) {
-            for (Asset building : Game.getInstance().getThem().getBuildings()) {
+            for (NetworkAsset building : Game.getInstance().getThem().getBuildings()) {
                 double distanceToTheirBuilding = building.getLocation().distance(unit.getLocation());
                 if (distanceToTheirBuilding <= unit.getAggroRange()) {
                     if (target == null || target.getLocation().distance(unit.getLocation()) > building.getLocation().distance(unit.getLocation())) {
@@ -49,7 +49,7 @@ public class Pathing {
         return target;
     }
     
-    public List<Point2D.Double> getRoute(Unit unit, Asset target) {
+    public List<Point2D.Double> getRoute(Unit unit, NetworkAsset target) {
         List<Point2D.Double> route = new ArrayList<Point2D.Double>();
         route.add(target.getLocation());
         return route;

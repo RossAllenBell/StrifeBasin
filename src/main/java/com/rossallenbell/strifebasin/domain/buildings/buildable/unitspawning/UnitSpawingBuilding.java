@@ -2,7 +2,6 @@ package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
 import java.awt.geom.Point2D.Double;
 
-import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.Unit;
@@ -13,8 +12,6 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
         super(owner);
     }
 
-    private static final long serialVersionUID = 1L;
-    
     public final static long DEFAULT_SPAWN_COOLDOWN = 10000;
     
     private long lastSpawnTime;
@@ -22,7 +19,7 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
     public Unit spawn(long spawnTime) {
         lastSpawnTime = spawnTime;
         try {
-            return getUnit().getConstructor(Player.class).newInstance(Game.getInstance().getMe());
+            return getUnit().getConstructor(Player.class).newInstance(getOwner());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,12 +1,16 @@
 package com.rossallenbell.strifebasin.domain;
 
+import java.util.Iterator;
 import java.util.List;
 
+import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
+import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
+import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.Unit;
-
 
 public class Game {
     
@@ -16,12 +20,12 @@ public class Game {
     public static final long INCOME_COOLDOWN = 10000;
     
     private final Player me;
-    private Player them;
+    private NetworkPlayer them;
     
     private static Game theInstance;
     
-    public static Game  getInstance() {
-        if(theInstance == null){
+    public static Game getInstance() {
+        if (theInstance == null) {
             theInstance = new Game();
         }
         return theInstance;
@@ -29,19 +33,19 @@ public class Game {
     
     private Game() {
         me = new Player();
-        them = new Player();
+        them = new NetworkPlayer();
         
         Sanctuary mySantuary = new Sanctuary(me);
-        mySantuary.setLocation(0, BOARD_HEIGHT/2-mySantuary.getShape().height);
+        mySantuary.setLocation(0, BOARD_HEIGHT / 2 - mySantuary.getShape().height);
         mySantuary.setAssetId(me.getNextAssetId());
         me.addBuilding(mySantuary);
     }
     
-    public Player getMe(){
+    public Player getMe() {
         return me;
     }
     
-    public Player getThem(){
+    public NetworkPlayer getThem() {
         return them;
     }
     
@@ -60,53 +64,72 @@ public class Game {
     public void keyReleased(int keyCode) {
         
     }
-
+    
     public void update(long updateTime) {
-        if(me.getLastIncomeTime() < updateTime - INCOME_COOLDOWN){
+        if (me.getLastIncomeTime() < updateTime - INCOME_COOLDOWN) {
             me.income();
             me.setLastIncomeTime(updateTime);
         }
         
-        for(Building building : me.getBuildings()){
-            building.update(updateTime);
+        Iterator<Building> buildings = me.getBuildings().iterator();
+        while (buildings.hasNext()) {
+            Building building = buildings.next();
+            if (building.getHealth() > 0) {
+                building.update(updateTime);
+            } else if (building.getHealth() <= 0 && !(building instanceof Sanctuary)) {
+                buildings.remove();
+            }
         }
         
-        for(Unit unit : me.getUnits()){
-            unit.update(updateTime);
+        Iterator<Unit> units = me.getUnits().iterator();
+        while (units.hasNext()) {
+            Unit unit = units.next();
+            if (unit.getHealth() > 0) {
+                unit.update(updateTime);
+            } else if (unit.getHealth() <= 0) {
+                buildings.remove();
+            }
         }
     }
-
+    
     public void buildingPlaced(BuildableBuilding building) {
-        if(me.getMoney() >= building.cost()){
+        if (me.getMoney() >= building.cost()) {
             me.alterMoney(-1 * building.cost());
             me.addBuilding(building);
         }
-        
     }
-
+    
     public List<Building> getMyBuildings() {
         return me.getBuildings();
     }
-
-    public List<Building> getTheirBuildings() {
+    
+    public List<NetworkAsset> getTheirBuildings() {
         return them.getBuildings();
     }
-
+    
     public List<Unit> getMyUnits() {
         return me.getUnits();
     }
-
-    public List<Unit> getTheirUnits() {
+    
+    public List<NetworkUnit> getTheirUnits() {
         return them.getUnits();
     }
-
-    public void updateTheirUnitsAndBuildings(Player them) {
-        this.them = them;
-        for(Building building : them.getBuildings()) {
-            building.setLocation(BOARD_WIDTH - building.getLocation().x - building.getShape().width, building.getLocation().y);
+    
+    public void updateTheirUnitsAndBuildings(NetworkPlayer networkPlayer) {
+        this.them = networkPlayer;
+        for (NetworkAsset building : networkPlayer.getBuildings()) {
+            building.getLocation().setLocation(BOARD_WIDTH - building.getLocation().x - building.getSize(), building.getLocation().y);
         }
-        for(Asset unit : them.getUnits()) {
-            unit.setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
+        for (NetworkAsset unit : networkPlayer.getUnits()) {
+            unit.getLocation().setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
+        }
+    }
+
+    public void attackEvent(AttackEvent attackEvent) {
+        for(Asset building : me.getBuildings()) {
+            if (building.getAssetId() == attackEvent.getTarget().getAssetId()) {
+                building.takeDamage(attackEvent.getUnit());
+            }
         }
     }
     

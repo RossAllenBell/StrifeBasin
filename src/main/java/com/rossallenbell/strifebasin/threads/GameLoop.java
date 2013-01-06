@@ -29,7 +29,7 @@ public class GameLoop extends StoppableThread {
                 long loopStartTime = System.currentTimeMillis();
                 
                 if (lastCommUpdateTime + COMM_UPDATE_INTERVAL <= loopStartTime) {
-                    CommSocketSender.getInstance().enqueue(Game.getInstance().getMe());
+                    CommSocketSender.getInstance().enqueue(Game.getInstance().getMe().snapshot());
                     lastCommUpdateTime = loopStartTime;
                 }
                 

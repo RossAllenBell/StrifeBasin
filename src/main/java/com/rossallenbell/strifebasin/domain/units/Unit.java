@@ -1,8 +1,12 @@
 package com.rossallenbell.strifebasin.domain.units;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
@@ -11,8 +15,6 @@ import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.threads.CommSocketSender;
 
 public abstract class Unit extends Asset {
-    
-    private static final long serialVersionUID = 1L;
     
     public static final double DEFAULT_SIZE = 1;
     public static final double DEFAULT_SPEED = 2;
@@ -25,7 +27,7 @@ public abstract class Unit extends Asset {
     public static final long ROUTE_ASSESSMENT_COOLDOWN = 1000;
     
     private List<Point2D.Double> route;
-    private Asset target;
+    private NetworkAsset target;
     
     private long lastTargetAssessment;
     private long lastRouteAssessment;
@@ -36,8 +38,10 @@ public abstract class Unit extends Asset {
     
     public Unit(Player owner) {
         super(owner);
+        route = Collections.synchronizedList(new ArrayList<Point2D.Double>());
     }
     
+    @Override
     public double getSize() {
         return DEFAULT_SIZE;
     }
@@ -51,7 +55,7 @@ public abstract class Unit extends Asset {
     }
     
     public double getRange() {
-        return DEFAULT_RANGE;
+        return Math.max(getSize() / 2, DEFAULT_RANGE);
     }
     
     public double getAggroRange() {
@@ -70,25 +74,29 @@ public abstract class Unit extends Asset {
         }
         
         // move
-        double moveDistance = (updateTime - lastUpdateTime) / 1000.0 * getSpeed();
+        double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * getSpeed();
         if (lastRouteAssessment + ROUTE_ASSESSMENT_COOLDOWN <= updateTime) {
             route = Pathing.getInstance().getRoute(this, target);
+            lastRouteAssessment = updateTime;
         }
-        Point2D.Double nextDestination = route.get(0);
-        if (nextDestination.distance(getLocation()) <= moveDistance) {
-            setLocation(route.remove(0));
-        } else {
-            Point2D.Double currentLocation = getLocation();
-            double direction = getDirection();
-            double dx = Math.sin(direction) + moveDistance;
-            double dy = Math.cos(direction) + moveDistance;
-            getLocation().setLocation(currentLocation.x + dx, currentLocation.y + dy);
+        
+        if (route.size() > 0) {
+            Point2D.Double nextDestination = route.get(0);
+            if (nextDestination.distance(getLocation()) <= moveDistance && target.getLocation().distance(getLocation()) > getRange() + target.getSize()) {
+                setLocation(route.remove(0));
+            } else {
+                Point2D.Double currentLocation = getLocation();
+                double direction = getDirection();
+                double dx = Math.sin(direction) * moveDistance;
+                double dy = Math.cos(direction) * moveDistance;
+                getLocation().setLocation(currentLocation.x + dx, currentLocation.y + dy);
+            }
         }
         
         // attack
-        if (target.getLocation().distance(getLocation()) <= getRange() && lastAttackTime + getAttackSpeed() <= updateTime) {
+        if (target.getLocation().distance(getLocation()) <= getRange() + target.getSize() && lastAttackTime + getAttackSpeed() <= updateTime) {
+            CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
             lastAttackTime = updateTime;
-            CommSocketSender.getInstance().enqueue(new AttackEvent(this, target));
         }
         
         lastUpdateTime = updateTime;
@@ -103,11 +111,11 @@ public abstract class Unit extends Asset {
         this.route = route;
     }
     
-    public Asset getTarget() {
+    public NetworkAsset getTarget() {
         return target;
     }
     
-    public void setTarget(Asset target) {
+    public void setTarget(NetworkAsset target) {
         this.target = target;
     }
     

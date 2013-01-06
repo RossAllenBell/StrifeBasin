@@ -134,15 +134,17 @@ public class ConnectionToOpponent {
     }
     
     public void sendObjectToThem(CommObject object) {
-        try {
-            commWriter.writeObject(object);
-            commWriter.reset();
-        } catch (SocketException e) {
-            if (!e.getMessage().equals("Software caused connection abort: socket write error")) {
+        if (!commSocket.isClosed()) {
+            try {
+                commWriter.writeObject(object);
+                commWriter.reset();
+            } catch (SocketException e) {
+                if (!e.getMessage().equals("Software caused connection abort: socket write error") && !e.getMessage().equals("Connection reset by peer: socket write error") && !e.getMessage().equals("Socket closed")) {
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
     

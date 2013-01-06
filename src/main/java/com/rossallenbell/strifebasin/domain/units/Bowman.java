@@ -8,8 +8,6 @@ public class Bowman extends Unit {
         super(owner);
     }
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public int getMaxHealth() {
         return 5;
