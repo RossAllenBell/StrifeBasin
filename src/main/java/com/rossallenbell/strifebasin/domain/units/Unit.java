@@ -80,9 +80,9 @@ public abstract class Unit extends Asset {
             lastRouteAssessment = updateTime;
         }
         
-        if (route.size() > 0) {
+        if (route.size() > 0 && !canHitTarget()) {
             Point2D.Double nextDestination = route.get(0);
-            if (nextDestination.distance(getLocation()) <= moveDistance && target.getLocation().distance(getLocation()) > getRange() + target.getSize()) {
+            if (nextDestination.distance(getLocation()) <= moveDistance) {
                 setLocation(route.remove(0));
             } else {
                 Point2D.Double currentLocation = getLocation();
@@ -94,13 +94,17 @@ public abstract class Unit extends Asset {
         }
         
         // attack
-        if (target.getLocation().distance(getLocation()) <= getRange() + target.getSize() && lastAttackTime + getAttackSpeed() <= updateTime) {
+        if (canHitTarget() && lastAttackTime + getAttackSpeed() <= updateTime) {
             CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
             lastAttackTime = updateTime;
         }
         
         lastUpdateTime = updateTime;
         
+    }
+
+    private boolean canHitTarget() {
+        return target.getLocation().distance(getLocation()) <= getRange() + (target.getSize() / 2);
     }
     
     public List<Point2D.Double> getRoute() {

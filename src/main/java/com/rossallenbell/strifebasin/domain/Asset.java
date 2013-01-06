@@ -60,4 +60,8 @@ public abstract class Asset {
         health -= networkUnit.getDamage();
     }
     
+    public double getHealthRatio() {
+        return getHealth() / getMaxHealth();
+    }
+    
 }

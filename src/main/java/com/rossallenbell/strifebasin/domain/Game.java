@@ -16,7 +16,7 @@ public class Game {
     
     public static final int BOARD_WIDTH = 250;
     public static final int BOARD_HEIGHT = 125;
-    public static final int STARTING_INCOME = 10;
+    public static final int STARTING_INCOME = 100;
     public static final long INCOME_COOLDOWN = 10000;
     
     private final Player me;
@@ -87,7 +87,7 @@ public class Game {
             if (unit.getHealth() > 0) {
                 unit.update(updateTime);
             } else if (unit.getHealth() <= 0) {
-                buildings.remove();
+                units.remove();
             }
         }
     }
@@ -129,6 +129,11 @@ public class Game {
         for(Asset building : me.getBuildings()) {
             if (building.getAssetId() == attackEvent.getTarget().getAssetId()) {
                 building.takeDamage(attackEvent.getUnit());
+            }
+        }
+        for(Asset units : me.getUnits()) {
+            if (units.getAssetId() == attackEvent.getTarget().getAssetId()) {
+                units.takeDamage(attackEvent.getUnit());
             }
         }
     }
