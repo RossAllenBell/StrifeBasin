@@ -1,0 +1,22 @@
+building images
+unit sprites
+background image
+projectile sprites
+units dont take up the same space
+health bars on damaged assets
+win/loss message
+show income
+buildings give income
+more buildings/units
+create build zone
+flying units
+impassable terrain
+defensive buildings
+sound
+3+ players in teams
+zoom in/out
+splash damage
+buffing units
+sanctuary abilities
+create builder unit that replaces insta build
+allow connections outside of a firewall
