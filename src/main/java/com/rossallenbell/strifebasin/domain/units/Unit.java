@@ -8,13 +8,13 @@ import java.util.List;
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
-import com.rossallenbell.strifebasin.domain.Asset;
+import com.rossallenbell.strifebasin.domain.PlayerAsset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.threads.CommSocketSender;
 
-public abstract class Unit extends Asset {
+public abstract class Unit extends PlayerAsset {
     
     public static final double DEFAULT_SIZE = 1;
     public static final double DEFAULT_SPEED = 2;

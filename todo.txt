@@ -1,22 +1,25 @@
-building images
-unit sprites
-background image
-projectile sprites
-units dont take up the same space
 health bars on damaged assets
+interpolate enemy movement
 win/loss message
 show income
 buildings give income
-more buildings/units
 create build zone
-flying units
-impassable terrain
-defensive buildings
-sound
-3+ players in teams
-zoom in/out
+refactor building placement to be game layer, not part of renderer
+buildings cant occupy same space
+building images
+unit sprites
+projectile sprites
+background image
+units dont take up the same space
 splash damage
+impassable terrain
+flying units
+defensive buildings
 buffing units
+more buildings/units
+allow connections outside of a firewall
 sanctuary abilities
 create builder unit that replaces insta build
-allow connections outside of a firewall
+zoom in/out
+sound
+3+ players in teams

@@ -126,12 +126,12 @@ public class Game {
     }
 
     public void attackEvent(AttackEvent attackEvent) {
-        for(Asset building : me.getBuildings()) {
+        for(PlayerAsset building : me.getBuildings()) {
             if (building.getAssetId() == attackEvent.getTarget().getAssetId()) {
                 building.takeDamage(attackEvent.getUnit());
             }
         }
-        for(Asset units : me.getUnits()) {
+        for(PlayerAsset units : me.getUnits()) {
             if (units.getAssetId() == attackEvent.getTarget().getAssetId()) {
                 units.takeDamage(attackEvent.getUnit());
             }

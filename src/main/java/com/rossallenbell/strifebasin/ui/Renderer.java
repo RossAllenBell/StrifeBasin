@@ -17,6 +17,7 @@ import java.util.List;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
+import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
@@ -96,36 +97,74 @@ public class Renderer {
     
     private void drawContent(Graphics2D graphics) {
         List<Building> myBuildings = Game.getInstance().getMyBuildings();
-        graphics.setColor(new Color(0, 255, 0));
         for(Building building : myBuildings){
             Point2D.Double location = building.getLocation();
+            graphics.setColor(new Color(0, 255, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
+            
+            if(building.getHealthRatio() < 1) {
+                drawHealthbar(graphics, building);
+            }
         }
-        
+
         List<NetworkAsset> theirBuildings = Game.getInstance().getTheirBuildings();
-        graphics.setColor(new Color(255, 0, 0));
         for(NetworkAsset building : theirBuildings){
             Point2D.Double location = building.getLocation();
+            graphics.setColor(new Color(255, 0, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), (int) building.getSize() * PIXELS_PER_BOARD_UNIT, (int) building.getSize() * PIXELS_PER_BOARD_UNIT);
+            
+            if(building.getHealthRatio() < 1) {
+                drawHealthbar(graphics, building);
+            }
         }
-        
+
         List<Unit> myUnits = Game.getInstance().getMyUnits();
-        graphics.setColor(new Color(0, 255, 0));
         for(Unit unit : myUnits){
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
+            graphics.setColor(new Color(0, 255, 0));
             graphics.fill(circle);
+            
+            if(unit.getHealthRatio() < 1) {
+                drawHealthbar(graphics, unit);
+            }
         }
-        
+
         List<NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
-        graphics.setColor(new Color(255, 0, 0));
         for(NetworkUnit unit : theirUnits){
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
+            graphics.setColor(new Color(255, 0, 0));
             graphics.fill(circle);
+            
+            if(unit.getHealthRatio() < 1) {
+                drawHealthbar(graphics, unit);
+            }
         }
     }
     
+    private void drawHealthbar(Graphics2D graphics, Asset asset) {
+        graphics.setColor(new Color(0, 0, 255, 128));
+        Point2D.Double topCenterPixel = getTopCenterPixel(asset);
+        int x = (int) (topCenterPixel.x - (asset.getSize() / 2 * PIXELS_PER_BOARD_UNIT));
+        int y = (int) (topCenterPixel.y - 5);
+        int width = (int) (asset.getHealthRatio() * asset.getSize() * PIXELS_PER_BOARD_UNIT);
+        int height = 3;
+        graphics.fillRect(x, y, width, height);
+    }
+    
+    private Point2D.Double getTopCenterPixel(Asset asset) {
+        if(Unit.class.isAssignableFrom(asset.getClass()) || NetworkUnit.class.isAssignableFrom(asset.getClass())) {
+            double x = asset.getLocation().x * PIXELS_PER_BOARD_UNIT;
+            double y = (asset.getLocation().y - (asset.getSize() / 2.0)) * PIXELS_PER_BOARD_UNIT;
+            return new Point2D.Double(x, y);
+        } else {
+            double x = (asset.getLocation().x + (asset.getSize() / 2.0)) * PIXELS_PER_BOARD_UNIT;
+            double y = asset.getLocation().y * PIXELS_PER_BOARD_UNIT;
+            return new Point2D.Double(x, y);
+        }
+    }
+
     private void drawOverlay(Graphics2D graphics) {
         // minimap border
         graphics.setColor(new Color(255, 255, 255, 64));
