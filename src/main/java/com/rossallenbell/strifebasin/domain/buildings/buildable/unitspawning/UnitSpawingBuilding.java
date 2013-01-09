@@ -2,13 +2,13 @@ package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
 import java.awt.geom.Point2D.Double;
 
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 
 public abstract class UnitSpawingBuilding extends BuildableBuilding {
     
-    public UnitSpawingBuilding(Player owner) {
+    public UnitSpawingBuilding(Me owner) {
         super(owner);
     }
 
@@ -16,10 +16,10 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
     
     private long lastSpawnTime;
     
-    public Unit spawn(long spawnTime) {
+    public PlayerUnit spawn(long spawnTime) {
         lastSpawnTime = spawnTime;
         try {
-            return getUnit().getConstructor(Player.class).newInstance(getOwner());
+            return getUnit().getConstructor(Me.class).newInstance(getOwner());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -34,16 +34,11 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
         return DEFAULT_SPAWN_COOLDOWN;
     }
     
-    public void copyFrom(UnitSpawingBuilding building) {
-        super.copyFrom(building);
-        lastSpawnTime = building.lastSpawnTime;
-    }
-    
     @Override
     public void update(long updateTime) {
         if(getLastSpawnTime() + getSpawnCooldown() <= updateTime){
             Double buildingLocation = getLocation();
-            Unit spawnedUnit = spawn(updateTime);
+            PlayerUnit spawnedUnit = spawn(updateTime);
             double x = buildingLocation.getX() + getShape().width;
             double y = buildingLocation.getY() + ((double) getShape().height / 2);
             spawnedUnit.setLocation(x, y);
@@ -51,6 +46,6 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
         }
     }
     
-    protected abstract Class<? extends Unit> getUnit();
+    protected abstract Class<? extends PlayerUnit> getUnit();
     
 }

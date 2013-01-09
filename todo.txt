@@ -1,10 +1,10 @@
-health bars on damaged assets
-interpolate enemy movement
+show ping to peer
 win/loss message
 show income
 buildings give income
-create build zone
 refactor building placement to be game layer, not part of renderer
+correct building hitbox
+create build zone
 buildings cant occupy same space
 building images
 unit sprites

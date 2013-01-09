@@ -19,10 +19,10 @@ import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 
 public class Renderer {
@@ -96,8 +96,7 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        List<Building> myBuildings = Game.getInstance().getMyBuildings();
-        for(Building building : myBuildings){
+        for(Building building : Game.getInstance().getMyBuildings().values()){
             Point2D.Double location = building.getLocation();
             graphics.setColor(new Color(0, 255, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
@@ -107,8 +106,7 @@ public class Renderer {
             }
         }
 
-        List<NetworkAsset> theirBuildings = Game.getInstance().getTheirBuildings();
-        for(NetworkAsset building : theirBuildings){
+        for(NetworkAsset building : Game.getInstance().getTheirBuildings()){
             Point2D.Double location = building.getLocation();
             graphics.setColor(new Color(255, 0, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), (int) building.getSize() * PIXELS_PER_BOARD_UNIT, (int) building.getSize() * PIXELS_PER_BOARD_UNIT);
@@ -118,8 +116,7 @@ public class Renderer {
             }
         }
 
-        List<Unit> myUnits = Game.getInstance().getMyUnits();
-        for(Unit unit : myUnits){
+        for(PlayerUnit unit : Game.getInstance().getMyUnits().values()){
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.setColor(new Color(0, 255, 0));
@@ -130,8 +127,7 @@ public class Renderer {
             }
         }
 
-        List<NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
-        for(NetworkUnit unit : theirUnits){
+        for(NetworkUnit unit : Game.getInstance().getTheirUnits()){
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.setColor(new Color(255, 0, 0));
@@ -144,7 +140,7 @@ public class Renderer {
     }
     
     private void drawHealthbar(Graphics2D graphics, Asset asset) {
-        graphics.setColor(new Color(0, 0, 255, 128));
+        graphics.setColor(new Color(0, 255, 255, 128));
         Point2D.Double topCenterPixel = getTopCenterPixel(asset);
         int x = (int) (topCenterPixel.x - (asset.getSize() / 2 * PIXELS_PER_BOARD_UNIT));
         int y = (int) (topCenterPixel.y - 5);
@@ -154,7 +150,7 @@ public class Renderer {
     }
     
     private Point2D.Double getTopCenterPixel(Asset asset) {
-        if(Unit.class.isAssignableFrom(asset.getClass()) || NetworkUnit.class.isAssignableFrom(asset.getClass())) {
+        if(PlayerUnit.class.isAssignableFrom(asset.getClass()) || NetworkUnit.class.isAssignableFrom(asset.getClass())) {
             double x = asset.getLocation().x * PIXELS_PER_BOARD_UNIT;
             double y = (asset.getLocation().y - (asset.getSize() / 2.0)) * PIXELS_PER_BOARD_UNIT;
             return new Point2D.Double(x, y);
@@ -216,7 +212,7 @@ public class Renderer {
         Class<? extends Building> clazz = BuildMenu.getInstance().getCursorEvent();
         if (clazz != null && mousePos != null) {
             try {
-                Building building = clazz.getConstructor(Player.class).newInstance(Game.getInstance().getMe());
+                Building building = clazz.getConstructor(Me.class).newInstance(Game.getInstance().getMe());
                 Dimension dimension = building.getShape();
                 graphics.setColor(new Color(0, 255, 0, 128));
                 
@@ -314,7 +310,7 @@ public class Renderer {
         if (buildMenuItem != null) {
             Point buildLocation = getGameGridUnitByMousePos(Canvas.getInstance().getMousePosition());
             try {
-                BuildableBuilding building = buildMenuItem.getConstructor(Player.class).newInstance(Game.getInstance().getMe());
+                BuildableBuilding building = buildMenuItem.getConstructor(Me.class).newInstance(Game.getInstance().getMe());
                 building.setLocation(buildLocation.x, buildLocation.y);
                 Game.getInstance().buildingPlaced(building);
             } catch (Exception e1) {

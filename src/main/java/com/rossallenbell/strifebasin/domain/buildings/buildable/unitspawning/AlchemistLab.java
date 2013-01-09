@@ -2,15 +2,15 @@ package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
 import java.awt.Dimension;
 
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.units.Alchemist;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 
 @AdvancedBuilding
 public class AlchemistLab extends UnitSpawingBuilding {
     
-    public AlchemistLab(Player owner) {
+    public AlchemistLab(Me owner) {
         super(owner);
     }
 
@@ -25,7 +25,7 @@ public class AlchemistLab extends UnitSpawingBuilding {
     }
 
     @Override
-    protected Class<? extends Unit> getUnit() {
+    protected Class<? extends PlayerUnit> getUnit() {
         return Alchemist.class;
     }
 

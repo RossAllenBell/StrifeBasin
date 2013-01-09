@@ -144,8 +144,30 @@ public class ConnectionToOpponent {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                System.err.println(object);
             }
         }
+    }
+    
+    public static boolean portAvailable(int port) {
+        ServerSocket ss = null;
+        try {
+            ss = new ServerSocket(port);
+            ss.setReuseAddress(true);
+            return true;
+        } catch (IOException e) {
+            
+        } finally {
+            if (ss != null) {
+                try {
+                    ss.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        return false;
     }
     
 }

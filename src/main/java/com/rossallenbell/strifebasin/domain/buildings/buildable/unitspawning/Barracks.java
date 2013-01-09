@@ -2,15 +2,15 @@ package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
 import java.awt.Dimension;
 
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 import com.rossallenbell.strifebasin.domain.units.Spearman;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 
 @BasicBuilding
 public class Barracks extends UnitSpawingBuilding {
     
-    public Barracks(Player owner) {
+    public Barracks(Me owner) {
         super(owner);
     }
 
@@ -25,7 +25,7 @@ public class Barracks extends UnitSpawingBuilding {
     }
 
     @Override
-    protected Class<? extends Unit> getUnit() {
+    protected Class<? extends PlayerUnit> getUnit() {
         return Spearman.class;
     }
 

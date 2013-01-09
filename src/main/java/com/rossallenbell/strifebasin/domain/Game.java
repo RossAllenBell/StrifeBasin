@@ -1,7 +1,9 @@
 package com.rossallenbell.strifebasin.domain;
 
+import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
@@ -10,19 +12,22 @@ import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
+import com.rossallenbell.strifebasin.domain.util.Pathing;
 
 public class Game {
     
     public static final int BOARD_WIDTH = 250;
     public static final int BOARD_HEIGHT = 125;
-    public static final int STARTING_INCOME = 100;
+    public static final int STARTING_INCOME = 10;
     public static final long INCOME_COOLDOWN = 10000;
     
-    private final Player me;
+    private final Me me;
     private NetworkPlayer them;
     
     private static Game theInstance;
+    
+    private long lastUpdateTime;
     
     public static Game getInstance() {
         if (theInstance == null) {
@@ -32,7 +37,7 @@ public class Game {
     }
     
     private Game() {
-        me = new Player();
+        me = new Me();
         them = new NetworkPlayer();
         
         Sanctuary mySantuary = new Sanctuary(me);
@@ -41,7 +46,7 @@ public class Game {
         me.addBuilding(mySantuary);
     }
     
-    public Player getMe() {
+    public Me getMe() {
         return me;
     }
     
@@ -71,7 +76,7 @@ public class Game {
             me.setLastIncomeTime(updateTime);
         }
         
-        Iterator<Building> buildings = me.getBuildings().iterator();
+        Iterator<Building> buildings = me.getBuildings().values().iterator();
         while (buildings.hasNext()) {
             Building building = buildings.next();
             if (building.getHealth() > 0) {
@@ -81,15 +86,36 @@ public class Game {
             }
         }
         
-        Iterator<Unit> units = me.getUnits().iterator();
+        Iterator<PlayerUnit> units = me.getUnits().values().iterator();
         while (units.hasNext()) {
-            Unit unit = units.next();
+            PlayerUnit unit = units.next();
             if (unit.getHealth() > 0) {
                 unit.update(updateTime);
             } else if (unit.getHealth() <= 0) {
                 units.remove();
             }
         }
+        
+        for (NetworkUnit unit : them.getUnits()) {
+            double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * unit.getSpeed();
+            PlayerAsset target = me.getAssetById(unit.getAssetId());
+            if (!Pathing.canHitAsset(unit, target)) {
+                Point2D.Double destination = unit.getCurrentDestination();
+                Point2D.Double location = unit.getLocation();
+                double distanceToDestination = destination.distance(location);
+                if (distanceToDestination <= moveDistance) {
+                    location.setLocation(destination);
+                } else if (moveDistance > 0) {
+                    Point2D.Double currentLocation = location;
+                    double direction = unit.getDirection();
+                    double dx = Math.sin(direction) * moveDistance;
+                    double dy = Math.cos(direction) * moveDistance;
+                    location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
+                }
+            }
+        }
+        
+        lastUpdateTime = updateTime;
     }
     
     public void buildingPlaced(BuildableBuilding building) {
@@ -99,7 +125,7 @@ public class Game {
         }
     }
     
-    public List<Building> getMyBuildings() {
+    public Map<Long, Building> getMyBuildings() {
         return me.getBuildings();
     }
     
@@ -107,7 +133,7 @@ public class Game {
         return them.getBuildings();
     }
     
-    public List<Unit> getMyUnits() {
+    public Map<Long, PlayerUnit> getMyUnits() {
         return me.getUnits();
     }
     
@@ -120,21 +146,17 @@ public class Game {
         for (NetworkAsset building : networkPlayer.getBuildings()) {
             building.getLocation().setLocation(BOARD_WIDTH - building.getLocation().x - building.getSize(), building.getLocation().y);
         }
-        for (NetworkAsset unit : networkPlayer.getUnits()) {
+        for (NetworkUnit unit : networkPlayer.getUnits()) {
             unit.getLocation().setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
+            unit.getCurrentDestination().setLocation(BOARD_WIDTH - unit.getCurrentDestination().x, unit.getCurrentDestination().y);
+            unit.setDirection((unit.getDirection() + Math.PI) % (2 * Math.PI));
         }
     }
-
+    
     public void attackEvent(AttackEvent attackEvent) {
-        for(PlayerAsset building : me.getBuildings()) {
-            if (building.getAssetId() == attackEvent.getTarget().getAssetId()) {
-                building.takeDamage(attackEvent.getUnit());
-            }
-        }
-        for(PlayerAsset units : me.getUnits()) {
-            if (units.getAssetId() == attackEvent.getTarget().getAssetId()) {
-                units.takeDamage(attackEvent.getUnit());
-            }
+        PlayerAsset asset = me.getAssetById(attackEvent.getTarget().getAssetId());
+        if(asset != null) {
+            asset.takeDamage(attackEvent.getUnit());
         }
     }
     

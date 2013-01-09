@@ -2,20 +2,18 @@ package com.rossallenbell.strifebasin.domain;
 
 import java.awt.geom.Point2D;
 
-public abstract class Asset {
+public interface Asset {
     
-    public abstract long getAssetId();
+    public long getAssetId();
     
-    public abstract Point2D.Double getLocation();
+    public Point2D.Double getLocation();
     
-    public abstract double getSize();
+    public double getSize();
     
-    public abstract int getHealth();
+    public int getHealth();
     
-    public abstract int getMaxHealth();
+    public int getMaxHealth();
 
-    public double getHealthRatio() {
-        return (double) getHealth() / getMaxHealth();
-    }
+    public double getHealthRatio();
     
 }

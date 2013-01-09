@@ -5,7 +5,7 @@ import com.rossallenbell.strifebasin.ui.Canvas;
 
 public class GameLoop extends StoppableThread {
     
-    private static final long COMM_UPDATE_INTERVAL = 500;
+    private static final long COMM_UPDATE_INTERVAL = 250;
     
     private long lastCommUpdateTime;
     

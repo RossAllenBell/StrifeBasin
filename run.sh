@@ -1,1 +1,1 @@
-java -jar target/StrifeBasin-1.0.jar
+java -ea -jar target/StrifeBasin-1.0.jar

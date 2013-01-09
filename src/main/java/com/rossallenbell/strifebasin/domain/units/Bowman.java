@@ -1,10 +1,10 @@
 package com.rossallenbell.strifebasin.domain.units;
 
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 
-public class Bowman extends Unit {
+public class Bowman extends PlayerUnit {
     
-    public Bowman(Player owner) {
+    public Bowman(Me owner) {
         super(owner);
     }
 

@@ -1,34 +1,34 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
-import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 
-public class Player {
+public class Me {
     
     private int money;
     private int income;
     private long lastIncomeTime;
     
-    private List<Building> buildings;
-    private List<Unit> units;
+    private Map<Long, Building> buildings;
+    private Map<Long, PlayerUnit> units;
     private long assetId;
     
-    public Player() {
+    public Me() {
         assetId = 0;
         money = 0;
         income = Game.STARTING_INCOME;
-        buildings = Collections.synchronizedList(new ArrayList<Building>());
-        units = Collections.synchronizedList(new ArrayList<Unit>());
+        buildings = Collections.synchronizedMap(new HashMap<Long, Building>());
+        units = Collections.synchronizedMap(new HashMap<Long, PlayerUnit>());
     }
 
     public Sanctuary getSanctuary() {
-        for (Building building : getBuildings()) {
+        for (Building building : getBuildings().values()) {
             if (building instanceof Sanctuary) {
                 return (Sanctuary) building;
             }
@@ -66,19 +66,19 @@ public class Player {
     
     public void addBuilding(Building building) {
         building.setAssetId(getNextAssetId());
-        buildings.add(building);
+        buildings.put(building.getAssetId(), building);
     }
     
-    public List<Building> getBuildings() {
+    public Map<Long, Building> getBuildings() {
         return buildings;
     }
     
-    public void addUnit(Unit unit) {
+    public void addUnit(PlayerUnit unit) {
         unit.setAssetId(getNextAssetId());
-        units.add(unit);
+        units.put(unit.getAssetId(), unit);
     }
     
-    public List<Unit> getUnits() {
+    public Map<Long, PlayerUnit> getUnits() {
         return units;
     }
     
@@ -88,6 +88,14 @@ public class Player {
 
     public NetworkPlayer snapshot() {
         return new NetworkPlayer(this);
+    }
+    
+    public PlayerAsset getAssetById(long assetId) {
+        PlayerAsset asset = getBuildings().get(assetId);
+        if(asset == null) {
+            asset = getUnits().get(assetId);
+        }        
+        return asset;
     }
     
 }

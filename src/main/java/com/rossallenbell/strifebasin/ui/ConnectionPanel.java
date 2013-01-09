@@ -38,7 +38,11 @@ public class ConnectionPanel extends JPanel implements ActionListener{
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JPanel reservePortPanel = new JPanel();
-        myPortInput = new JTextField(Integer.toString(ConnectionToOpponent.DEFAULT_MY_PORT), 7);
+        int portToUse = ConnectionToOpponent.DEFAULT_MY_PORT;
+        if(!ConnectionToOpponent.portAvailable(portToUse)) {
+            portToUse++;
+        }
+        myPortInput = new JTextField(Integer.toString(portToUse), 7);
         reservePortPanel.add(myPortInput);
         
         reservePortButton = new JButton("Reserve Port");
@@ -62,10 +66,10 @@ public class ConnectionPanel extends JPanel implements ActionListener{
         
         JPanel invitePanel = new JPanel();
         
-        theirIP = new JTextField("their IP", 20);
+        theirIP = new JTextField("127.0.0.1", 20);
         invitePanel.add(theirIP);
         
-        theirPort = new JTextField(Integer.toString(ConnectionToOpponent.DEFAULT_MY_PORT), 7);
+        theirPort = new JTextField(Integer.toString(ConnectionToOpponent.DEFAULT_MY_PORT + 1), 7);
         invitePanel.add(theirPort);
         
         inviteButton = new JButton("Invite");

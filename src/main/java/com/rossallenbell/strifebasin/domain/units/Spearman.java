@@ -1,10 +1,10 @@
 package com.rossallenbell.strifebasin.domain.units;
 
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 
-public class Spearman extends Unit {
+public class Spearman extends PlayerUnit {
     
-    public Spearman(Player owner) {
+    public Spearman(Me owner) {
         super(owner);
     }
 

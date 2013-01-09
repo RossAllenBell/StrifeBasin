@@ -3,11 +3,11 @@ package com.rossallenbell.strifebasin.domain.buildings;
 import java.awt.Dimension;
 
 import com.rossallenbell.strifebasin.domain.PlayerAsset;
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 
 public abstract class Building extends PlayerAsset {
     
-    public Building(Player owner) {
+    public Building(Me owner) {
         super(owner);
     }
     

@@ -9,7 +9,7 @@ import java.util.List;
 import org.reflections.Reflections;
 
 import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
@@ -145,7 +145,7 @@ public class BuildMenu extends Menu {
         @Override
         public int compare(Class<? extends BuildableBuilding> o1, Class<? extends BuildableBuilding> o2) {
             try {
-                return new Integer(o1.getConstructor(Player.class).newInstance(Game.getInstance().getMe()).cost()).compareTo(o2.getConstructor(Player.class).newInstance(Game.getInstance().getMe()).cost());
+                return new Integer(o1.getConstructor(Me.class).newInstance(Game.getInstance().getMe()).cost()).compareTo(o2.getConstructor(Me.class).newInstance(Game.getInstance().getMe()).cost());
             } catch (Exception e) {
                 e.printStackTrace();
             }
