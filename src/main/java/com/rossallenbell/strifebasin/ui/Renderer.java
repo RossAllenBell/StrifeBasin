@@ -24,6 +24,7 @@ import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
+import com.rossallenbell.strifebasin.threads.GameLoop;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 
 public class Renderer {
@@ -194,6 +195,8 @@ public class Renderer {
         graphics.setColor(new Color(0, 255, 0));
         String pingString = "Ping: " + ConnectionToOpponent.getInstance().getPing();
         graphics.drawString(pingString, viewDimensions.width - fm.stringWidth(pingString) - 10, viewDimensions.height - 10);
+        String fpsString = "FPS: " + GameLoop.getInstance().getFps();
+        graphics.drawString(fpsString, viewDimensions.width - fm.stringWidth(fpsString) - 10, viewDimensions.height - 10 - fm.getHeight());
         
         //build menu
         List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
