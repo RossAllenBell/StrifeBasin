@@ -1,4 +1,3 @@
-fix y interpolation
 show fps
 win/loss message
 show income

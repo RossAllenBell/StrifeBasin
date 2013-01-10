@@ -65,4 +65,8 @@ public class Pathing {
         return false;
     }
     
+    public static double getDirection(Unit unit, Point2D.Double location) {        
+        return Math.atan2(location.x - unit.getLocation().x, location.y - unit.getLocation().y);
+    }
+    
 }

@@ -8,8 +8,6 @@ public interface Unit {
 
     public Point2D.Double getCurrentDestination();
 
-    public double getDirection();
-
     public double getDamage();
 
     public double getAggroRange();

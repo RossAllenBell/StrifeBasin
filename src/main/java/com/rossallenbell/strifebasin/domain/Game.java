@@ -107,7 +107,7 @@ public class Game {
                     location.setLocation(destination);
                 } else if (moveDistance > 0) {
                     Point2D.Double currentLocation = location;
-                    double direction = unit.getDirection();
+                    double direction = Pathing.getDirection(unit,destination);
                     double dx = Math.sin(direction) * moveDistance;
                     double dy = Math.cos(direction) * moveDistance;
                     location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
@@ -149,7 +149,6 @@ public class Game {
         for (NetworkUnit unit : networkPlayer.getUnits()) {
             unit.getLocation().setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
             unit.getCurrentDestination().setLocation(BOARD_WIDTH - unit.getCurrentDestination().x, unit.getCurrentDestination().y);
-            unit.setDirection((unit.getDirection() + Math.PI) % (2 * Math.PI));
         }
     }
     

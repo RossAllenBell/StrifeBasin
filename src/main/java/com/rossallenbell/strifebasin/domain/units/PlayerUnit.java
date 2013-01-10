@@ -94,7 +94,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
                 setLocation(destination);
             } else if (moveDistance > 0) {
                 Point2D.Double currentLocation = getLocation();
-                double direction = getDirection();
+                double direction = Pathing.getDirection(this, destination);
                 double dx = Math.sin(direction) * moveDistance;
                 double dy = Math.cos(direction) * moveDistance;
                 getLocation().setLocation(currentLocation.x + dx, currentLocation.y + dy);
@@ -131,13 +131,6 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     public void setTarget(NetworkAsset target) {
         this.target = target;
-    }
-    
-    @Override
-    public double getDirection() {
-        Point2D.Double target = getCurrentDestination();
-        
-        return Math.atan2(target.x - getLocation().x, target.y - getLocation().y);
     }
     
     @Override

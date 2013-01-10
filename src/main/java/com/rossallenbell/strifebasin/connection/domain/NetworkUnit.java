@@ -13,8 +13,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     
     private final double damage;
     
-    private double direction;
-    
     private final Point2D.Double destination;
     
     private final double speed;
@@ -30,7 +28,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     public NetworkUnit(PlayerUnit originalUnit) {
         super(originalUnit);
         damage = originalUnit.getDamage();
-        direction = originalUnit.getDirection();
         destination = originalUnit.getCurrentDestination();
         speed = originalUnit.getSpeed();
         range = originalUnit.getRange();
@@ -42,15 +39,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     @Override
     public double getDamage() {
         return damage;
-    }
-    
-    public void setDirection(double direction) {
-        this.direction = direction;
-    }
-    
-    @Override
-    public double getDirection() {
-        return direction;
     }
     
     @Override
