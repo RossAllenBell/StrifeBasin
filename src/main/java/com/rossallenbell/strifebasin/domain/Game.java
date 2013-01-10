@@ -98,7 +98,7 @@ public class Game {
         
         for (NetworkUnit unit : them.getUnits()) {
             double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * unit.getSpeed();
-            PlayerAsset target = me.getAssetById(unit.getAssetId());
+            PlayerAsset target = me.getAssetById(unit.getTargetId());
             if (!Pathing.canHitAsset(unit, target)) {
                 Point2D.Double destination = unit.getCurrentDestination();
                 Point2D.Double location = unit.getLocation();
@@ -142,13 +142,17 @@ public class Game {
     }
     
     public void updateTheirUnitsAndBuildings(NetworkPlayer networkPlayer) {
-        this.them = networkPlayer;
-        for (NetworkAsset building : networkPlayer.getBuildings()) {
+        them = networkPlayer;
+        for (NetworkAsset building : them.getBuildings()) {
             building.getLocation().setLocation(BOARD_WIDTH - building.getLocation().x - building.getSize(), building.getLocation().y);
         }
-        for (NetworkUnit unit : networkPlayer.getUnits()) {
-            unit.getLocation().setLocation(BOARD_WIDTH - unit.getLocation().x, unit.getLocation().y);
-            unit.getCurrentDestination().setLocation(BOARD_WIDTH - unit.getCurrentDestination().x, unit.getCurrentDestination().y);
+        for (NetworkUnit unit : them.getUnits()) {
+            double mirroredLocationX = BOARD_WIDTH - unit.getLocation().x;
+            double mirroredLocationY = unit.getLocation().y;
+            unit.getLocation().setLocation(mirroredLocationX, mirroredLocationY);
+            double mirroredDestinationX = BOARD_WIDTH - unit.getCurrentDestination().x;
+            double mirroredDestinationY = unit.getCurrentDestination().y;
+            unit.getCurrentDestination().setLocation(mirroredDestinationX, mirroredDestinationY);
         }
     }
     

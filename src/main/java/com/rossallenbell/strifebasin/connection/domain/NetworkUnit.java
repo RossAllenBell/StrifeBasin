@@ -28,7 +28,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     public NetworkUnit(PlayerUnit originalUnit) {
         super(originalUnit);
         damage = originalUnit.getDamage();
-        destination = originalUnit.getCurrentDestination();
+        destination = new Point2D.Double(originalUnit.getCurrentDestination().x, originalUnit.getCurrentDestination().y);
         speed = originalUnit.getSpeed();
         range = originalUnit.getRange();
         aggroRange = originalUnit.getAggroRange();
