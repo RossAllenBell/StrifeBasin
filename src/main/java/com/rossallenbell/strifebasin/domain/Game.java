@@ -100,7 +100,10 @@ public class Game {
         for (NetworkUnit unit : them.getUnits()) {
             double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * unit.getSpeed();
             PlayerAsset target = me.getAssetById(unit.getTargetId());
-            if (!Pathing.canHitAsset(unit, target)) {
+            // if the target is null, it should imply that the peer unit was
+            // attacking a local asset that died, but the death hasn't updated
+            // to the peer unit yet
+            if (target != null && !Pathing.canHitAsset(unit, target)) {
                 Point2D.Double destination = unit.getCurrentDestination();
                 Point2D.Double location = unit.getLocation();
                 double distanceToDestination = destination.distance(location);
@@ -108,7 +111,7 @@ public class Game {
                     location.setLocation(destination);
                 } else if (moveDistance > 0) {
                     Point2D.Double currentLocation = location;
-                    double direction = Pathing.getDirection(unit,destination);
+                    double direction = Pathing.getDirection(unit, destination);
                     double dx = Math.sin(direction) * moveDistance;
                     double dy = Math.cos(direction) * moveDistance;
                     location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
@@ -161,7 +164,7 @@ public class Game {
     
     public void attackEvent(AttackEvent attackEvent) {
         PlayerAsset asset = me.getAssetById(attackEvent.getTarget().getAssetId());
-        if(asset != null) {
+        if (asset != null) {
             asset.takeDamage(attackEvent.getUnit());
         }
     }
