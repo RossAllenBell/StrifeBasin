@@ -112,7 +112,7 @@ public class Renderer {
             }
         }
         
-        for (NetworkAsset building : Game.getInstance().getTheirBuildings()) {
+        for (NetworkAsset building : Game.getInstance().getTheirBuildings().values()) {
             Point2D.Double location = building.getLocation();
             graphics.setColor(new Color(255, 0, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), (int) building.getSize() * PIXELS_PER_BOARD_UNIT, (int) building.getSize() * PIXELS_PER_BOARD_UNIT);
@@ -133,7 +133,7 @@ public class Renderer {
             }
         }
         
-        for (NetworkUnit unit : Game.getInstance().getTheirUnits()) {
+        for (NetworkUnit unit : Game.getInstance().getTheirUnits().values()) {
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.setColor(new Color(255, 0, 0));

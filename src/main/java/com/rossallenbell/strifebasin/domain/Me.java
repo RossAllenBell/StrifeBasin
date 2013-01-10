@@ -9,7 +9,7 @@ import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 
-public class Me {
+public class Me implements Player {
     
     private int money;
     private int income;

@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import com.rossallenbell.strifebasin.domain.Asset;
 
-public interface Unit {
+public interface Unit extends Asset {
 
     public Point2D.Double getCurrentDestination();
 

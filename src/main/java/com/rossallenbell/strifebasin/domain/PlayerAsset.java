@@ -2,7 +2,7 @@ package com.rossallenbell.strifebasin.domain;
 
 import java.awt.geom.Point2D;
 
-import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
+import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public abstract class PlayerAsset implements Asset {
     
@@ -55,8 +55,9 @@ public abstract class PlayerAsset implements Asset {
         return health;
     }
     
-    public void takeDamage(NetworkUnit networkUnit) {
-        health -= networkUnit.getDamage();
+    @Override
+    public void takeDamage(Unit unit) {
+        health -= unit.getDamage();
     }
     
     @Override

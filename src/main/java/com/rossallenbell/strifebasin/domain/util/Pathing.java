@@ -4,10 +4,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.domain.Asset;
-import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
+import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Pathing {
@@ -25,10 +23,10 @@ public class Pathing {
         
     }
     
-    public NetworkAsset getClosestAggroableAsset(PlayerUnit unit) {
-        NetworkAsset target = null;
+    public Asset getClosestAggroableAsset(Unit unit, Player theOtherPlayer) {
+        Asset target = null;
         
-        for (NetworkAsset theirUnit : Game.getInstance().getThem().getUnits()) {
+        for (Unit theirUnit : theOtherPlayer.getUnits().values()) {
             double distanceToTheirUnit = theirUnit.getHitLocation().distance(unit.getLocation());
             if (distanceToTheirUnit <= unit.getAggroRange()) {
                 if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirUnit) {
@@ -38,7 +36,7 @@ public class Pathing {
         }
         
         if (target == null) {
-            for (NetworkAsset building : Game.getInstance().getThem().getBuildings()) {
+            for (Asset building : theOtherPlayer.getBuildings().values()) {
                 double distanceToTheirBuilding = building.getHitLocation().distance(unit.getLocation());
                 if (distanceToTheirBuilding <= unit.getAggroRange()) {
                     if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirBuilding) {
@@ -51,7 +49,7 @@ public class Pathing {
         return target;
     }
     
-    public List<Point2D.Double> getRoute(Unit unit, NetworkAsset target) {
+    public List<Point2D.Double> getRoute(Unit unit, Asset target) {
         List<Point2D.Double> route = new ArrayList<Point2D.Double>();
         route.add(target.getHitLocation());
         return route;

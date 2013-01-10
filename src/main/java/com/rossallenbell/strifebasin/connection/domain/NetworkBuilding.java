@@ -2,13 +2,13 @@ package com.rossallenbell.strifebasin.connection.domain;
 
 import java.awt.geom.Point2D;
 
-import com.rossallenbell.strifebasin.domain.PlayerAsset;
+import com.rossallenbell.strifebasin.domain.Asset;
 
 public class NetworkBuilding extends NetworkAsset {
     
     private static final long serialVersionUID = 1L;
     
-    public NetworkBuilding(PlayerAsset originalAsset) {
+    public NetworkBuilding(Asset originalAsset) {
         super(originalAsset);
     }
     

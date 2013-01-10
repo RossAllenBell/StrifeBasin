@@ -2,8 +2,8 @@ package com.rossallenbell.strifebasin.connection.domain;
 
 import java.awt.geom.Point2D;
 
+import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.PlayerAsset;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
@@ -33,7 +33,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         range = originalUnit.getRange();
         aggroRange = originalUnit.getAggroRange();
         attackSpeed = originalUnit.getAttackSpeed();
-        targetId = originalUnit.getTarget().getAssetId();
+        targetId = originalUnit.getTargetId();
     }
     
     @Override
@@ -72,7 +72,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     }
     
     @Override
-    public PlayerAsset getTarget() {
+    public Asset getTarget() {
         return Game.getInstance().getMe().getAssetById(getTargetId());
     }
     

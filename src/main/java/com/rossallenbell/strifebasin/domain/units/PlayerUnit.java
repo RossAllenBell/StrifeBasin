@@ -28,7 +28,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     public static final long ROUTE_ASSESSMENT_COOLDOWN = 500;
     
     private List<Point2D.Double> route;
-    private NetworkAsset target;
+    private long targetId;
     
     private long lastTargetAssessment;
     private long lastRouteAssessment;
@@ -76,13 +76,14 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         }
         
         // target
+        Asset target = Game.getInstance().getThem().getUnits().get(targetId);
         if (target == null || target.getHealth() <= 0 || lastTargetAssessment + TARGET_ASSESSMENT_COOLDOWN <= updateTime) {
-            target = Pathing.getInstance().getClosestAggroableAsset(this);
+            target = Pathing.getInstance().getClosestAggroableAsset(this, Game.getInstance().getThem());
             if (target == null) {
                 target = Game.getInstance().getThem().getSanctuary();
             }
         }
-        assert target != null;
+        targetId = target.getAssetId();
         
         // move
         double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * getSpeed();
@@ -108,6 +109,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         // attack
         if (Pathing.canHitAsset(this, target) && lastAttackTime + getAttackSpeed() <= updateTime) {
             CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
+            target.takeDamage(this);
             lastAttackTime = updateTime;
         }
         
@@ -125,16 +127,16 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     @Override
     public long getTargetId() {
-        return target.getAssetId();
+        return targetId;
     }
     
     @Override
     public Asset getTarget() {
-        return target;
+        return Game.getInstance().getThem().getUnits().get(targetId);
     }
     
     public void setTarget(NetworkAsset target) {
-        this.target = target;
+        targetId = target.getAssetId();
     }
     
     @Override
@@ -143,6 +145,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             route.remove(0);
         }
         
+        Asset target = getTarget();
         if (!route.isEmpty()) {
             return route.get(0);
         } else if (target != null) {

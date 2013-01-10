@@ -2,7 +2,6 @@ package com.rossallenbell.strifebasin.domain;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
@@ -97,12 +96,13 @@ public class Game {
             }
         }
         
-        for (NetworkUnit unit : them.getUnits()) {
+        for (NetworkUnit unit : them.getUnits().values()) {
             double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * unit.getSpeed();
-            PlayerAsset target = me.getAssetById(unit.getTargetId());
-            // if the target is null, it should imply that the peer unit was
-            // attacking a local asset that died, but the death hasn't updated
-            // to the peer unit yet
+            Asset target = me.getAssetById(unit.getTargetId());
+            if(target == null) {
+                //guess the next target until we get an update
+                target = Pathing.getInstance().getClosestAggroableAsset(unit, Game.getInstance().getMe());
+            }
             if (target != null && !Pathing.canHitAsset(unit, target)) {
                 Point2D.Double destination = unit.getCurrentDestination();
                 Point2D.Double location = unit.getLocation();
@@ -133,7 +133,7 @@ public class Game {
         return me.getBuildings();
     }
     
-    public List<NetworkBuilding> getTheirBuildings() {
+    public Map<Long, NetworkBuilding> getTheirBuildings() {
         return them.getBuildings();
     }
     
@@ -141,18 +141,18 @@ public class Game {
         return me.getUnits();
     }
     
-    public List<NetworkUnit> getTheirUnits() {
+    public Map<Long, NetworkUnit> getTheirUnits() {
         return them.getUnits();
     }
     
     public void updateTheirUnitsAndBuildings(NetworkPlayer networkPlayer) {
         them = networkPlayer;
-        for (NetworkAsset building : them.getBuildings()) {
+        for (NetworkAsset building : them.getBuildings().values()) {
             double mirroedLocationX = BOARD_WIDTH - building.getLocation().x - building.getSize();
             double mirroredLocationY = building.getLocation().y;
             building.getLocation().setLocation(mirroedLocationX, mirroredLocationY);
         }
-        for (NetworkUnit unit : them.getUnits()) {
+        for (NetworkUnit unit : them.getUnits().values()) {
             double mirroredLocationX = BOARD_WIDTH - unit.getLocation().x;
             double mirroredLocationY = unit.getLocation().y;
             unit.getLocation().setLocation(mirroredLocationX, mirroredLocationY);

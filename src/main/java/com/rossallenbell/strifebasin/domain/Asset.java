@@ -2,6 +2,8 @@ package com.rossallenbell.strifebasin.domain;
 
 import java.awt.geom.Point2D;
 
+import com.rossallenbell.strifebasin.domain.units.Unit;
+
 public interface Asset {
     
     public long getAssetId();
@@ -17,5 +19,7 @@ public interface Asset {
     public int getMaxHealth();
 
     public double getHealthRatio();
+
+    public abstract void takeDamage(Unit networkUnit);
     
 }
