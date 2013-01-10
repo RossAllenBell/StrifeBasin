@@ -1,13 +1,16 @@
 package com.rossallenbell.strifebasin.threads;
 
+import com.rossallenbell.strifebasin.connection.protocol.Ping;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.ui.Canvas;
 
 public class GameLoop extends StoppableThread {
     
     private static final long COMM_UPDATE_INTERVAL = 250;
+    private static final long PING_INTERVAL = 1000;
     
     private long lastCommUpdateTime;
+    private long lastPingTime;
     
     private static GameLoop theInstance;
     
@@ -31,6 +34,11 @@ public class GameLoop extends StoppableThread {
                 if (lastCommUpdateTime + COMM_UPDATE_INTERVAL <= loopStartTime) {
                     CommSocketSender.getInstance().enqueue(Game.getInstance().getMe().snapshot());
                     lastCommUpdateTime = loopStartTime;
+                }
+                
+                if (lastPingTime + PING_INTERVAL <= loopStartTime) {
+                    CommSocketSender.getInstance().enqueue(new Ping());
+                    lastPingTime = loopStartTime;
                 }
                 
                 Game.getInstance().update(loopStartTime);

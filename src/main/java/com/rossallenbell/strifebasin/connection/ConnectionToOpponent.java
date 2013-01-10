@@ -9,9 +9,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.rossallenbell.strifebasin.StrifeBasin;
 import com.rossallenbell.strifebasin.connection.protocol.ConnectionAccepted;
+import com.rossallenbell.strifebasin.connection.protocol.Pong;
 import com.rossallenbell.strifebasin.threads.CommSocketListener;
 import com.rossallenbell.strifebasin.threads.CommSocketSender;
 import com.rossallenbell.strifebasin.threads.ConnectionListener;
@@ -21,10 +25,13 @@ public class ConnectionToOpponent {
     
     public static short DEFAULT_MY_PORT = 23456;
     
+    public static int PING_HISTORY = 5;
+    
     private ServerSocket listeningSocket;
     private Socket commSocket;
     private Socket incomingSocket;
     private ObjectOutputStream commWriter;
+    private List<Pong> pingPongs;
     
     private static ConnectionToOpponent theInstance;
     
@@ -36,7 +43,7 @@ public class ConnectionToOpponent {
     }
     
     private ConnectionToOpponent() {
-        
+        pingPongs = Collections.synchronizedList(new ArrayList<Pong>(PING_HISTORY));
     }
     
     public void reservePort(int port) {
@@ -168,6 +175,25 @@ public class ConnectionToOpponent {
         }
         
         return false;
+    }
+    
+    public long getPing() {
+        if (pingPongs.isEmpty()) {
+            return 0;
+        }
+        
+        long sum = 0;
+        for (Pong pong : pingPongs) {
+            sum += pong.getRoundtripTime();
+        }
+        return sum / pingPongs.size();
+    }
+    
+    public void pongReturned(Pong pong) {
+        while(pingPongs.size() > PING_HISTORY - 1) {
+            pingPongs.remove(0);
+        }
+        pingPongs.add(pong);
     }
     
 }

@@ -15,6 +15,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
@@ -184,10 +185,17 @@ public class Renderer {
         
         FontMetrics fm = graphics.getFontMetrics();
         
+        //game stats
         graphics.setColor(new Color(0, 255, 0));
         String moneyString = "Money: " + Game.getInstance().getMe().getMoney();
         graphics.drawString(moneyString, 10, fm.getHeight());
         
+        //system stats
+        graphics.setColor(new Color(0, 255, 0));
+        String pingString = "Ping: " + ConnectionToOpponent.getInstance().getPing();
+        graphics.drawString(pingString, viewDimensions.width - fm.stringWidth(pingString) - 10, viewDimensions.height - 10);
+        
+        //build menu
         List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
         int nextX = 10;
         int num = 1;
@@ -209,6 +217,7 @@ public class Renderer {
             }
         }
         
+        //new building
         Class<? extends Building> clazz = BuildMenu.getInstance().getCursorEvent();
         if (clazz != null && mousePos != null) {
             try {

@@ -8,6 +8,8 @@ import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
 import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
 import com.rossallenbell.strifebasin.connection.protocol.ConnectionAccepted;
+import com.rossallenbell.strifebasin.connection.protocol.Ping;
+import com.rossallenbell.strifebasin.connection.protocol.Pong;
 import com.rossallenbell.strifebasin.domain.Game;
 
 public class CommSocketListener extends StoppableThread {
@@ -39,6 +41,10 @@ public class CommSocketListener extends StoppableThread {
                         Game.getInstance().updateTheirUnitsAndBuildings((NetworkPlayer) commInput);
                     } else if (commInput instanceof AttackEvent) {
                         Game.getInstance().attackEvent((AttackEvent) commInput);
+                    } else if (commInput instanceof Ping) {
+                        CommSocketSender.getInstance().enqueue(new Pong((Ping) commInput));
+                    } else if (commInput instanceof Pong) {
+                        ConnectionToOpponent.getInstance().pongReturned(((Pong) commInput).receive());
                     } else {
                         System.out.println("Unknown incoming data: " + commInput);
                     }

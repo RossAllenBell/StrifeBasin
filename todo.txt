@@ -1,4 +1,5 @@
-show ping to peer
+fix y interpolation
+show fps
 win/loss message
 show income
 buildings give income
