@@ -14,18 +14,18 @@ public class NetworkPlayer extends CommObject {
     
     private static final long serialVersionUID = 1L;
     
-    private final List<NetworkAsset> buildings;
+    private final List<NetworkBuilding> buildings;
     private final List<NetworkUnit> units;
     
     public NetworkPlayer() {
-        buildings = new ArrayList<NetworkAsset>();
+        buildings = new ArrayList<NetworkBuilding>();
         units = new ArrayList<NetworkUnit>();
     }
     
     public NetworkPlayer(Me player) {
-        buildings = new ArrayList<NetworkAsset>();
+        buildings = new ArrayList<NetworkBuilding>();
         for (Building building : player.getBuildings().values()) {
-            buildings.add(new NetworkAsset(building));
+            buildings.add(new NetworkBuilding(building));
         }
         
         units = new ArrayList<NetworkUnit>();
@@ -34,7 +34,7 @@ public class NetworkPlayer extends CommObject {
         }
     }
     
-    public List<NetworkAsset> getBuildings() {
+    public List<NetworkBuilding> getBuildings() {
         return Collections.unmodifiableList(buildings);
     }
     

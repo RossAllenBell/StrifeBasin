@@ -8,6 +8,8 @@ public interface Asset {
     
     public Point2D.Double getLocation();
     
+    public Point2D.Double getHitLocation();
+    
     public double getSize();
     
     public int getHealth();

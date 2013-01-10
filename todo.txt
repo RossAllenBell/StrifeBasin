@@ -2,7 +2,6 @@ show income
 win/loss message
 buildings give income
 refactor building placement to be game layer, not part of renderer
-correct building hitbox
 create build zone
 buildings cant occupy same space
 building images

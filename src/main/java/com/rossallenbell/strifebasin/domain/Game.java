@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkBuilding;
 import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.connection.gameevents.AttackEvent;
@@ -129,7 +130,7 @@ public class Game {
         return me.getBuildings();
     }
     
-    public List<NetworkAsset> getTheirBuildings() {
+    public List<NetworkBuilding> getTheirBuildings() {
         return them.getBuildings();
     }
     
@@ -144,7 +145,9 @@ public class Game {
     public void updateTheirUnitsAndBuildings(NetworkPlayer networkPlayer) {
         them = networkPlayer;
         for (NetworkAsset building : them.getBuildings()) {
-            building.getLocation().setLocation(BOARD_WIDTH - building.getLocation().x - building.getSize(), building.getLocation().y);
+            double mirroedLocationX = BOARD_WIDTH - building.getLocation().x - building.getSize();
+            double mirroredLocationY = building.getLocation().y;
+            building.getLocation().setLocation(mirroedLocationX, mirroredLocationY);
         }
         for (NetworkUnit unit : them.getUnits()) {
             double mirroredLocationX = BOARD_WIDTH - unit.getLocation().x;

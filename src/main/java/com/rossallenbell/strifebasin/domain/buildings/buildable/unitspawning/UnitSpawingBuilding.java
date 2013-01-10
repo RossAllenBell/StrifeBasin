@@ -37,10 +37,10 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
     @Override
     public void update(long updateTime) {
         if(getLastSpawnTime() + getSpawnCooldown() <= updateTime){
-            Double buildingLocation = getLocation();
+            Double buildingLocation = getHitLocation();
             PlayerUnit spawnedUnit = spawn(updateTime);
-            double x = buildingLocation.getX() + getShape().width;
-            double y = buildingLocation.getY() + ((double) getShape().height / 2);
+            double x = buildingLocation.getX() + (getShape().width / 2);
+            double y = buildingLocation.getY();
             spawnedUnit.setLocation(x, y);
             getOwner().addUnit(spawnedUnit);
         }

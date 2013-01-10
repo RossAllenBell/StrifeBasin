@@ -29,9 +29,9 @@ public class Pathing {
         NetworkAsset target = null;
         
         for (NetworkAsset theirUnit : Game.getInstance().getThem().getUnits()) {
-            double distanceToTheirUnit = theirUnit.getLocation().distance(unit.getLocation());
+            double distanceToTheirUnit = theirUnit.getHitLocation().distance(unit.getLocation());
             if (distanceToTheirUnit <= unit.getAggroRange()) {
-                if (target == null || target.getLocation().distance(unit.getLocation()) > distanceToTheirUnit) {
+                if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirUnit) {
                     target = theirUnit;
                 }
             }
@@ -39,9 +39,9 @@ public class Pathing {
         
         if (target == null) {
             for (NetworkAsset building : Game.getInstance().getThem().getBuildings()) {
-                double distanceToTheirBuilding = building.getLocation().distance(unit.getLocation());
+                double distanceToTheirBuilding = building.getHitLocation().distance(unit.getLocation());
                 if (distanceToTheirBuilding <= unit.getAggroRange()) {
-                    if (target == null || target.getLocation().distance(unit.getLocation()) > distanceToTheirBuilding) {
+                    if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirBuilding) {
                         target = building;
                     }
                 }
@@ -53,13 +53,13 @@ public class Pathing {
     
     public List<Point2D.Double> getRoute(Unit unit, NetworkAsset target) {
         List<Point2D.Double> route = new ArrayList<Point2D.Double>();
-        route.add(target.getLocation());
+        route.add(target.getHitLocation());
         return route;
     }
     
     public static boolean canHitAsset(Unit unit, Asset target) {
         if (target != null) {
-            double distanceToTarget = target.getLocation().distance(unit.getLocation());
+            double distanceToTarget = target.getHitLocation().distance(unit.getLocation());
             return distanceToTarget <= unit.getRange() + (target.getSize() / 2);
         }
         return false;

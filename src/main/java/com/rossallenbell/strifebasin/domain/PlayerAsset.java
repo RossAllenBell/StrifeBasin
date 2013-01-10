@@ -30,7 +30,11 @@ public abstract class PlayerAsset implements Asset {
     }
     
     public void setLocation(Point2D.Double location) {
-        location.setLocation(location);
+        setLocation(location.x, location.y);
+    }
+    
+    public Point2D.Double getHitLocation() {
+        return location;
     }
     
     public Me getOwner() {

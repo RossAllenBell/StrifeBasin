@@ -71,6 +71,10 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     public abstract double getDamage();
     
     public void update(long updateTime) {
+        if (lastUpdateTime == 0) {
+            lastUpdateTime = updateTime;
+        }
+        
         // target
         if (target == null || target.getHealth() <= 0 || lastTargetAssessment + TARGET_ASSESSMENT_COOLDOWN <= updateTime) {
             target = Pathing.getInstance().getClosestAggroableAsset(this);
@@ -135,14 +139,14 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     @Override
     public Point2D.Double getCurrentDestination() {
-        if(!route.isEmpty() && route.get(0).equals(getLocation())){
+        if (!route.isEmpty() && route.get(0).equals(getLocation())) {
             route.remove(0);
         }
         
-        if (!route.isEmpty()) {            
+        if (!route.isEmpty()) {
             return route.get(0);
         } else if (target != null) {
-            return target.getLocation();
+            return target.getHitLocation();
         } else {
             return getLocation();
         }

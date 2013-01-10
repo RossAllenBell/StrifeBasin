@@ -43,6 +43,11 @@ public class NetworkAsset implements Asset, Serializable {
     public Point2D.Double getLocation() {
         return location;
     }
+
+    @Override
+    public Point2D.Double getHitLocation() {
+        return location;
+    }
     
     @Override
     public double getSize() {

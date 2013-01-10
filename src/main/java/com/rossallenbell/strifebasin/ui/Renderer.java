@@ -50,8 +50,8 @@ public class Renderer {
     
     private static Renderer theInstance;
     
-    public static Renderer  getInstance() {
-        if(theInstance == null){
+    public static Renderer getInstance() {
+        if (theInstance == null) {
             theInstance = new Renderer();
         }
         return theInstance;
@@ -93,49 +93,53 @@ public class Renderer {
     }
     
     private void drawBackground(Graphics2D graphics) {
-        //graphics.drawImage(background, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
+        // graphics.drawImage(background, viewCornerPixelX, viewCornerPixelY,
+        // viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY +
+        // viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY,
+        // viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY +
+        // viewDimensions.height - 1, null);
         graphics.drawImage(background, 0, 0, null);
     }
     
     private void drawContent(Graphics2D graphics) {
-        for(Building building : Game.getInstance().getMyBuildings().values()){
+        for (Building building : Game.getInstance().getMyBuildings().values()) {
             Point2D.Double location = building.getLocation();
             graphics.setColor(new Color(0, 255, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
             
-            if(building.getHealthRatio() < 1) {
+            if (building.getHealthRatio() < 1) {
                 drawHealthbar(graphics, building);
             }
         }
-
-        for(NetworkAsset building : Game.getInstance().getTheirBuildings()){
+        
+        for (NetworkAsset building : Game.getInstance().getTheirBuildings()) {
             Point2D.Double location = building.getLocation();
             graphics.setColor(new Color(255, 0, 0));
             graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), (int) building.getSize() * PIXELS_PER_BOARD_UNIT, (int) building.getSize() * PIXELS_PER_BOARD_UNIT);
             
-            if(building.getHealthRatio() < 1) {
+            if (building.getHealthRatio() < 1) {
                 drawHealthbar(graphics, building);
             }
         }
-
-        for(PlayerUnit unit : Game.getInstance().getMyUnits().values()){
+        
+        for (PlayerUnit unit : Game.getInstance().getMyUnits().values()) {
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.setColor(new Color(0, 255, 0));
             graphics.fill(circle);
             
-            if(unit.getHealthRatio() < 1) {
+            if (unit.getHealthRatio() < 1) {
                 drawHealthbar(graphics, unit);
             }
         }
-
-        for(NetworkUnit unit : Game.getInstance().getTheirUnits()){
+        
+        for (NetworkUnit unit : Game.getInstance().getTheirUnits()) {
             Point2D.Double location = unit.getLocation();
             Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.setColor(new Color(255, 0, 0));
             graphics.fill(circle);
             
-            if(unit.getHealthRatio() < 1) {
+            if (unit.getHealthRatio() < 1) {
                 drawHealthbar(graphics, unit);
             }
         }
@@ -152,24 +156,18 @@ public class Renderer {
     }
     
     private Point2D.Double getTopCenterPixel(Asset asset) {
-        if(PlayerUnit.class.isAssignableFrom(asset.getClass()) || NetworkUnit.class.isAssignableFrom(asset.getClass())) {
-            double x = asset.getLocation().x * PIXELS_PER_BOARD_UNIT;
-            double y = (asset.getLocation().y - (asset.getSize() / 2.0)) * PIXELS_PER_BOARD_UNIT;
-            return new Point2D.Double(x, y);
-        } else {
-            double x = (asset.getLocation().x + (asset.getSize() / 2.0)) * PIXELS_PER_BOARD_UNIT;
-            double y = asset.getLocation().y * PIXELS_PER_BOARD_UNIT;
-            return new Point2D.Double(x, y);
-        }
+        double x = asset.getHitLocation().x * PIXELS_PER_BOARD_UNIT;
+        double y = (asset.getHitLocation().y - (asset.getSize() / 2.0)) * PIXELS_PER_BOARD_UNIT;
+        return new Point2D.Double(x, y);
     }
-
+    
     private void drawOverlay(Graphics2D graphics) {
         // minimap border
         graphics.setColor(new Color(255, 255, 255, 64));
         graphics.setStroke(new BasicStroke(3));
         graphics.drawRect((viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS);
         
-        //minimap
+        // minimap
         Composite composite = graphics.getComposite();
         graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
         graphics.drawImage(image, (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2) + MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS, 0, 0, image.getWidth(), image.getHeight(), null);
@@ -186,19 +184,19 @@ public class Renderer {
         
         FontMetrics fm = graphics.getFontMetrics();
         
-        //game stats
+        // game stats
         graphics.setColor(new Color(0, 255, 0));
         String moneyString = "Money: " + Game.getInstance().getMe().getMoney();
         graphics.drawString(moneyString, 10, fm.getHeight());
         
-        //system stats
+        // system stats
         graphics.setColor(new Color(0, 255, 0));
         String pingString = "Ping: " + ConnectionToOpponent.getInstance().getPing();
         graphics.drawString(pingString, viewDimensions.width - fm.stringWidth(pingString) - 10, viewDimensions.height - 10);
         String fpsString = "FPS: " + GameLoop.getInstance().getFps();
         graphics.drawString(fpsString, viewDimensions.width - fm.stringWidth(fpsString) - 10, viewDimensions.height - 10 - fm.getHeight());
         
-        //build menu
+        // build menu
         List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
         int nextX = 10;
         int num = 1;
@@ -220,7 +218,7 @@ public class Renderer {
             }
         }
         
-        //new building
+        // new building
         Class<? extends Building> clazz = BuildMenu.getInstance().getCursorEvent();
         if (clazz != null && mousePos != null) {
             try {
@@ -264,13 +262,17 @@ public class Renderer {
         graphics.setColor(new Color(30, 30, 30));
         graphics.fillRect(0, 0, background.getWidth(), background.getHeight());
         
-//        graphics.setColor(new Color(60, 60, 60));
-//        for (int i = 1; i < Game.BOARD_WIDTH; i++) {
-//            graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() - 1);
-//        }
-//        for (int i = 1; i < Game.BOARD_HEIGHT; i++) {
-//            graphics.drawLine(0, i * background.getHeight() / Game.BOARD_HEIGHT, background.getWidth() - 1, i * background.getHeight() / Game.BOARD_HEIGHT);
-//        }
+        // graphics.setColor(new Color(60, 60, 60));
+        // for (int i = 1; i < Game.BOARD_WIDTH; i++) {
+        // graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i
+        // * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() -
+        // 1);
+        // }
+        // for (int i = 1; i < Game.BOARD_HEIGHT; i++) {
+        // graphics.drawLine(0, i * background.getHeight() / Game.BOARD_HEIGHT,
+        // background.getWidth() - 1, i * background.getHeight() /
+        // Game.BOARD_HEIGHT);
+        // }
         
         return background;
     }
