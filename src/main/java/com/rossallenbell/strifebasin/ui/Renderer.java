@@ -5,6 +5,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -28,6 +29,9 @@ import com.rossallenbell.strifebasin.threads.GameLoop;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 
 public class Renderer {
+    
+    private static final String WIN_STRING = "YOU WIN";
+    private static final String LOSE_STRING = "YOU LOSE";
     
     private static final int MINIMAP_WIDTH_PIXELS = 300;
     private static final int MINIMAP_HEIGHT_PIXELS = (int) ((double) MINIMAP_WIDTH_PIXELS * Game.BOARD_HEIGHT / Game.BOARD_WIDTH);
@@ -162,6 +166,9 @@ public class Renderer {
     }
     
     private void drawOverlay(Graphics2D graphics) {
+        graphics.setFont(new Font(null,Font.PLAIN, 14));
+        FontMetrics fm = graphics.getFontMetrics();
+        
         // minimap border
         graphics.setColor(new Color(255, 255, 255, 64));
         graphics.setStroke(new BasicStroke(3));
@@ -181,8 +188,6 @@ public class Renderer {
         int minimapViewWidth = (int) ((double) viewDimensions.width / image.getWidth() * MINIMAP_WIDTH_PIXELS);
         int minimapViewHeight = (int) ((double) viewDimensions.height / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
         graphics.drawRect(minimapViewX, minimapViewY, minimapViewWidth, minimapViewHeight);
-        
-        FontMetrics fm = graphics.getFontMetrics();
         
         // game stats
         graphics.setColor(new Color(0, 255, 0));
@@ -234,6 +239,18 @@ public class Renderer {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        
+        if (Game.getInstance().getThem().getSanctuary().getHealth() <= 0) {
+            graphics.setColor(new Color(0, 255, 0));
+            graphics.setFont(new Font(null,Font.PLAIN, 70));
+            fm = graphics.getFontMetrics();
+            graphics.drawString(WIN_STRING, (viewDimensions.width / 2) - (fm.stringWidth(WIN_STRING) / 2), viewDimensions.height / 2);
+        } else if (Game.getInstance().getMe().getSanctuary().getHealth() <= 0) {
+            graphics.setColor(new Color(255, 0, 0));
+            graphics.setFont(new Font(null,Font.PLAIN, 70));
+            fm = graphics.getFontMetrics();
+            graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
         }
     }
     
