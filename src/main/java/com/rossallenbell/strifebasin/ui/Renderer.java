@@ -51,6 +51,7 @@ public class Renderer {
     private boolean panningWest = false;
     
     private Point mousePos;
+    private long currentTime;
     
     private static Renderer theInstance;
     
@@ -72,6 +73,7 @@ public class Renderer {
     public void render(Graphics2D destinationGraphics) {
         if (viewDimensions != null) {
             mousePos = Canvas.getInstance().getMousePosition();
+            currentTime = System.currentTimeMillis();
             
             Graphics2D graphics = image.createGraphics();
             
@@ -195,6 +197,9 @@ public class Renderer {
         graphics.drawString(moneyString, 10, fm.getHeight());
         String incomeString = "Income: " + (int) Game.getInstance().getMe().getIncome();
         graphics.drawString(incomeString, 10, fm.getHeight() * 2);
+        graphics.drawRect(10, (fm.getHeight()) * 2 + 10, fm.stringWidth("Income"), 10);
+        double incomeProgress = fm.stringWidth("Income") * (double) (currentTime - Game.getInstance().getMe().getLastIncomeTime()) / Game.INCOME_COOLDOWN;
+        graphics.fillRect(10, (fm.getHeight()) * 2 + 10, (int) incomeProgress, 10);
         
         // system stats
         graphics.setColor(new Color(0, 255, 0));
