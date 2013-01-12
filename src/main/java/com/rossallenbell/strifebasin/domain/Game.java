@@ -22,6 +22,7 @@ public class Game {
     public static final int BOARD_HEIGHT = 125;
     public static final double STARTING_INCOME = 10;
     public static final long INCOME_COOLDOWN = 10000;
+    public static final int BUILD_ZONE_WIDTH = (int) (BOARD_WIDTH * 0.15);
     
     private final Me me;
     private NetworkPlayer them;
@@ -126,7 +127,7 @@ public class Game {
     }
     
     public void buildingPlaced(Point buildLocation) {
-        if(buildingPreview != null) {
+        if (buildingPreview != null && isValidBuildLocation(buildLocation)) {
             BuildableBuilding building;
             try {
                 building = buildingPreview.getClass().getConstructor(Me.class).newInstance(Game.getInstance().getMe());
@@ -192,9 +193,16 @@ public class Game {
     public void clearBuildingPreview() {
         buildingPreview = null;
     }
-
+    
     public BuildableBuilding getBuildingPreview() {
         return buildingPreview;
+    }
+    
+    public boolean isValidBuildLocation(Point gamePoint) {
+        if (buildingPreview != null) {
+            return gamePoint.x + buildingPreview.getSize() <= Game.BUILD_ZONE_WIDTH;
+        }
+        return false;
     }
     
 }

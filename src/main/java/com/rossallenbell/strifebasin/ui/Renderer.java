@@ -232,10 +232,20 @@ public class Renderer {
         // new building
         Building building = Game.getInstance().getBuildingPreview();
         if (building != null && mousePos != null) {
-            Dimension dimension = building.getShape();
-            graphics.setColor(new Color(0, 255, 0, 128));
+            if(viewCornerPixelX < Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) {
+                graphics.setColor(new Color(0, 255, 0, 32));
+                graphics.fillRect(0,0,(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) - viewCornerPixelX,image.getHeight());
+            }
             
+            Dimension dimension = building.getShape();
             Point selectionPoint = getDisplayGridPointByMousePos(mousePos);
+            Point gamePoint = getGameGridUnitByMousePos(mousePos);
+            
+            if(Game.getInstance().isValidBuildLocation(gamePoint)) {
+                graphics.setColor(new Color(0, 255, 0, 128));
+            } else {
+                graphics.setColor(new Color(255, 0, 0, 128));
+            }
             
             graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
         }
