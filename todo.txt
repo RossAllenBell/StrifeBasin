@@ -1,4 +1,3 @@
-show income
 win/loss message
 buildings give income
 refactor building placement to be game layer, not part of renderer
