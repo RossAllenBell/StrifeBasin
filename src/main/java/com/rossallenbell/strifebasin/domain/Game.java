@@ -1,5 +1,6 @@
 package com.rossallenbell.strifebasin.domain;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,6 +29,8 @@ public class Game {
     private static Game theInstance;
     
     private long lastUpdateTime;
+    
+    private BuildableBuilding buildingPreview;
     
     public static Game getInstance() {
         if (theInstance == null) {
@@ -99,8 +102,8 @@ public class Game {
         for (NetworkUnit unit : them.getUnits().values()) {
             double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * unit.getSpeed();
             Asset target = me.getAssetById(unit.getTargetId());
-            if(target == null) {
-                //guess the next target until we get an update
+            if (target == null) {
+                // guess the next target until we get an update
                 target = Pathing.getInstance().getClosestAggroableAsset(unit, Game.getInstance().getMe());
             }
             if (target != null && !Pathing.canHitAsset(unit, target)) {
@@ -122,10 +125,19 @@ public class Game {
         lastUpdateTime = updateTime;
     }
     
-    public void buildingPlaced(BuildableBuilding building) {
-        if (me.getMoney() >= building.cost()) {
-            me.alterMoney(-1 * building.cost());
-            me.addBuilding(building);
+    public void buildingPlaced(Point buildLocation) {
+        if(buildingPreview != null) {
+            BuildableBuilding building;
+            try {
+                building = buildingPreview.getClass().getConstructor(Me.class).newInstance(Game.getInstance().getMe());
+                building.setLocation(buildLocation.x, buildLocation.y);
+                if (me.getMoney() >= building.cost()) {
+                    me.alterMoney(-1 * building.cost());
+                    me.addBuilding(building);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     
@@ -167,6 +179,22 @@ public class Game {
         if (asset != null) {
             asset.takeDamage(attackEvent.getUnit());
         }
+    }
+    
+    public void setBuildingPreview(Class<? extends BuildableBuilding> clazz) {
+        try {
+            buildingPreview = clazz.getConstructor(Me.class).newInstance(Game.getInstance().getMe());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void clearBuildingPreview() {
+        buildingPreview = null;
+    }
+
+    public BuildableBuilding getBuildingPreview() {
+        return buildingPreview;
     }
     
 }

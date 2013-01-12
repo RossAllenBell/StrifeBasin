@@ -21,7 +21,6 @@ import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
-import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
@@ -168,7 +167,7 @@ public class Renderer {
     }
     
     private void drawOverlay(Graphics2D graphics) {
-        graphics.setFont(new Font(null,Font.PLAIN, 14));
+        graphics.setFont(new Font(null, Font.PLAIN, 14));
         FontMetrics fm = graphics.getFontMetrics();
         
         // minimap border
@@ -231,29 +230,24 @@ public class Renderer {
         }
         
         // new building
-        Class<? extends Building> clazz = BuildMenu.getInstance().getCursorEvent();
-        if (clazz != null && mousePos != null) {
-            try {
-                Building building = clazz.getConstructor(Me.class).newInstance(Game.getInstance().getMe());
-                Dimension dimension = building.getShape();
-                graphics.setColor(new Color(0, 255, 0, 128));
-                
-                Point selectionPoint = getDisplayGridPointByMousePos(mousePos);
-                
-                graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        Building building = Game.getInstance().getBuildingPreview();
+        if (building != null && mousePos != null) {
+            Dimension dimension = building.getShape();
+            graphics.setColor(new Color(0, 255, 0, 128));
+            
+            Point selectionPoint = getDisplayGridPointByMousePos(mousePos);
+            
+            graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
         }
         
         if (Game.getInstance().getThem().getSanctuary().getHealth() <= 0) {
             graphics.setColor(new Color(0, 255, 0));
-            graphics.setFont(new Font(null,Font.PLAIN, 70));
+            graphics.setFont(new Font(null, Font.PLAIN, 70));
             fm = graphics.getFontMetrics();
             graphics.drawString(WIN_STRING, (viewDimensions.width / 2) - (fm.stringWidth(WIN_STRING) / 2), viewDimensions.height / 2);
         } else if (Game.getInstance().getMe().getSanctuary().getHealth() <= 0) {
             graphics.setColor(new Color(255, 0, 0));
-            graphics.setFont(new Font(null,Font.PLAIN, 70));
+            graphics.setFont(new Font(null, Font.PLAIN, 70));
             fm = graphics.getFontMetrics();
             graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
         }
@@ -344,16 +338,10 @@ public class Renderer {
     }
     
     public void mouseClicked(MouseEvent e) {
-        Class<? extends BuildableBuilding> buildMenuItem = BuildMenu.getInstance().getCursorEvent();
-        if (buildMenuItem != null) {
+        BuildableBuilding buildingPreview = Game.getInstance().getBuildingPreview();
+        if (buildingPreview != null) {
             Point buildLocation = getGameGridUnitByMousePos(Canvas.getInstance().getMousePosition());
-            try {
-                BuildableBuilding building = buildMenuItem.getConstructor(Me.class).newInstance(Game.getInstance().getMe());
-                building.setLocation(buildLocation.x, buildLocation.y);
-                Game.getInstance().buildingPlaced(building);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            Game.getInstance().buildingPlaced(buildLocation);
         }
     }
     

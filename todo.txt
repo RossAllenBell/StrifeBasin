@@ -1,4 +1,3 @@
-refactor building placement to be game layer, not part of renderer
 create build zone
 buildings cant occupy same space
 building images

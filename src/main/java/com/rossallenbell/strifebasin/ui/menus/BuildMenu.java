@@ -25,7 +25,6 @@ public class BuildMenu extends Menu {
     private List<Class<? extends BuildableBuilding>> advancedBuildings;
     
     private State state;
-    private int numSelected;
     
     private static BuildMenu theInstance;
     
@@ -96,22 +95,20 @@ public class BuildMenu extends Menu {
         switch (keyCode) {
             case KeyEvent.VK_ESCAPE:
                 state = State.CLOSED;
-                numSelected = -1;
+                Game.getInstance().clearBuildingPreview();
                 break;
             case KeyEvent.VK_B:
                 state = State.TYPE;
-                numSelected = -1;
+                Game.getInstance().clearBuildingPreview();
                 break;
             case KeyEvent.VK_1:
                 if (state == State.TYPE) {
                     state = State.BASIC;
-                    numSelected = -1;
                     break;
                 }
             case KeyEvent.VK_2:
                 if (state == State.TYPE) {
                     state = State.ADVANCED;
-                    numSelected = -1;
                     break;
                 }
             case KeyEvent.VK_3:
@@ -122,23 +119,14 @@ public class BuildMenu extends Menu {
             case KeyEvent.VK_8:
             case KeyEvent.VK_9:
             case KeyEvent.VK_0:
-                numSelected = keyCode - 48;
+                if (state == State.BASIC) {
+                    Game.getInstance().setBuildingPreview(basicBuildings.get(keyCode - 49));
+                }
+                if (state == State.ADVANCED) {
+                    Game.getInstance().setBuildingPreview(advancedBuildings.get(keyCode - 49));
+                }
                 break;
         }
-    }
-    
-    @Override
-    public Class<? extends BuildableBuilding> getCursorEvent() {
-        if (numSelected != -1) {
-            if (state == State.BASIC) {
-                return basicBuildings.get(numSelected - 1);
-            }
-            if (state == State.ADVANCED) {
-                return advancedBuildings.get(numSelected - 1);
-            }
-        }
-        
-        return null;
     }
     
     public class CostComparator implements Comparator<Class<? extends BuildableBuilding>> {
