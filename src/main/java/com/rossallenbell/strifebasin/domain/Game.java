@@ -200,7 +200,18 @@ public class Game {
     
     public boolean isValidBuildLocation(Point gamePoint) {
         if (buildingPreview != null) {
-            return gamePoint.x + buildingPreview.getSize() <= Game.BUILD_ZONE_WIDTH;
+            if (gamePoint.x + buildingPreview.getSize() > Game.BUILD_ZONE_WIDTH) {
+                return false;
+            }
+            
+            buildingPreview.setLocation(gamePoint.x, gamePoint.y);
+            for(Building otherBuilding : me.getBuildings().values()) {
+                if (Pathing.getInstance().buildingsOverlap(buildingPreview, otherBuilding)) {
+                    return false;
+                }
+            }
+            
+            return true;
         }
         return false;
     }

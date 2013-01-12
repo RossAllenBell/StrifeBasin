@@ -1,4 +1,3 @@
-buildings cant occupy same space
 building images
 unit sprites
 projectile sprites

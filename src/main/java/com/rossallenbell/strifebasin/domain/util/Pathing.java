@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Player;
+import com.rossallenbell.strifebasin.domain.buildings.Building;
+import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Pathing {
@@ -65,6 +67,13 @@ public class Pathing {
     
     public static double getDirection(Unit unit, Point2D.Double location) {        
         return Math.atan2(location.x - unit.getLocation().x, location.y - unit.getLocation().y);
+    }
+
+    public boolean buildingsOverlap(BuildableBuilding buildingPreview, Building otherBuilding) {
+        return buildingPreview.getLocation().x < otherBuilding.getLocation().x + otherBuilding.getSize() &&
+                buildingPreview.getLocation().x + buildingPreview.getSize() > otherBuilding.getLocation().x &&
+                buildingPreview.getLocation().y < otherBuilding.getLocation().y + otherBuilding.getSize() &&
+                buildingPreview.getLocation().y + buildingPreview.getSize() > otherBuilding.getLocation().y;
     }
     
 }
