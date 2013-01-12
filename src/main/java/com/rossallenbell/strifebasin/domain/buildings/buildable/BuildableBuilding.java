@@ -11,4 +11,9 @@ public abstract class BuildableBuilding extends Building {
 
     public abstract int cost();
     
+    @Override
+    public double getIncome() {
+        return cost() / 10.0;
+    }
+    
 }

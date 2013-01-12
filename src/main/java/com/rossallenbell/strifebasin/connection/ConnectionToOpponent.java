@@ -9,9 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import com.rossallenbell.strifebasin.StrifeBasin;
 import com.rossallenbell.strifebasin.connection.protocol.ConnectionAccepted;
@@ -31,7 +28,7 @@ public class ConnectionToOpponent {
     private Socket commSocket;
     private Socket incomingSocket;
     private ObjectOutputStream commWriter;
-    private List<Pong> pingPongs;
+    private Pong ping;
     
     private static ConnectionToOpponent theInstance;
     
@@ -43,7 +40,7 @@ public class ConnectionToOpponent {
     }
     
     private ConnectionToOpponent() {
-        pingPongs = Collections.synchronizedList(new ArrayList<Pong>(PING_HISTORY));
+        
     }
     
     public void reservePort(int port) {
@@ -178,22 +175,15 @@ public class ConnectionToOpponent {
     }
     
     public long getPing() {
-        if (pingPongs.isEmpty()) {
+        if (ping == null) {
             return 0;
         }
         
-        long sum = 0;
-        for (Pong pong : pingPongs) {
-            sum += pong.getRoundtripTime();
-        }
-        return sum / pingPongs.size();
+        return ping.getRoundtripTime();
     }
     
     public void pongReturned(Pong pong) {
-        while(pingPongs.size() > PING_HISTORY - 1) {
-            pingPongs.remove(0);
-        }
-        pingPongs.add(pong);
+        ping = pong;
     }
     
 }

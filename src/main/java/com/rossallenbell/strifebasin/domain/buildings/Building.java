@@ -28,4 +28,8 @@ public abstract class Building extends PlayerAsset {
         return new Point2D.Double(getLocation().x + (getSize() / 2), getLocation().y + (getSize() / 2));
     }
     
+    public double getIncome() {
+        return 0;
+    }
+    
 }

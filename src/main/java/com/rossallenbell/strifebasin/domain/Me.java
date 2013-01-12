@@ -11,8 +11,7 @@ import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 
 public class Me implements Player {
     
-    private int money;
-    private int income;
+    private double money;
     private long lastIncomeTime;
     
     private Map<Long, Building> buildings;
@@ -22,11 +21,10 @@ public class Me implements Player {
     public Me() {
         assetId = 0;
         money = 0;
-        income = Game.STARTING_INCOME;
         buildings = Collections.synchronizedMap(new HashMap<Long, Building>());
         units = Collections.synchronizedMap(new HashMap<Long, PlayerUnit>());
     }
-
+    
     public Sanctuary getSanctuary() {
         for (Building building : getBuildings().values()) {
             if (building instanceof Sanctuary) {
@@ -36,24 +34,24 @@ public class Me implements Player {
         return null;
     }
     
-    public int getMoney() {
+    public double getMoney() {
         return money;
     }
     
-    public void alterMoney(int amount) {
+    public void alterMoney(double amount) {
         money += amount;
     }
     
     public void income() {
-        money += income;
+        money += getIncome();
     }
     
-    public int getIncome() {
-        return income;
-    }
-    
-    public void alterIncome(int amount) {
-        income += amount;
+    public double getIncome() {
+        double income = 0;
+        for (Building building : getBuildings().values()) {
+            income += building.getIncome();
+        }
+        return income + Game.STARTING_INCOME;
     }
     
     public long getLastIncomeTime() {
@@ -85,16 +83,16 @@ public class Me implements Player {
     public synchronized long getNextAssetId() {
         return assetId++;
     }
-
+    
     public NetworkPlayer snapshot() {
         return new NetworkPlayer(this);
     }
     
     public PlayerAsset getAssetById(long assetId) {
         PlayerAsset asset = getBuildings().get(assetId);
-        if(asset == null) {
+        if (asset == null) {
             asset = getUnits().get(assetId);
-        }        
+        }
         return asset;
     }
     

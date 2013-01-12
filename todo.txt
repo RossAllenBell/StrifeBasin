@@ -1,4 +1,3 @@
-buildings give income
 income cooldown indicator
 refactor building placement to be game layer, not part of renderer
 create build zone

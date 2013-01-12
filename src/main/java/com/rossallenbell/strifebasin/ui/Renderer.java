@@ -191,9 +191,9 @@ public class Renderer {
         
         // game stats
         graphics.setColor(new Color(0, 255, 0));
-        String moneyString = "Money: " + Game.getInstance().getMe().getMoney();
+        String moneyString = "Money: " + (int) Game.getInstance().getMe().getMoney();
         graphics.drawString(moneyString, 10, fm.getHeight());
-        String incomeString = "Income: " + Game.getInstance().getMe().getIncome();
+        String incomeString = "Income: " + (int) Game.getInstance().getMe().getIncome();
         graphics.drawString(incomeString, 10, fm.getHeight() * 2);
         
         // system stats

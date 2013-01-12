@@ -19,7 +19,7 @@ public class Game {
     
     public static final int BOARD_WIDTH = 250;
     public static final int BOARD_HEIGHT = 125;
-    public static final int STARTING_INCOME = 10;
+    public static final double STARTING_INCOME = 10;
     public static final long INCOME_COOLDOWN = 10000;
     
     private final Me me;
