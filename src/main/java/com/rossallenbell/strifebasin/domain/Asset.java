@@ -22,4 +22,6 @@ public interface Asset {
 
     public abstract void takeDamage(Unit networkUnit);
     
+    public Class<? extends Asset> getImageClass();
+    
 }

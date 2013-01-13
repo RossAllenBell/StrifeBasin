@@ -26,6 +26,8 @@ import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuildin
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.threads.GameLoop;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
+import com.rossallenbell.strifebasin.ui.resources.HasImage;
+import com.rossallenbell.strifebasin.ui.resources.ImageManager;
 
 public class Renderer {
     
@@ -107,24 +109,14 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
+        graphics.setColor(new Color(0, 255, 0));
         for (Building building : Game.getInstance().getMyBuildings().values()) {
-            Point2D.Double location = building.getLocation();
-            graphics.setColor(new Color(0, 255, 0));
-            graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), building.getShape().width * PIXELS_PER_BOARD_UNIT, building.getShape().height * PIXELS_PER_BOARD_UNIT);
-            
-            if (building.getHealthRatio() < 1) {
-                drawHealthbar(graphics, building);
-            }
+            drawBuilding(graphics, building);
         }
-        
+
+        graphics.setColor(new Color(255, 0, 0));
         for (NetworkAsset building : Game.getInstance().getTheirBuildings().values()) {
-            Point2D.Double location = building.getLocation();
-            graphics.setColor(new Color(255, 0, 0));
-            graphics.fillRect((int) (location.x * PIXELS_PER_BOARD_UNIT), (int) (location.y * PIXELS_PER_BOARD_UNIT), (int) building.getSize() * PIXELS_PER_BOARD_UNIT, (int) building.getSize() * PIXELS_PER_BOARD_UNIT);
-            
-            if (building.getHealthRatio() < 1) {
-                drawHealthbar(graphics, building);
-            }
+            drawBuilding(graphics, building);
         }
         
         for (PlayerUnit unit : Game.getInstance().getMyUnits().values()) {
@@ -147,6 +139,27 @@ public class Renderer {
             if (unit.getHealthRatio() < 1) {
                 drawHealthbar(graphics, unit);
             }
+        }
+    }
+
+    private void drawBuilding(Graphics2D graphics, Asset building) {
+        drawBuilding(graphics, building, (int) (building.getLocation().x * PIXELS_PER_BOARD_UNIT), (int) (building.getLocation().y * PIXELS_PER_BOARD_UNIT));
+    }
+    
+    private void drawBuilding(Graphics2D graphics, Asset building, int displayX, int displayY) {        
+        int width = (int) (building.getSize() * PIXELS_PER_BOARD_UNIT);
+        int height = (int) (building.getSize() * PIXELS_PER_BOARD_UNIT);
+        
+        Class<? extends Asset> imagedClass = building.getImageClass();        
+        if (imagedClass.isAnnotationPresent(HasImage.class)) {
+            BufferedImage image = ImageManager.getInstance().getImage(imagedClass);
+            graphics.drawImage(image, displayX, displayY, displayX + width, displayY + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
+        } else {
+            graphics.fillRect(displayX, displayY, width, height);
+        }
+        
+        if (building.getHealthRatio() < 1) {
+            drawHealthbar(graphics, building);
         }
     }
     
@@ -230,23 +243,29 @@ public class Renderer {
         }
         
         // new building
-        Building building = Game.getInstance().getBuildingPreview();
+        BuildableBuilding building = Game.getInstance().getBuildingPreview();
         if (building != null && mousePos != null) {
-            if(viewCornerPixelX < Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) {
+            if (viewCornerPixelX < Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) {
                 graphics.setColor(new Color(0, 255, 0, 32));
-                graphics.fillRect(0,0,(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) - viewCornerPixelX,image.getHeight());
+                graphics.fillRect(0, 0, (Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) - viewCornerPixelX, image.getHeight());
             }
             
             Dimension dimension = building.getShape();
             Point selectionPoint = getDisplayGridPointByMousePos(mousePos);
             Point gamePoint = getGameGridUnitByMousePos(mousePos);
+            building.setLocation(selectionPoint.x, selectionPoint.y);
             
-            if(Game.getInstance().isValidBuildLocation(gamePoint)) {
-                graphics.setColor(new Color(0, 255, 0, 128));
+            if (Game.getInstance().isValidBuildLocation(gamePoint)) {
+                if(Game.getInstance().getMe().getMoney() >= building.cost()) {
+                    graphics.setColor(new Color(0, 255, 0, 128));
+                } else {
+                    graphics.setColor(new Color(255, 255, 0, 128));
+                }
             } else {
                 graphics.setColor(new Color(255, 0, 0, 128));
             }
             
+            drawBuilding(graphics, building, selectionPoint.x, selectionPoint.y);
             graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
         }
         

@@ -6,7 +6,9 @@ import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.units.Alchemist;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
+import com.rossallenbell.strifebasin.ui.resources.HasImage;
 
+@HasImage
 @AdvancedBuilding
 public class AlchemistLab extends UnitSpawingBuilding {
     

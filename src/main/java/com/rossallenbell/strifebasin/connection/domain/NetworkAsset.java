@@ -6,7 +6,7 @@ import java.io.Serializable;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
-public class NetworkAsset implements Asset, Serializable {
+public abstract class NetworkAsset implements Asset, Serializable {
     
     private static final long serialVersionUID = 1L;
     
@@ -75,5 +75,10 @@ public class NetworkAsset implements Asset, Serializable {
     }
 
     public void takeDamage(NetworkUnit networkUnit) {}
+
+    @Override
+    public Class<? extends Asset> getImageClass() {
+        return originalAssetClass;
+    }
     
 }

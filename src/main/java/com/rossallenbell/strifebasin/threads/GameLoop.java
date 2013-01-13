@@ -53,10 +53,12 @@ public class GameLoop extends StoppableThread {
                 Game.getInstance().update(loopStartTime);
                 Canvas.getInstance().repaint();
                 
-                if(loopTimes.size() > FPS_HISTORY - 1) {
-                    loopTimes.remove(0);
+                synchronized(loopTimes) {
+                    if(loopTimes.size() > FPS_HISTORY - 1) {
+                        loopTimes.remove(0);
+                    }
+                    loopTimes.add(loopStartTime);
                 }
-                loopTimes.add(loopStartTime);
                 
                 try {
                     Thread.sleep(Math.max(0, (long) (DESIRED_FRAME_DURATION - (System.currentTimeMillis() - loopStartTime))));
@@ -74,7 +76,9 @@ public class GameLoop extends StoppableThread {
             return 0;
         }
 
-        return 1000 / ((loopTimes.get(loopTimes.size() - 1) - loopTimes.get(0)) / (loopTimes.size() - 1));
+        synchronized(loopTimes) { 
+            return 1000 / ((loopTimes.get(loopTimes.size() - 1) - loopTimes.get(0)) / (loopTimes.size() - 1));
+        }
     }
     
 }

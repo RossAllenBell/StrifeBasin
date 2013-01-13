@@ -65,4 +65,9 @@ public abstract class PlayerAsset implements Asset {
         return (double) getHealth() / getMaxHealth();
     }
     
+    @Override
+    public Class<? extends Asset> getImageClass() {
+        return this.getClass();
+    }
+    
 }

@@ -1,9 +1,9 @@
-package com.rossallenbell.strifebasin.domain.buildings.buildable;
+package com.rossallenbell.strifebasin.ui.resources;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BasicBuilding {
+public @interface HasImage {
     
 }
