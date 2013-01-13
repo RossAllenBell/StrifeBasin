@@ -1,7 +1,9 @@
 package com.rossallenbell.strifebasin.domain.units;
 
 import com.rossallenbell.strifebasin.domain.Me;
+import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
 
+@HasAnimation
 public class Bowman extends PlayerUnit {
     
     public Bowman(Me owner) {

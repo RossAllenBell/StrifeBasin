@@ -66,7 +66,9 @@ public class Pathing {
     }
     
     public static double getDirection(Unit unit, Point2D.Double location) {        
-        return Math.atan2(location.x - unit.getLocation().x, location.y - unit.getLocation().y);
+        double dx = location.x - unit.getLocation().x;
+        double dy = location.y - unit.getLocation().y;
+        return Math.atan2(dy, dx) + (Math.PI / 2);
     }
 
     public boolean buildingsOverlap(BuildableBuilding buildingPreview, Building otherBuilding) {

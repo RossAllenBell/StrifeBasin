@@ -24,4 +24,8 @@ public interface Unit extends Asset {
     
     public Point2D.Double getLocation(); 
     
+    public int getAnimationFrame();
+    
+    public Class<? extends Asset> getAnimationClass();
+    
 }

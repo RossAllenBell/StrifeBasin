@@ -6,24 +6,22 @@ import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.util.Pathing;
 
 public class NetworkUnit extends NetworkAsset implements Unit {
     
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;   
     
-    private final double damage;
-    
-    private final Point2D.Double destination;
-    
-    private final double speed;
-    
-    private final double range;
-    
-    private final double aggroRange;
-    
-    private final double attackSpeed;
-    
+    private final double damage;    
+    private final Point2D.Double destination;    
+    private final double speed;    
+    private final double range;    
+    private final double aggroRange;    
+    private final double attackSpeed;    
     private final long targetId;
+    private final int animationFrame;
+    
+    private long lastUpdateTime;
     
     public NetworkUnit(PlayerUnit originalUnit) {
         super(originalUnit);
@@ -34,6 +32,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         aggroRange = originalUnit.getAggroRange();
         attackSpeed = originalUnit.getAttackSpeed();
         targetId = originalUnit.getTargetId();
+        animationFrame = originalUnit.getAnimationFrame();
     }
     
     @Override
@@ -74,6 +73,45 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     @Override
     public Asset getTarget() {
         return Game.getInstance().getMe().getAssetById(getTargetId());
+    }
+    
+    @Override
+    public int getAnimationFrame() {
+        return animationFrame;
+    }
+    
+    @Override
+    public Class<? extends Asset> getAnimationClass() {
+        return this.getOriginalAssetClass();
+    }
+
+    public void update(long updateTime) {
+        if(lastUpdateTime == 0) {
+            lastUpdateTime = updateTime;
+        }
+        
+        double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * getSpeed();
+        Asset target = Game.getInstance().getMe().getAssetById(getTargetId());
+        if (target == null) {
+            // guess the next target until we get an update
+            target = Pathing.getInstance().getClosestAggroableAsset(this, Game.getInstance().getMe());
+        }
+        if (target != null && !Pathing.canHitAsset(this, target)) {
+            Point2D.Double destination = getCurrentDestination();
+            Point2D.Double location = getLocation();
+            double distanceToDestination = destination.distance(location);
+            if (distanceToDestination <= moveDistance) {
+                location.setLocation(destination);
+            } else if (moveDistance > 0) {
+                Point2D.Double currentLocation = location;
+                double direction = Pathing.getDirection(this, destination);
+                double dx = Math.sin(direction) * moveDistance;
+                double dy = -Math.cos(direction) * moveDistance;
+                location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
+            }
+        }
+        
+        lastUpdateTime = updateTime;
     }
     
 }

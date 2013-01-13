@@ -11,9 +11,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
@@ -24,8 +27,11 @@ import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
-import com.rossallenbell.strifebasin.threads.GameLoop;
+import com.rossallenbell.strifebasin.domain.units.Unit;
+import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
+import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
+import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
 import com.rossallenbell.strifebasin.ui.resources.HasImage;
 import com.rossallenbell.strifebasin.ui.resources.ImageManager;
 
@@ -36,8 +42,10 @@ public class Renderer {
     
     private static final int MINIMAP_WIDTH_PIXELS = 300;
     private static final int MINIMAP_HEIGHT_PIXELS = (int) ((double) MINIMAP_WIDTH_PIXELS * Game.BOARD_HEIGHT / Game.BOARD_WIDTH);
-    private static final int PIXELS_PER_BOARD_UNIT = 10;
-    private static final int PIXELS_PER_PAN_TICK = 20;
+    private static final int PIXELS_PER_BOARD_UNIT = 15;
+    private static final int PIXELS_PER_PAN_TICK = PIXELS_PER_BOARD_UNIT * 2;
+    
+    private static final int FPS_HISTORY = 10;
     
     private final BufferedImage image;
     private final BufferedImage background;
@@ -54,6 +62,8 @@ public class Renderer {
     private Point mousePos;
     private long currentTime;
     
+    private List<Long> loopTimes;
+    
     private static Renderer theInstance;
     
     public static Renderer getInstance() {
@@ -69,12 +79,15 @@ public class Renderer {
         
         viewCornerPixelX = 0;
         viewCornerPixelY = 0;
+        
+        loopTimes = Collections.synchronizedList(new ArrayList<Long>(FPS_HISTORY));
     }
     
     public void render(Graphics2D destinationGraphics) {
+        currentTime = System.currentTimeMillis();
+        
         if (viewDimensions != null) {
             mousePos = Canvas.getInstance().getMousePosition();
-            currentTime = System.currentTimeMillis();
             
             Graphics2D graphics = image.createGraphics();
             
@@ -96,6 +109,13 @@ public class Renderer {
             destinationGraphics.drawImage(image, 0, 0, viewDimensions.width - 1, viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
             
             drawOverlay(destinationGraphics);
+            
+            synchronized (loopTimes) {
+                if (loopTimes.size() > FPS_HISTORY - 1) {
+                    loopTimes.remove(0);
+                }
+                loopTimes.add(currentTime);
+            }
         }
     }
     
@@ -109,48 +129,40 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        graphics.setColor(new Color(0, 255, 0));
-        for (Building building : Game.getInstance().getMyBuildings().values()) {
-            drawBuilding(graphics, building);
+        synchronized (Game.getInstance().getMyBuildings()) {
+            for (Building building : Game.getInstance().getMyBuildings().values()) {
+                graphics.setColor(new Color(0, 255, 0));
+                drawBuilding(graphics, building);
+            }
         }
-
-        graphics.setColor(new Color(255, 0, 0));
+        
         for (NetworkAsset building : Game.getInstance().getTheirBuildings().values()) {
+            graphics.setColor(new Color(255, 0, 0));
             drawBuilding(graphics, building);
         }
         
-        for (PlayerUnit unit : Game.getInstance().getMyUnits().values()) {
-            Point2D.Double location = unit.getLocation();
-            Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
-            graphics.setColor(new Color(0, 255, 0));
-            graphics.fill(circle);
-            
-            if (unit.getHealthRatio() < 1) {
-                drawHealthbar(graphics, unit);
+        synchronized (Game.getInstance().getMyUnits()) {
+            for (PlayerUnit unit : Game.getInstance().getMyUnits().values()) {
+                graphics.setColor(new Color(0, 255, 0));
+                drawUnit(graphics, unit);
             }
         }
         
         for (NetworkUnit unit : Game.getInstance().getTheirUnits().values()) {
-            Point2D.Double location = unit.getLocation();
-            Ellipse2D.Double circle = new Ellipse2D.Double(location.x * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), location.y * PIXELS_PER_BOARD_UNIT - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), unit.getSize() * PIXELS_PER_BOARD_UNIT, unit.getSize() * PIXELS_PER_BOARD_UNIT);
             graphics.setColor(new Color(255, 0, 0));
-            graphics.fill(circle);
-            
-            if (unit.getHealthRatio() < 1) {
-                drawHealthbar(graphics, unit);
-            }
+            drawUnit(graphics, unit);
         }
     }
-
+    
     private void drawBuilding(Graphics2D graphics, Asset building) {
         drawBuilding(graphics, building, (int) (building.getLocation().x * PIXELS_PER_BOARD_UNIT), (int) (building.getLocation().y * PIXELS_PER_BOARD_UNIT));
     }
     
-    private void drawBuilding(Graphics2D graphics, Asset building, int displayX, int displayY) {        
+    private void drawBuilding(Graphics2D graphics, Asset building, int displayX, int displayY) {
         int width = (int) (building.getSize() * PIXELS_PER_BOARD_UNIT);
         int height = (int) (building.getSize() * PIXELS_PER_BOARD_UNIT);
         
-        Class<? extends Asset> imagedClass = building.getImageClass();        
+        Class<? extends Asset> imagedClass = building.getImageClass();
         if (imagedClass.isAnnotationPresent(HasImage.class)) {
             BufferedImage image = ImageManager.getInstance().getImage(imagedClass);
             graphics.drawImage(image, displayX, displayY, displayX + width, displayY + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
@@ -160,6 +172,33 @@ public class Renderer {
         
         if (building.getHealthRatio() < 1) {
             drawHealthbar(graphics, building);
+        }
+    }
+    
+    private void drawUnit(Graphics2D graphics, Unit unit) {
+        int x = (int) (unit.getLocation().x * PIXELS_PER_BOARD_UNIT);
+        int y = (int) (unit.getLocation().y * PIXELS_PER_BOARD_UNIT);
+        int width = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
+        int height = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
+        
+        AffineTransform oldXForm = graphics.getTransform();
+        graphics.rotate(Pathing.getDirection(unit, unit.getCurrentDestination()), x, y);
+        
+        Class<? extends Asset> animatedClass = unit.getAnimationClass();
+        if (animatedClass.isAnnotationPresent(HasAnimation.class)) {
+            BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame());
+            x = x - (width / 2);
+            y = y - (height / 2);
+            graphics.drawImage(image, x, y, x + width, y + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
+        } else {
+            Ellipse2D.Double circle = new Ellipse2D.Double(x - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), y - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), width, height);
+            graphics.fill(circle);
+        }
+        
+        graphics.setTransform(oldXForm);
+        
+        if (unit.getHealthRatio() < 1) {
+            drawHealthbar(graphics, unit);
         }
     }
     
@@ -217,7 +256,7 @@ public class Renderer {
         graphics.setColor(new Color(0, 255, 0));
         String pingString = "Ping: " + ConnectionToOpponent.getInstance().getPing();
         graphics.drawString(pingString, viewDimensions.width - fm.stringWidth(pingString) - 10, viewDimensions.height - 10);
-        String fpsString = "FPS: " + GameLoop.getInstance().getFps();
+        String fpsString = "FPS: " + getFps();
         graphics.drawString(fpsString, viewDimensions.width - fm.stringWidth(fpsString) - 10, viewDimensions.height - 10 - fm.getHeight());
         
         // build menu
@@ -256,7 +295,7 @@ public class Renderer {
             building.setLocation(selectionPoint.x, selectionPoint.y);
             
             if (Game.getInstance().isValidBuildLocation(gamePoint)) {
-                if(Game.getInstance().getMe().getMoney() >= building.cost()) {
+                if (Game.getInstance().getMe().getMoney() >= building.cost()) {
                     graphics.setColor(new Color(0, 255, 0, 128));
                 } else {
                     graphics.setColor(new Color(255, 255, 0, 128));
@@ -371,6 +410,16 @@ public class Renderer {
         if (buildingPreview != null) {
             Point buildLocation = getGameGridUnitByMousePos(Canvas.getInstance().getMousePosition());
             Game.getInstance().buildingPlaced(buildLocation);
+        }
+    }
+    
+    public long getFps() {
+        if (loopTimes.size() < 2) {
+            return 0;
+        }
+        
+        synchronized (loopTimes) {
+            return 1000 / ((loopTimes.get(loopTimes.size() - 1) - loopTimes.get(0)) / (loopTimes.size() - 1));
         }
     }
     

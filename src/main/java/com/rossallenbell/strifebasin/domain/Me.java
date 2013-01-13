@@ -2,6 +2,7 @@ package com.rossallenbell.strifebasin.domain;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
@@ -64,7 +65,9 @@ public class Me implements Player {
     
     public void addBuilding(Building building) {
         building.setAssetId(getNextAssetId());
-        buildings.put(building.getAssetId(), building);
+        synchronized (buildings) {
+            buildings.put(building.getAssetId(), building);
+        }
     }
     
     public Map<Long, Building> getBuildings() {
@@ -73,7 +76,9 @@ public class Me implements Player {
     
     public void addUnit(PlayerUnit unit) {
         unit.setAssetId(getNextAssetId());
-        units.put(unit.getAssetId(), unit);
+        synchronized (units) {
+            units.put(unit.getAssetId(), unit);
+        }
     }
     
     public Map<Long, PlayerUnit> getUnits() {
@@ -94,6 +99,38 @@ public class Me implements Player {
             asset = getUnits().get(assetId);
         }
         return asset;
+    }
+    
+    public void update(long updateTime) {
+        if (getLastIncomeTime() < updateTime - Game.INCOME_COOLDOWN) {
+            income();
+            setLastIncomeTime(updateTime);
+        }
+        
+        synchronized (buildings) {
+            Iterator<Building> buildingsI = buildings.values().iterator();
+            while (buildingsI.hasNext()) {
+                Building building = buildingsI.next();
+                if (building.getHealth() > 0) {
+                    building.update(updateTime);
+                } else if (building.getHealth() <= 0 && !(building instanceof Sanctuary)) {
+                    buildingsI.remove();
+                }
+            }
+        }
+        
+        synchronized (units) {
+            Iterator<PlayerUnit> unitsI = units.values().iterator();
+            while (unitsI.hasNext()) {
+                PlayerUnit unit = unitsI.next();
+                if (unit.getHealth() > 0) {
+                    unit.update(updateTime);
+                } else if (unit.getHealth() <= 0) {
+                    unitsI.remove();
+                }
+            }
+        }
+        
     }
     
 }

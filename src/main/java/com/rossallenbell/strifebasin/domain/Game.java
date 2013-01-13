@@ -1,8 +1,6 @@
 package com.rossallenbell.strifebasin.domain;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
-import java.util.Iterator;
 import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
@@ -28,8 +26,6 @@ public class Game {
     private NetworkPlayer them;
     
     private static Game theInstance;
-    
-    private long lastUpdateTime;
     
     private BuildableBuilding buildingPreview;
     
@@ -75,55 +71,8 @@ public class Game {
     }
     
     public void update(long updateTime) {
-        if (me.getLastIncomeTime() < updateTime - INCOME_COOLDOWN) {
-            me.income();
-            me.setLastIncomeTime(updateTime);
-        }
-        
-        Iterator<Building> buildings = me.getBuildings().values().iterator();
-        while (buildings.hasNext()) {
-            Building building = buildings.next();
-            if (building.getHealth() > 0) {
-                building.update(updateTime);
-            } else if (building.getHealth() <= 0 && !(building instanceof Sanctuary)) {
-                buildings.remove();
-            }
-        }
-        
-        Iterator<PlayerUnit> units = me.getUnits().values().iterator();
-        while (units.hasNext()) {
-            PlayerUnit unit = units.next();
-            if (unit.getHealth() > 0) {
-                unit.update(updateTime);
-            } else if (unit.getHealth() <= 0) {
-                units.remove();
-            }
-        }
-        
-        for (NetworkUnit unit : them.getUnits().values()) {
-            double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * unit.getSpeed();
-            Asset target = me.getAssetById(unit.getTargetId());
-            if (target == null) {
-                // guess the next target until we get an update
-                target = Pathing.getInstance().getClosestAggroableAsset(unit, Game.getInstance().getMe());
-            }
-            if (target != null && !Pathing.canHitAsset(unit, target)) {
-                Point2D.Double destination = unit.getCurrentDestination();
-                Point2D.Double location = unit.getLocation();
-                double distanceToDestination = destination.distance(location);
-                if (distanceToDestination <= moveDistance) {
-                    location.setLocation(destination);
-                } else if (moveDistance > 0) {
-                    Point2D.Double currentLocation = location;
-                    double direction = Pathing.getDirection(unit, destination);
-                    double dx = Math.sin(direction) * moveDistance;
-                    double dy = Math.cos(direction) * moveDistance;
-                    location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
-                }
-            }
-        }
-        
-        lastUpdateTime = updateTime;
+        me.update(updateTime);
+        them.update(updateTime);
     }
     
     public void buildingPlaced(Point buildLocation) {

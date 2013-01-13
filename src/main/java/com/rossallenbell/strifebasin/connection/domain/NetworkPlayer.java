@@ -1,6 +1,5 @@
 package com.rossallenbell.strifebasin.connection.domain;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ public class NetworkPlayer extends CommObject implements Player {
     
     private final Map<Long, NetworkBuilding> buildings;
     private final Map<Long, NetworkUnit> units;
-    
+
     public NetworkPlayer() {
         buildings = new HashMap<Long, NetworkBuilding>();
         units = new HashMap<Long, NetworkUnit>();
@@ -36,11 +35,11 @@ public class NetworkPlayer extends CommObject implements Player {
     }
     
     public Map<Long, NetworkBuilding> getBuildings() {
-        return Collections.unmodifiableMap(buildings);
+        return buildings;
     }
     
     public Map<Long, NetworkUnit> getUnits() {
-        return Collections.unmodifiableMap(units);
+        return units;
     }
     
     public NetworkAsset getSanctuary() {
@@ -51,6 +50,12 @@ public class NetworkPlayer extends CommObject implements Player {
         }
         assert false;
         return null;
+    }
+
+    public void update(long updateTime) {        
+        for (NetworkUnit unit : getUnits().values()) {
+            unit.update(updateTime);
+        }
     }
     
 }

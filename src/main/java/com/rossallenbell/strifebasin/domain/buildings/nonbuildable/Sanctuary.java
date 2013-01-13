@@ -15,7 +15,7 @@ public class Sanctuary extends Building {
 
     @Override
     public Dimension getShape() {
-        return new Dimension(6,6);
+        return new Dimension(8,8);
     }
 
     public int getMaxHealth() {

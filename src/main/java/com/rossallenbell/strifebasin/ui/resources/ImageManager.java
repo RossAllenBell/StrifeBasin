@@ -27,7 +27,7 @@ public class ImageManager {
         images = new HashMap<Class<?>, BufferedImage>();
         
         try {
-            Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings");
+            Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain");
             for (Class<?> imagedClass : reflections.getTypesAnnotatedWith(HasImage.class)) {
                 String imagePath = "images/" + imagedClass.getSimpleName().toLowerCase() + ".png";
                 URL resourceURL = ImageManager.class.getClassLoader().getResource(imagePath);

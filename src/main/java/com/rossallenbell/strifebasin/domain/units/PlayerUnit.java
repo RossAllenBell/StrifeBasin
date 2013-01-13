@@ -14,10 +14,11 @@ import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.PlayerAsset;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.threads.CommSocketSender;
+import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 
 public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
-    public static final double DEFAULT_SIZE = 1;
+    public static final double DEFAULT_SIZE = 3;
     public static final double DEFAULT_SPEED = 2;
     public static final long DEFAULT_ATTACK_SPEED = 2000;
     public static final double DEFAULT_RANGE = 0;
@@ -32,10 +33,11 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     private long lastTargetAssessment;
     private long lastRouteAssessment;
-    
     private long lastUpdateTime;
-    
     private long lastAttackTime;
+    private long lastAnimationFrameSwitch;
+    
+    private int animationFrame;
     
     public PlayerUnit(Me owner) {
         super(owner);
@@ -101,7 +103,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
                 Point2D.Double currentLocation = getLocation();
                 double direction = Pathing.getDirection(this, destination);
                 double dx = Math.sin(direction) * moveDistance;
-                double dy = Math.cos(direction) * moveDistance;
+                double dy = -Math.cos(direction) * moveDistance;
                 getLocation().setLocation(currentLocation.x + dx, currentLocation.y + dy);
             }
         }
@@ -111,6 +113,11 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
             target.takeDamage(this);
             lastAttackTime = updateTime;
+        }
+        
+        if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
+            animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(this.getClass());
+            lastAnimationFrameSwitch = updateTime;
         }
         
         lastUpdateTime = updateTime;
@@ -153,6 +160,16 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         } else {
             return getLocation();
         }
+    }
+    
+    @Override
+    public int getAnimationFrame() {
+        return animationFrame;
+    }
+    
+    @Override
+    public Class<? extends Asset> getAnimationClass() {
+        return this.getClass();
     }
     
 }
