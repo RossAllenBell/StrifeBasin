@@ -1,4 +1,3 @@
-optimize renderer
 background image
 units dont take up the same space
 splash damage

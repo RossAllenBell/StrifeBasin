@@ -45,6 +45,7 @@ public class Renderer {
     
     private static final int MINIMAP_WIDTH_PIXELS = 300;
     private static final int MINIMAP_HEIGHT_PIXELS = (int) ((double) MINIMAP_WIDTH_PIXELS * Game.BOARD_HEIGHT / Game.BOARD_WIDTH);
+    private static final double MINIMAP_PIXELS_PER_BOARD_UNIT = MINIMAP_WIDTH_PIXELS / (double) Game.BOARD_WIDTH;
     private static final int PIXELS_PER_BOARD_UNIT = 15;
     private static final int PIXELS_PER_PAN_TICK = PIXELS_PER_BOARD_UNIT * 2;
     
@@ -123,12 +124,7 @@ public class Renderer {
     }
     
     private void drawBackground(Graphics2D graphics) {
-        // graphics.drawImage(background, viewCornerPixelX, viewCornerPixelY,
-        // viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY +
-        // viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY,
-        // viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY +
-        // viewDimensions.height - 1, null);
-        graphics.drawImage(background, 0, 0, null);
+        graphics.drawImage(background, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
     }
     
     private void drawContent(Graphics2D graphics) {
@@ -157,7 +153,6 @@ public class Renderer {
             graphics.setColor(new Color(255, 0, 0));
             drawUnit(graphics, unit);
         }
-        
         
         List<Effect> effects = EffectsManager.getInstance().getEffects();
         synchronized (effects) {
@@ -250,68 +245,31 @@ public class Renderer {
     
     private void drawOverlay(Graphics2D graphics) {
         graphics.setFont(new Font(null, Font.PLAIN, 14));
+        
+        drawMinimap(graphics);        
+        drawStats(graphics);        
+        drawSystemStats(graphics);
+        drawBuildMenu(graphics);
+        drawNewBuildingPreview(graphics);
+        drawGameResult(graphics);
+    }
+
+    private void drawGameResult(Graphics2D graphics) {
         FontMetrics fm = graphics.getFontMetrics();
-        
-        // minimap border
-        graphics.setColor(new Color(255, 255, 255, 64));
-        graphics.setStroke(new BasicStroke(3));
-        graphics.drawRect((viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS);
-        
-        // minimap
-        Composite composite = graphics.getComposite();
-        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        graphics.drawImage(image, (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2) + MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS, 0, 0, image.getWidth(), image.getHeight(), null);
-        graphics.setComposite(composite);
-        
-        // minimap view indicator
-        graphics.setColor(new Color(0, 128, 255, 255));
-        graphics.setStroke(new BasicStroke(1));
-        int minimapViewX = (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2) + (int) ((double) viewCornerPixelX / image.getWidth() * MINIMAP_WIDTH_PIXELS);
-        int minimapViewY = (int) ((double) viewCornerPixelY / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
-        int minimapViewWidth = (int) ((double) viewDimensions.width / image.getWidth() * MINIMAP_WIDTH_PIXELS);
-        int minimapViewHeight = (int) ((double) viewDimensions.height / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
-        graphics.drawRect(minimapViewX, minimapViewY, minimapViewWidth, minimapViewHeight);
-        
-        // game stats
-        graphics.setColor(new Color(0, 255, 0));
-        String moneyString = "Money: " + (int) Game.getInstance().getMe().getMoney();
-        graphics.drawString(moneyString, 10, fm.getHeight());
-        String incomeString = "Income: " + (int) Game.getInstance().getMe().getIncome();
-        graphics.drawString(incomeString, 10, fm.getHeight() * 2);
-        graphics.drawRect(10, (fm.getHeight()) * 2 + 10, fm.stringWidth("Income"), 10);
-        double incomeProgress = fm.stringWidth("Income") * (double) (currentTime - Game.getInstance().getMe().getLastIncomeTime()) / Game.INCOME_COOLDOWN;
-        graphics.fillRect(10, (fm.getHeight()) * 2 + 10, (int) incomeProgress, 10);
-        
-        // system stats
-        graphics.setColor(new Color(0, 255, 0));
-        String pingString = "Ping: " + ConnectionToOpponent.getInstance().getPing();
-        graphics.drawString(pingString, viewDimensions.width - fm.stringWidth(pingString) - 10, viewDimensions.height - 10);
-        String fpsString = "FPS: " + getFps();
-        graphics.drawString(fpsString, viewDimensions.width - fm.stringWidth(fpsString) - 10, viewDimensions.height - 10 - fm.getHeight());
-        
-        // build menu
-        List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
-        int nextX = 10;
-        int num = 1;
-        for (List<String> strings : buildMenuDisplayStrings) {
-            int nextY = viewDimensions.height - 10;
-            int thisColumnX = nextX;
-            for (String string : strings) {
-                graphics.drawString(string, thisColumnX, nextY);
-                if (fm.stringWidth(string) + thisColumnX > nextX) {
-                    nextX = fm.stringWidth(string) + thisColumnX;
-                }
-                nextY -= fm.getHeight();
-            }
-            
-            if (num < buildMenuDisplayStrings.size()) {
-                num++;
-                graphics.drawString(" > ", nextX, viewDimensions.height - 10);
-                nextX += fm.stringWidth(" > ");
-            }
+        if (Game.getInstance().getThem().getSanctuary().getHealth() <= 0) {
+            graphics.setColor(new Color(0, 255, 0));
+            graphics.setFont(new Font(null, Font.PLAIN, 70));
+            fm = graphics.getFontMetrics();
+            graphics.drawString(WIN_STRING, (viewDimensions.width / 2) - (fm.stringWidth(WIN_STRING) / 2), viewDimensions.height / 2);
+        } else if (Game.getInstance().getMe().getSanctuary().getHealth() <= 0) {
+            graphics.setColor(new Color(255, 0, 0));
+            graphics.setFont(new Font(null, Font.PLAIN, 70));
+            fm = graphics.getFontMetrics();
+            graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
         }
-        
-        // new building
+    }
+
+    private void drawNewBuildingPreview(Graphics2D graphics) {
         BuildableBuilding building = Game.getInstance().getBuildingPreview();
         if (building != null && mousePos != null) {
             if (viewCornerPixelX < Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT) {
@@ -337,20 +295,114 @@ public class Renderer {
             drawBuilding(graphics, building, selectionPoint.x, selectionPoint.y);
             graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
         }
-        
-        if (Game.getInstance().getThem().getSanctuary().getHealth() <= 0) {
-            graphics.setColor(new Color(0, 255, 0));
-            graphics.setFont(new Font(null, Font.PLAIN, 70));
-            fm = graphics.getFontMetrics();
-            graphics.drawString(WIN_STRING, (viewDimensions.width / 2) - (fm.stringWidth(WIN_STRING) / 2), viewDimensions.height / 2);
-        } else if (Game.getInstance().getMe().getSanctuary().getHealth() <= 0) {
-            graphics.setColor(new Color(255, 0, 0));
-            graphics.setFont(new Font(null, Font.PLAIN, 70));
-            fm = graphics.getFontMetrics();
-            graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
+    }
+
+    private void drawBuildMenu(Graphics2D graphics) {
+        FontMetrics fm = graphics.getFontMetrics();
+        List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
+        int nextX = 10;
+        int num = 1;
+        for (List<String> strings : buildMenuDisplayStrings) {
+            int nextY = viewDimensions.height - 10;
+            int thisColumnX = nextX;
+            for (String string : strings) {
+                graphics.drawString(string, thisColumnX, nextY);
+                if (fm.stringWidth(string) + thisColumnX > nextX) {
+                    nextX = fm.stringWidth(string) + thisColumnX;
+                }
+                nextY -= fm.getHeight();
+            }
+            
+            if (num < buildMenuDisplayStrings.size()) {
+                num++;
+                graphics.drawString(" > ", nextX, viewDimensions.height - 10);
+                nextX += fm.stringWidth(" > ");
+            }
         }
     }
+
+    private void drawSystemStats(Graphics2D graphics) {
+        FontMetrics fm = graphics.getFontMetrics();
+        graphics.setColor(new Color(0, 255, 0));
+        String pingString = "Ping: " + ConnectionToOpponent.getInstance().getPing();
+        graphics.drawString(pingString, viewDimensions.width - fm.stringWidth(pingString) - 10, viewDimensions.height - 10);
+        String fpsString = "FPS: " + getFps();
+        graphics.drawString(fpsString, viewDimensions.width - fm.stringWidth(fpsString) - 10, viewDimensions.height - 10 - fm.getHeight());
+    }
+
+    private void drawStats(Graphics2D graphics) {
+        FontMetrics fm = graphics.getFontMetrics();
+        graphics.setColor(new Color(0, 255, 0));
+        String moneyString = "Money: " + (int) Game.getInstance().getMe().getMoney();
+        graphics.drawString(moneyString, 10, fm.getHeight());
+        String incomeString = "Income: " + (int) Game.getInstance().getMe().getIncome();
+        graphics.drawString(incomeString, 10, fm.getHeight() * 2);
+        graphics.drawRect(10, (fm.getHeight()) * 2 + 10, fm.stringWidth("Income"), 10);
+        double incomeProgress = fm.stringWidth("Income") * (double) (currentTime - Game.getInstance().getMe().getLastIncomeTime()) / Game.INCOME_COOLDOWN;
+        graphics.fillRect(10, (fm.getHeight()) * 2 + 10, (int) incomeProgress, 10);
+    }
+
+    private void drawMinimap(Graphics2D graphics) {
+        //border
+        graphics.setColor(new Color(255, 255, 255, 64));
+        graphics.setStroke(new BasicStroke(3));
+        graphics.drawRect((viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS);
+        
+        drawMinimapContents(graphics);
+        
+        //view indicator
+        graphics.setColor(new Color(0, 128, 255, 255));
+        graphics.setStroke(new BasicStroke(1));
+        int minimapViewX = (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2) + (int) ((double) viewCornerPixelX / image.getWidth() * MINIMAP_WIDTH_PIXELS);
+        int minimapViewY = (int) ((double) viewCornerPixelY / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
+        int minimapViewWidth = (int) ((double) viewDimensions.width / image.getWidth() * MINIMAP_WIDTH_PIXELS);
+        int minimapViewHeight = (int) ((double) viewDimensions.height / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
+        graphics.drawRect(minimapViewX, minimapViewY, minimapViewWidth, minimapViewHeight);
+    }
+
+    private void drawMinimapContents(Graphics2D graphics) {
+        AffineTransform oldXForm = graphics.getTransform();
+        Composite oldComposite = graphics.getComposite();
+        
+        graphics.translate((viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0);
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        
+        graphics.setColor(new Color(0, 255, 0));
+        Map<Long, Building> myBuildings = Game.getInstance().getMyBuildings();
+        synchronized (myBuildings) {
+            for (Building building : myBuildings.values()) {
+                drawMinimapAsset(graphics, building);
+            }
+        }
+        
+        Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
+        synchronized (myUnits) {
+            for (PlayerUnit unit : myUnits.values()) {
+                drawMinimapAsset(graphics, unit);
+            }
+        }
+        
+        graphics.setColor(new Color(255, 0, 0));
+        for (NetworkAsset building : Game.getInstance().getTheirBuildings().values()) {
+            drawMinimapAsset(graphics, building);
+        }
+        
+        for (NetworkUnit unit : Game.getInstance().getTheirUnits().values()) {
+            drawMinimapAsset(graphics, unit);
+        }
+        
+        graphics.setTransform(oldXForm);
+        graphics.setComposite(oldComposite);
+    }
     
+    private void drawMinimapAsset(Graphics2D graphics, Asset asset) {
+        int x = (int) ((asset.getHitLocation().x - asset.getSize() / 2.0) * MINIMAP_PIXELS_PER_BOARD_UNIT);
+        int y = (int) ((asset.getHitLocation().y - asset.getSize() / 2.0) * MINIMAP_PIXELS_PER_BOARD_UNIT);
+        int size = (int) Math.max(1, asset.getSize() * MINIMAP_PIXELS_PER_BOARD_UNIT);
+        
+        graphics.fillRect(x, y, size, size);
+    }
+
     public Point getDisplayGridPointByMousePos(Point point) {
         Point gameGrid = getGameGridUnitByMousePos(point);
         
@@ -377,18 +429,6 @@ public class Renderer {
         
         graphics.setColor(new Color(30, 30, 30));
         graphics.fillRect(0, 0, background.getWidth(), background.getHeight());
-        
-        // graphics.setColor(new Color(60, 60, 60));
-        // for (int i = 1; i < Game.BOARD_WIDTH; i++) {
-        // graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i
-        // * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() -
-        // 1);
-        // }
-        // for (int i = 1; i < Game.BOARD_HEIGHT; i++) {
-        // graphics.drawLine(0, i * background.getHeight() / Game.BOARD_HEIGHT,
-        // background.getWidth() - 1, i * background.getHeight() /
-        // Game.BOARD_HEIGHT);
-        // }
         
         return background;
     }
