@@ -1,4 +1,3 @@
-background image
 units dont take up the same space
 splash damage
 impassable terrain

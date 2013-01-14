@@ -15,10 +15,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
@@ -427,8 +431,18 @@ public class Renderer {
         BufferedImage background = new BufferedImage(Game.BOARD_WIDTH * PIXELS_PER_BOARD_UNIT, Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = background.createGraphics();
         
-        graphics.setColor(new Color(30, 30, 30));
-        graphics.fillRect(0, 0, background.getWidth(), background.getHeight());
+        String imagePath = "images/sand.png";
+        URL resourceURL = Renderer.class.getClassLoader().getResource(imagePath);
+        try {
+            BufferedImage sand = ImageIO.read(resourceURL);
+            for(int i=0; i<background.getWidth(); i+=sand.getWidth()) {
+                for(int j=0; j<background.getHeight(); j+=sand.getHeight()) {
+                    graphics.drawImage(sand, i, j, null);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
         return background;
     }
