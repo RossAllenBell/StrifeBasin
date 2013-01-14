@@ -97,22 +97,27 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             lastRouteAssessment = updateTime;
         }
         
-        if (!Pathing.canHitAsset(this, target)) {
+        if (!Pathing.getInstance().canHitAsset(this, target)) {
             Point2D.Double destination = getCurrentDestination();
             double distanceToDestination = destination.distance(getLocation());
+            Point2D.Double newLocation = null;
             if (distanceToDestination <= moveDistance) {
-                setLocation(destination);
+                newLocation = destination;
             } else if (moveDistance > 0) {
                 Point2D.Double currentLocation = getLocation();
-                double direction = Pathing.getDirection(currentLocation, destination);
+                double direction = Pathing.getInstance().getDirection(currentLocation, destination);
                 double dx = Math.sin(direction) * moveDistance;
                 double dy = -Math.cos(direction) * moveDistance;
-                getLocation().setLocation(currentLocation.x + dx, currentLocation.y + dy);
+                newLocation = new Point2D.Double(currentLocation.x + dx, currentLocation.y + dy);
+            }
+            
+            if(newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
+                getLocation().setLocation(newLocation);
             }
         }
         
         // attack
-        if (Pathing.canHitAsset(this, target) && lastAttackTime + getAttackSpeed() <= updateTime) {
+        if (Pathing.getInstance().canHitAsset(this, target) && lastAttackTime + getAttackSpeed() <= updateTime) {
             Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
             if (attackEffect != null) {
                 EffectsManager.getInstance().addEffect(attackEffect);

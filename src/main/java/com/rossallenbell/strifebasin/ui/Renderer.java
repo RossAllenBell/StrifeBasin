@@ -211,7 +211,7 @@ public class Renderer {
         int height = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
         
         AffineTransform oldXForm = graphics.getTransform();
-        graphics.rotate(Pathing.getDirection(unit.getLocation(), unit.getCurrentDestination()), x, y);
+        graphics.rotate(Pathing.getInstance().getDirection(unit.getLocation(), unit.getCurrentDestination()), x, y);
         
         Class<? extends Asset> animatedClass = unit.getAnimationClass();
         if (animatedClass.isAnnotationPresent(HasAnimation.class)) {

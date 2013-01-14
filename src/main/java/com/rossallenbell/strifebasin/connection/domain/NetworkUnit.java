@@ -99,19 +99,24 @@ public class NetworkUnit extends NetworkAsset implements Unit {
             // guess the next target until we get an update
             target = Pathing.getInstance().getClosestAggroableAsset(this, Game.getInstance().getMe());
         }
-        if (target != null && !Pathing.canHitAsset(this, target)) {
+        if (target != null && !Pathing.getInstance().canHitAsset(this, target)) {
             Point2D.Double destination = getCurrentDestination();
             Point2D.Double location = getLocation();
             double distanceToDestination = destination.distance(location);
+            Point2D.Double newLocation = null;
             if (distanceToDestination <= moveDistance) {
-                location.setLocation(destination);
+                newLocation = destination;
             } else if (moveDistance > 0) {
-                Point2D.Double currentLocation = location;
-                double direction = Pathing.getDirection(currentLocation, destination);
+                Point2D.Double currentLocation = getLocation();
+                double direction = Pathing.getInstance().getDirection(currentLocation, destination);
                 double dx = Math.sin(direction) * moveDistance;
                 double dy = -Math.cos(direction) * moveDistance;
-                location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
+                newLocation = new Point2D.Double(currentLocation.x + dx, currentLocation.y + dy);
             }
+            
+            if(newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
+                getLocation().setLocation(newLocation);
+            }            
         }
         
         lastUpdateTime = updateTime;

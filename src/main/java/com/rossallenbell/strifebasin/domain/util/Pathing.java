@@ -3,11 +3,15 @@ package com.rossallenbell.strifebasin.domain.util;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
+import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Pathing {
@@ -57,7 +61,7 @@ public class Pathing {
         return route;
     }
     
-    public static boolean canHitAsset(Unit unit, Asset target) {
+    public boolean canHitAsset(Unit unit, Asset target) {
         if (target != null) {
             double distanceToTarget = target.getHitLocation().distance(unit.getLocation());
             return distanceToTarget <= unit.getRange() + (target.getSize() / 2);
@@ -65,17 +69,46 @@ public class Pathing {
         return false;
     }
     
-    public static double getDirection(Point2D.Double origin, Point2D.Double destination) {        
+    public double getDirection(Point2D.Double origin, Point2D.Double destination) {
         double dx = destination.x - origin.x;
         double dy = destination.y - origin.y;
         return Math.atan2(dy, dx) + (Math.PI / 2);
     }
-
+    
     public boolean buildingsOverlap(BuildableBuilding buildingPreview, Building otherBuilding) {
-        return buildingPreview.getLocation().x < otherBuilding.getLocation().x + otherBuilding.getSize() &&
-                buildingPreview.getLocation().x + buildingPreview.getSize() > otherBuilding.getLocation().x &&
-                buildingPreview.getLocation().y < otherBuilding.getLocation().y + otherBuilding.getSize() &&
-                buildingPreview.getLocation().y + buildingPreview.getSize() > otherBuilding.getLocation().y;
+        return buildingPreview.getLocation().x < otherBuilding.getLocation().x + otherBuilding.getSize() && buildingPreview.getLocation().x + buildingPreview.getSize() > otherBuilding.getLocation().x && buildingPreview.getLocation().y < otherBuilding.getLocation().y + otherBuilding.getSize() && buildingPreview.getLocation().y + buildingPreview.getSize() > otherBuilding.getLocation().y;
+    }
+    
+    public boolean canMove(Unit unit, Point2D.Double newLocation) {
+        Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
+        synchronized (myUnits) {
+            for (Unit myUnit : myUnits.values()) {
+                if (myUnit.getAssetId() != unit.getAssetId()) {
+                    double newDistance = newLocation.distance(myUnit.getLocation());
+                    if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
+                        if(newDistance < unit.getLocation().distance(myUnit.getLocation())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
+        synchronized (theirUnits) {
+            for (Unit theirUnit : theirUnits.values()) {
+                if (theirUnit.getAssetId() != unit.getAssetId()) {
+                    double newDistance = newLocation.distance(theirUnit.getLocation());
+                    if (newDistance < (unit.getSize() / 2) + (theirUnit.getSize() / 2)) {
+                        if(newDistance < unit.getLocation().distance(theirUnit.getLocation())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return true;
     }
     
 }

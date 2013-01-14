@@ -1,9 +1,9 @@
-units dont take up the same space
-splash damage
+units pathfind around each other if in the way
 impassable terrain
 animations for standing still and attacking
 death effect
 tint unit color according to friendly or enemy
+splash damage
 flying units
 defensive buildings
 buffing units

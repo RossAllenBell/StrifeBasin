@@ -16,7 +16,7 @@ public class Arrow extends ImagedEffect {
         super(startTime, origin);
         this.target = target;
         this.origin = origin;
-        direction = Pathing.getDirection(origin, target);
+        direction = Pathing.getInstance().getDirection(origin, target);
     }
     
     @Override
