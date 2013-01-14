@@ -1,6 +1,7 @@
 package com.rossallenbell.strifebasin.domain;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
@@ -13,6 +14,9 @@ import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuildin
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
+import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.effects.EffectsFactory;
+import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 
 public class Game {
     
@@ -110,24 +114,26 @@ public class Game {
     public void updateTheirUnitsAndBuildings(NetworkPlayer networkPlayer) {
         them = networkPlayer;
         for (NetworkAsset building : them.getBuildings().values()) {
-            double mirroedLocationX = BOARD_WIDTH - building.getLocation().x - building.getSize();
-            double mirroredLocationY = building.getLocation().y;
-            building.getLocation().setLocation(mirroedLocationX, mirroredLocationY);
+            building.getLocation().setLocation(building.getLocation().x + building.getSize(), building.getLocation().y);
+            building.getLocation().setLocation(Game.getMirroredLocation(building.getLocation()));
         }
         for (NetworkUnit unit : them.getUnits().values()) {
-            double mirroredLocationX = BOARD_WIDTH - unit.getLocation().x;
-            double mirroredLocationY = unit.getLocation().y;
-            unit.getLocation().setLocation(mirroredLocationX, mirroredLocationY);
-            double mirroredDestinationX = BOARD_WIDTH - unit.getCurrentDestination().x;
-            double mirroredDestinationY = unit.getCurrentDestination().y;
-            unit.getCurrentDestination().setLocation(mirroredDestinationX, mirroredDestinationY);
+            unit.getLocation().setLocation(Game.getMirroredLocation(unit.getLocation()));
+            unit.getCurrentDestination().setLocation(Game.getMirroredLocation(unit.getCurrentDestination()));
         }
     }
     
     public void attackEvent(AttackEvent attackEvent) {
-        PlayerAsset asset = me.getAssetById(attackEvent.getTarget().getAssetId());
-        if (asset != null) {
-            asset.takeDamage(attackEvent.getUnit());
+        PlayerAsset myAsset = me.getAssetById(attackEvent.getTarget().getAssetId());
+        if (myAsset != null) {
+            NetworkUnit attackingUnit = attackEvent.getUnit();
+            myAsset.takeDamage(attackingUnit);
+
+            attackingUnit.getLocation().setLocation(Game.getMirroredLocation(attackingUnit.getLocation()));
+            Effect effect = EffectsFactory.getInstance().buildEffect(attackingUnit, myAsset);
+            if (effect != null) {
+                EffectsManager.getInstance().addEffect(effect);
+            }
         }
     }
     
@@ -163,6 +169,12 @@ public class Game {
             return true;
         }
         return false;
+    }
+    
+    public static Point2D.Double getMirroredLocation(Point2D.Double location) {
+        double mirroredLocationX = BOARD_WIDTH - location.x;
+        double mirroredLocationY = location.y;
+        return new Point2D.Double(mirroredLocationX, mirroredLocationY);
     }
     
 }

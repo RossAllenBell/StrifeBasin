@@ -3,6 +3,7 @@ package com.rossallenbell.strifebasin.threads;
 import com.rossallenbell.strifebasin.connection.protocol.Ping;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.ui.Canvas;
+import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 
 public class GameLoop extends StoppableThread {
     
@@ -43,6 +44,7 @@ public class GameLoop extends StoppableThread {
                 }
                 
                 Game.getInstance().update(loopStartTime);
+                EffectsManager.getInstance().update(loopStartTime);
                 Canvas.getInstance().repaint();
                 
                 try {

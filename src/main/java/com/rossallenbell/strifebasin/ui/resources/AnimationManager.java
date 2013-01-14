@@ -30,7 +30,7 @@ public class AnimationManager {
         images = new HashMap<Class<?>, ArrayList<BufferedImage>>();
         
         try {
-            Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain");
+            Reflections reflections = new Reflections("com.rossallenbell.strifebasin");
             for (Class<?> imagedClass : reflections.getTypesAnnotatedWith(HasAnimation.class)) {
                 images.put(imagedClass, new ArrayList<BufferedImage>());
                 String folderPath = "images/" + imagedClass.getSimpleName().toLowerCase() + "/";

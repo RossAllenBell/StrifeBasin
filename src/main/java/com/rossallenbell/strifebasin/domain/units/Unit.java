@@ -3,6 +3,7 @@ package com.rossallenbell.strifebasin.domain.units;
 import java.awt.geom.Point2D;
 
 import com.rossallenbell.strifebasin.domain.Asset;
+import com.rossallenbell.strifebasin.ui.effects.Effect;
 
 public interface Unit extends Asset {
 
@@ -27,5 +28,7 @@ public interface Unit extends Asset {
     public int getAnimationFrame();
     
     public Class<? extends Asset> getAnimationClass();
+    
+    public Class<? extends Effect> getAttackEffect();
     
 }

@@ -14,6 +14,9 @@ import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.PlayerAsset;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.threads.CommSocketSender;
+import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.effects.EffectsFactory;
+import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 
 public abstract class PlayerUnit extends PlayerAsset implements Unit {
@@ -101,7 +104,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
                 setLocation(destination);
             } else if (moveDistance > 0) {
                 Point2D.Double currentLocation = getLocation();
-                double direction = Pathing.getDirection(this, destination);
+                double direction = Pathing.getDirection(currentLocation, destination);
                 double dx = Math.sin(direction) * moveDistance;
                 double dy = -Math.cos(direction) * moveDistance;
                 getLocation().setLocation(currentLocation.x + dx, currentLocation.y + dy);
@@ -110,6 +113,10 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         
         // attack
         if (Pathing.canHitAsset(this, target) && lastAttackTime + getAttackSpeed() <= updateTime) {
+            Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
+            if (attackEffect != null) {
+                EffectsManager.getInstance().addEffect(attackEffect);
+            }
             CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
             target.takeDamage(this);
             lastAttackTime = updateTime;
@@ -170,6 +177,11 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     @Override
     public Class<? extends Asset> getAnimationClass() {
         return this.getClass();
+    }
+    
+    @Override
+    public Class<? extends Effect> getAttackEffect() {
+        return null;
     }
     
 }

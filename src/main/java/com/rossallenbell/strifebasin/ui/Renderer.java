@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
@@ -29,6 +30,8 @@ import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuildin
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
+import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
@@ -129,8 +132,9 @@ public class Renderer {
     }
     
     private void drawContent(Graphics2D graphics) {
-        synchronized (Game.getInstance().getMyBuildings()) {
-            for (Building building : Game.getInstance().getMyBuildings().values()) {
+        Map<Long, Building> myBuildings = Game.getInstance().getMyBuildings();
+        synchronized (myBuildings) {
+            for (Building building : myBuildings.values()) {
                 graphics.setColor(new Color(0, 255, 0));
                 drawBuilding(graphics, building);
             }
@@ -141,8 +145,9 @@ public class Renderer {
             drawBuilding(graphics, building);
         }
         
-        synchronized (Game.getInstance().getMyUnits()) {
-            for (PlayerUnit unit : Game.getInstance().getMyUnits().values()) {
+        Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
+        synchronized (myUnits) {
+            for (PlayerUnit unit : myUnits.values()) {
                 graphics.setColor(new Color(0, 255, 0));
                 drawUnit(graphics, unit);
             }
@@ -152,6 +157,31 @@ public class Renderer {
             graphics.setColor(new Color(255, 0, 0));
             drawUnit(graphics, unit);
         }
+        
+        
+        List<Effect> effects = EffectsManager.getInstance().getEffects();
+        synchronized (effects) {
+            for (Effect effect : effects) {
+                drawEffect(graphics, effect);
+            }
+        }
+    }
+    
+    private void drawEffect(Graphics2D graphics, Effect effect) {
+        int x = (int) (effect.getLocation().x * PIXELS_PER_BOARD_UNIT);
+        int y = (int) (effect.getLocation().y * PIXELS_PER_BOARD_UNIT);
+        int width = (int) (effect.getSize() * PIXELS_PER_BOARD_UNIT);
+        int height = (int) (effect.getSize() * PIXELS_PER_BOARD_UNIT);
+        
+        AffineTransform oldXForm = graphics.getTransform();
+        graphics.rotate(effect.getDirection(), x, y);
+        
+        BufferedImage image = effect.getImage();
+        x = x - (width / 2);
+        y = y - (height / 2);
+        graphics.drawImage(image, x, y, x + width, y + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
+        
+        graphics.setTransform(oldXForm);
     }
     
     private void drawBuilding(Graphics2D graphics, Asset building) {
@@ -182,7 +212,7 @@ public class Renderer {
         int height = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
         
         AffineTransform oldXForm = graphics.getTransform();
-        graphics.rotate(Pathing.getDirection(unit, unit.getCurrentDestination()), x, y);
+        graphics.rotate(Pathing.getDirection(unit.getLocation(), unit.getCurrentDestination()), x, y);
         
         Class<? extends Asset> animatedClass = unit.getAnimationClass();
         if (animatedClass.isAnnotationPresent(HasAnimation.class)) {

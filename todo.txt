@@ -1,9 +1,10 @@
-projectile sprites
+optimize renderer
 background image
 units dont take up the same space
 splash damage
 impassable terrain
 animations for standing still and attacking
+death effect
 tint unit color according to friendly or enemy
 flying units
 defensive buildings

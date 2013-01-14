@@ -7,6 +7,7 @@ import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
+import com.rossallenbell.strifebasin.ui.effects.Effect;
 
 public class NetworkUnit extends NetworkAsset implements Unit {
     
@@ -20,6 +21,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     private final double attackSpeed;    
     private final long targetId;
     private final int animationFrame;
+    private final Class<? extends Effect> attackEffect;
     
     private long lastUpdateTime;
     
@@ -33,6 +35,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         attackSpeed = originalUnit.getAttackSpeed();
         targetId = originalUnit.getTargetId();
         animationFrame = originalUnit.getAnimationFrame();
+        attackEffect = originalUnit.getAttackEffect();
     }
     
     @Override
@@ -104,7 +107,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
                 location.setLocation(destination);
             } else if (moveDistance > 0) {
                 Point2D.Double currentLocation = location;
-                double direction = Pathing.getDirection(this, destination);
+                double direction = Pathing.getDirection(currentLocation, destination);
                 double dx = Math.sin(direction) * moveDistance;
                 double dy = -Math.cos(direction) * moveDistance;
                 location.setLocation(currentLocation.x + dx, currentLocation.y + dy);
@@ -112,6 +115,11 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         }
         
         lastUpdateTime = updateTime;
+    }
+    
+    @Override
+    public Class<? extends Effect> getAttackEffect() {
+        return attackEffect;
     }
     
 }

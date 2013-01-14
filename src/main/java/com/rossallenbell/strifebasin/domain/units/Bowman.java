@@ -1,6 +1,8 @@
 package com.rossallenbell.strifebasin.domain.units;
 
 import com.rossallenbell.strifebasin.domain.Me;
+import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.effects.imaged.Arrow;
 import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
 
 @HasAnimation
@@ -9,7 +11,7 @@ public class Bowman extends PlayerUnit {
     public Bowman(Me owner) {
         super(owner);
     }
-
+    
     @Override
     public int getMaxHealth() {
         return 5;
@@ -21,8 +23,13 @@ public class Bowman extends PlayerUnit {
     }
     
     @Override
-    public double getRange(){
+    public double getRange() {
         return 5;
+    }
+    
+    @Override
+    public Class<? extends Effect> getAttackEffect() {
+        return Arrow.class;
     }
     
 }
