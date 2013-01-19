@@ -64,7 +64,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     @Override
     public double getRange() {
-        return Math.max(getSize() / 2, DEFAULT_RANGE);
+        return Math.max(getSize() / 2, DEFAULT_RANGE) + 0.3;
     }
     
     @Override
@@ -92,12 +92,13 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         
         // move
         double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * getSpeed();
-        if (lastRouteAssessment + ROUTE_ASSESSMENT_COOLDOWN <= updateTime) {
-            route = Pathing.getInstance().getRoute(this, target);
-            lastRouteAssessment = updateTime;
-        }
         
         if (!Pathing.getInstance().canHitAsset(this, target)) {
+            if (lastRouteAssessment + ROUTE_ASSESSMENT_COOLDOWN <= updateTime) {
+                route = Pathing.getInstance().getRoute(this, target);
+                lastRouteAssessment = updateTime;
+            }
+            
             Point2D.Double destination = getCurrentDestination();
             double distanceToDestination = destination.distance(getLocation());
             Point2D.Double newLocation = null;
@@ -131,6 +132,8 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(this.getClass());
             lastAnimationFrameSwitch = updateTime;
         }
+        
+        Pathing.getInstance().updatePathingMap(this);
         
         lastUpdateTime = updateTime;
         

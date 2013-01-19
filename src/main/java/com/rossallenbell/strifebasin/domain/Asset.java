@@ -24,4 +24,6 @@ public interface Asset {
     
     public Class<? extends Asset> getImageClass();
     
+    public boolean isMine();
+    
 }

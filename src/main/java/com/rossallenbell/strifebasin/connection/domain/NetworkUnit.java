@@ -1,6 +1,9 @@
 package com.rossallenbell.strifebasin.connection.domain;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
@@ -22,6 +25,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     private final long targetId;
     private final int animationFrame;
     private final Class<? extends Effect> attackEffect;
+    private final List<Point2D.Double> route;
     
     private long lastUpdateTime;
     
@@ -36,6 +40,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         targetId = originalUnit.getTargetId();
         animationFrame = originalUnit.getAnimationFrame();
         attackEffect = originalUnit.getAttackEffect();
+        route = new ArrayList<Point2D.Double>(originalUnit.getRoute());
     }
     
     @Override
@@ -118,6 +123,8 @@ public class NetworkUnit extends NetworkAsset implements Unit {
                 getLocation().setLocation(newLocation);
             }            
         }
+
+        Pathing.getInstance().updatePathingMap(this);
         
         lastUpdateTime = updateTime;
     }
@@ -125,6 +132,11 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     @Override
     public Class<? extends Effect> getAttackEffect() {
         return attackEffect;
+    }
+    
+    @Override
+    public List<Double> getRoute() {
+        return route;
     }
     
 }

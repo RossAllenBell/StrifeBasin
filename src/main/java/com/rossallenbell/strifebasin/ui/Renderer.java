@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import com.rossallenbell.strifebasin.StrifeBasin;
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
@@ -38,7 +40,6 @@ import com.rossallenbell.strifebasin.ui.effects.Effect;
 import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
 import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
-import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
 import com.rossallenbell.strifebasin.ui.resources.HasImage;
 import com.rossallenbell.strifebasin.ui.resources.ImageManager;
 
@@ -114,6 +115,10 @@ public class Renderer {
             drawBackground(graphics);
             drawContent(graphics);
             
+            if (StrifeBasin.DEBUG) {
+                drawPathingMap(graphics);
+            }
+            
             destinationGraphics.drawImage(image, 0, 0, viewDimensions.width - 1, viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
             
             drawOverlay(destinationGraphics);
@@ -123,6 +128,23 @@ public class Renderer {
                     loopTimes.remove(0);
                 }
                 loopTimes.add(currentTime);
+            }
+        }
+    }
+    
+    private void drawPathingMap(Graphics2D graphics) {
+        Color me = new Color(0, 255, 0, 64);
+        Color them = new Color(255, 255, 0, 64);
+        for (int x = 0; x < Pathing.PATHING_MAP.length; x++) {
+            for (int y = 0; y < Pathing.PATHING_MAP[x].length; y++) {
+                if (Pathing.PATHING_MAP[x][y] != Pathing.PATHING_MAP_EMPTY) {
+                    if (Pathing.PATHING_MAP[x][y] == Pathing.PATHING_MAP_ME) {
+                        graphics.setColor(me);
+                    } else {
+                        graphics.setColor(them);
+                    }
+                    graphics.fillRect(x * PIXELS_PER_BOARD_UNIT, y * PIXELS_PER_BOARD_UNIT, PIXELS_PER_BOARD_UNIT, PIXELS_PER_BOARD_UNIT);
+                }
             }
         }
     }
@@ -212,22 +234,42 @@ public class Renderer {
         
         AffineTransform oldXForm = graphics.getTransform();
         graphics.rotate(Pathing.getInstance().getDirection(unit.getLocation(), unit.getCurrentDestination()), x, y);
+        x = x - (width / 2);
+        y = y - (height / 2);
         
         Class<? extends Asset> animatedClass = unit.getAnimationClass();
-        if (animatedClass.isAnnotationPresent(HasAnimation.class)) {
-            BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame());
-            x = x - (width / 2);
-            y = y - (height / 2);
-            graphics.drawImage(image, x, y, x + width, y + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
-        } else {
-            Ellipse2D.Double circle = new Ellipse2D.Double(x - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), y - (unit.getSize() * PIXELS_PER_BOARD_UNIT / 2), width, height);
-            graphics.fill(circle);
-        }
+        BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame());
+        graphics.drawImage(image, x, y, x + width, y + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
         
         graphics.setTransform(oldXForm);
         
         if (unit.getHealthRatio() < 1) {
             drawHealthbar(graphics, unit);
+        }
+        
+        if (StrifeBasin.DEBUG) {
+            graphics.setColor(new Color(255, 255, 0, 128));
+            Ellipse2D.Double circle = new Ellipse2D.Double(x, y, width, height);
+            graphics.fill(circle);
+            
+            graphics.setColor(new Color(255, 0, 0, 255));
+            graphics.drawString(unit.getAssetId() + "", x, y);
+            
+            if (unit.isMine()) {
+                graphics.setColor(new Color(0, 255, 255, 128));
+                Point2D.Double current = unit.getLocation();
+                List<Double> route = unit.getRoute();
+                synchronized (route) {
+                    for (Point2D.Double point : route) {
+                        int x1 = (int) (current.x * PIXELS_PER_BOARD_UNIT);
+                        int y1 = (int) (current.y * PIXELS_PER_BOARD_UNIT);
+                        int x2 = (int) (point.x * PIXELS_PER_BOARD_UNIT);
+                        int y2 = (int) (point.y * PIXELS_PER_BOARD_UNIT);
+                        graphics.drawLine(x1, y1, x2, y2);
+                        current = point;
+                    }
+                }
+            }
         }
     }
     
@@ -250,14 +292,14 @@ public class Renderer {
     private void drawOverlay(Graphics2D graphics) {
         graphics.setFont(new Font(null, Font.PLAIN, 14));
         
-        drawMinimap(graphics);        
-        drawStats(graphics);        
+        drawMinimap(graphics);
+        drawStats(graphics);
         drawSystemStats(graphics);
         drawBuildMenu(graphics);
         drawNewBuildingPreview(graphics);
         drawGameResult(graphics);
     }
-
+    
     private void drawGameResult(Graphics2D graphics) {
         FontMetrics fm = graphics.getFontMetrics();
         if (Game.getInstance().getThem().getSanctuary().getHealth() <= 0) {
@@ -272,7 +314,7 @@ public class Renderer {
             graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
         }
     }
-
+    
     private void drawNewBuildingPreview(Graphics2D graphics) {
         BuildableBuilding building = Game.getInstance().getBuildingPreview();
         if (building != null && mousePos != null) {
@@ -300,7 +342,7 @@ public class Renderer {
             graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
         }
     }
-
+    
     private void drawBuildMenu(Graphics2D graphics) {
         FontMetrics fm = graphics.getFontMetrics();
         List<List<String>> buildMenuDisplayStrings = BuildMenu.getInstance().getDisplayStrings();
@@ -324,7 +366,7 @@ public class Renderer {
             }
         }
     }
-
+    
     private void drawSystemStats(Graphics2D graphics) {
         FontMetrics fm = graphics.getFontMetrics();
         graphics.setColor(new Color(0, 255, 0));
@@ -333,7 +375,7 @@ public class Renderer {
         String fpsString = "FPS: " + getFps();
         graphics.drawString(fpsString, viewDimensions.width - fm.stringWidth(fpsString) - 10, viewDimensions.height - 10 - fm.getHeight());
     }
-
+    
     private void drawStats(Graphics2D graphics) {
         FontMetrics fm = graphics.getFontMetrics();
         graphics.setColor(new Color(0, 255, 0));
@@ -345,16 +387,16 @@ public class Renderer {
         double incomeProgress = fm.stringWidth("Income") * (double) (currentTime - Game.getInstance().getMe().getLastIncomeTime()) / Game.INCOME_COOLDOWN;
         graphics.fillRect(10, (fm.getHeight()) * 2 + 10, (int) incomeProgress, 10);
     }
-
+    
     private void drawMinimap(Graphics2D graphics) {
-        //border
+        // border
         graphics.setColor(new Color(255, 255, 255, 64));
         graphics.setStroke(new BasicStroke(3));
         graphics.drawRect((viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2), 0, MINIMAP_WIDTH_PIXELS, MINIMAP_HEIGHT_PIXELS);
         
         drawMinimapContents(graphics);
         
-        //view indicator
+        // view indicator
         graphics.setColor(new Color(0, 128, 255, 255));
         graphics.setStroke(new BasicStroke(1));
         int minimapViewX = (viewDimensions.width / 2) - (MINIMAP_WIDTH_PIXELS / 2) + (int) ((double) viewCornerPixelX / image.getWidth() * MINIMAP_WIDTH_PIXELS);
@@ -363,7 +405,7 @@ public class Renderer {
         int minimapViewHeight = (int) ((double) viewDimensions.height / image.getHeight() * MINIMAP_HEIGHT_PIXELS);
         graphics.drawRect(minimapViewX, minimapViewY, minimapViewWidth, minimapViewHeight);
     }
-
+    
     private void drawMinimapContents(Graphics2D graphics) {
         AffineTransform oldXForm = graphics.getTransform();
         Composite oldComposite = graphics.getComposite();
@@ -406,7 +448,7 @@ public class Renderer {
         
         graphics.fillRect(x, y, size, size);
     }
-
+    
     public Point getDisplayGridPointByMousePos(Point point) {
         Point gameGrid = getGameGridUnitByMousePos(point);
         
@@ -435,13 +477,23 @@ public class Renderer {
         URL resourceURL = Renderer.class.getClassLoader().getResource(imagePath);
         try {
             BufferedImage sand = ImageIO.read(resourceURL);
-            for(int i=0; i<background.getWidth(); i+=sand.getWidth()) {
-                for(int j=0; j<background.getHeight(); j+=sand.getHeight()) {
+            for (int i = 0; i < background.getWidth(); i += sand.getWidth()) {
+                for (int j = 0; j < background.getHeight(); j += sand.getHeight()) {
                     graphics.drawImage(sand, i, j, null);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        
+        if (StrifeBasin.DEBUG) {
+            graphics.setColor(new Color(60, 60, 60));
+            for (int i = 1; i < Game.BOARD_WIDTH; i++) {
+                graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() - 1);
+            }
+            for (int i = 1; i < Game.BOARD_HEIGHT; i++) {
+                graphics.drawLine(0, i * background.getHeight() / Game.BOARD_HEIGHT, background.getWidth() - 1, i * background.getHeight() / Game.BOARD_HEIGHT);
+            }
         }
         
         return background;

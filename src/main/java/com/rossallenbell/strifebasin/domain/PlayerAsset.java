@@ -70,4 +70,9 @@ public abstract class PlayerAsset implements Asset {
         return this.getClass();
     }
     
+    @Override
+    public boolean isMine() {
+        return true;
+    }
+    
 }

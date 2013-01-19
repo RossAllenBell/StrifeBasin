@@ -5,6 +5,8 @@ import com.rossallenbell.strifebasin.ui.Window;
 
 public class StrifeBasin {
     
+    public static boolean DEBUG = true;
+    
     public static Window window;
     
     public static void main(String[] args) {

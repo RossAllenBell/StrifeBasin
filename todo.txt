@@ -1,4 +1,3 @@
-units pathfind around each other if in the way
 impassable terrain
 animations for standing still and attacking
 death effect

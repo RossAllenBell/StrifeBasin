@@ -81,4 +81,9 @@ public abstract class NetworkAsset implements Asset, Serializable {
         return originalAssetClass;
     }
     
+    @Override
+    public boolean isMine() {
+        return false;
+    }
+    
 }
