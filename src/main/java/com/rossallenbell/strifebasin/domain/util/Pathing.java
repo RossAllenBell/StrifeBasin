@@ -73,7 +73,8 @@ public class Pathing {
     
     public List<Point2D.Double> getRoute(Unit unit, Asset target) {
         List<Point2D.Double> route = new ArrayList<Point2D.Double>();
-        route.add(target.getHitLocation());
+        Point2D.Double targetHitLocation = target.getHitLocation();
+        route.add(targetHitLocation);
         
         Point2D.Double currentLocation = unit.getLocation();
         double direction = getDirection(currentLocation, route.get(0));
@@ -81,7 +82,7 @@ public class Pathing {
         double dx = Math.sin(direction) * moveDistance;
         double dy = -Math.cos(direction) * moveDistance;
         Point2D.Double newLocation = new Point2D.Double(currentLocation.x + dx, currentLocation.y + dy);
-        if (!canMove(unit, newLocation)) {
+        if (!canMove(unit, newLocation) || Point.distance(currentLocation.x, currentLocation.y, targetHitLocation.x, targetHitLocation.y) <= REROUTE_RANGE) {
             double desiredDistanceToTarget = distanceToHitTarget(unit, target);
             List<Point2D.Double> reroute = reroute(unit, route.get(0), desiredDistanceToTarget);
             route.addAll(0, reroute);
