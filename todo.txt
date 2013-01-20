@@ -1,3 +1,5 @@
+make debug mode toggleable without rebuilding
+make network units use blind reckoning and then catch up to real positions
 impassable terrain
 animations for standing still and attacking
 death effect
