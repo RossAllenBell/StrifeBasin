@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -105,10 +104,9 @@ public class Pathing {
     }
     
     private List<Point2D.Double> getLocalRoute(Unit unit, Point2D.Double destination, double desiredDistanceToTarget) {
-        // boolean[][] localArea = getLocalAreaGrid(unit.getLocation());
-        
         Point2D.Double goal = new Point2D.Double(destination.x, destination.y);
         Point2D.Double start = new Point2D.Double(unit.getLocation().x, unit.getLocation().y);
+        Point2D.Double bestFail = new Point2D.Double(unit.getLocation().x, unit.getLocation().y);
         Set<Point2D.Double> closedSet = new HashSet<Point2D.Double>();
         SortedMap<Double, Point2D.Double> openSet = new TreeMap<Double, Point2D.Double>();
         openSet.put(0.0, start);
@@ -123,6 +121,11 @@ public class Pathing {
         while (!openSet.isEmpty()) {
             Double currentFScore = openSet.firstKey();
             current = openSet.get(currentFScore);
+            
+            if(bestFail == null || Point.distance(bestFail.x, bestFail.y, goal.x, goal.y) > Point.distance(current.x, current.y, goal.x, goal.y)) {
+                bestFail = current;
+            }
+            
             if (Point.distance(current.x, current.y, goal.x, goal.y) <= desiredDistanceToTarget) {
                 List<Point2D.Double> solution = new ArrayList<Point2D.Double>();
                 solution.add(current);
@@ -151,7 +154,9 @@ public class Pathing {
             }
         }
         
-        return Collections.emptyList();
+        List<Point2D.Double> bestFailList = new ArrayList<Point2D.Double>();
+        bestFailList.add(bestFail);
+        return bestFailList;
     }
     
     private Collection<Point2D.Double> neighbors(Unit unit, Point2D.Double currentLocation) {
@@ -182,10 +187,10 @@ public class Pathing {
         double y = unit.getLocation().y;
         double radius = unit.getSize() / 2;
         
-        int northBounds = (int) Math.floor(y - radius);
-        int southBounds = (int) Math.floor(y + radius);
-        int westBounds = (int) Math.floor(x - radius);
-        int eastBounds = (int) Math.floor(x + radius);
+        int northBounds = Math.max(0, (int) Math.floor(y - radius));
+        int southBounds = Math.min(PATHING_MAP[0].length - 1, (int) Math.floor(y + radius));
+        int westBounds = Math.max(0, (int) Math.floor(x - radius));
+        int eastBounds = Math.min(PATHING_MAP.length - 1, (int) Math.floor(x + radius));
         
         for (int i = westBounds; i <= eastBounds; i++) {
             for (int j = northBounds; j <= southBounds; j++) {
