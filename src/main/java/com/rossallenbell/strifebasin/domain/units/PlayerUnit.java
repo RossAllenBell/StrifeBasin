@@ -129,7 +129,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         }
         
         if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
-            animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(this.getClass());
+            animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
             lastAnimationFrameSwitch = updateTime;
         }
         
@@ -190,6 +190,10 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     @Override
     public Class<? extends Effect> getAttackEffect() {
         return null;
+    }
+
+    public long getLastAnimationFrameSwitch() {
+        return lastAnimationFrameSwitch;
     }
     
 }

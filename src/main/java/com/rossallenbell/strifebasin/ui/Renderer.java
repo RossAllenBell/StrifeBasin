@@ -28,11 +28,13 @@ import javax.imageio.ImageIO;
 import com.rossallenbell.strifebasin.StrifeBasin;
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
+import com.rossallenbell.strifebasin.connection.domain.NetworkBuilding;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
+import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
@@ -162,9 +164,12 @@ public class Renderer {
             }
         }
         
-        for (NetworkAsset building : Game.getInstance().getTheirBuildings().values()) {
-            graphics.setColor(new Color(255, 0, 0));
-            drawBuilding(graphics, building);
+        Map<Long, NetworkBuilding> theirBuildings = Game.getInstance().getTheirBuildings();
+        synchronized (theirBuildings) {
+            for (NetworkAsset building : theirBuildings.values()) {
+                graphics.setColor(new Color(255, 0, 0));
+                drawBuilding(graphics, building);
+            }
         }
         
         Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
@@ -175,9 +180,12 @@ public class Renderer {
             }
         }
         
-        for (NetworkUnit unit : Game.getInstance().getTheirUnits().values()) {
-            graphics.setColor(new Color(255, 0, 0));
-            drawUnit(graphics, unit);
+        Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
+        synchronized (theirUnits) {
+            for (NetworkUnit unit : theirUnits.values()) {
+                graphics.setColor(new Color(255, 0, 0));
+                drawUnit(graphics, unit);
+            }
         }
         
         List<Effect> effects = EffectsManager.getInstance().getEffects();
@@ -302,16 +310,20 @@ public class Renderer {
     
     private void drawGameResult(Graphics2D graphics) {
         FontMetrics fm = graphics.getFontMetrics();
-        if (Game.getInstance().getThem().getSanctuary().getHealth() <= 0) {
+        NetworkAsset theirSanctuary = Game.getInstance().getThem().getSanctuary();
+        if (theirSanctuary != null && theirSanctuary.getHealth() <= 0) {
             graphics.setColor(new Color(0, 255, 0));
             graphics.setFont(new Font(null, Font.PLAIN, 70));
             fm = graphics.getFontMetrics();
             graphics.drawString(WIN_STRING, (viewDimensions.width / 2) - (fm.stringWidth(WIN_STRING) / 2), viewDimensions.height / 2);
-        } else if (Game.getInstance().getMe().getSanctuary().getHealth() <= 0) {
-            graphics.setColor(new Color(255, 0, 0));
-            graphics.setFont(new Font(null, Font.PLAIN, 70));
-            fm = graphics.getFontMetrics();
-            graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
+        } else {
+            Sanctuary mySanctuary = Game.getInstance().getMe().getSanctuary();
+            if (mySanctuary != null && mySanctuary.getHealth() <= 0) {
+                graphics.setColor(new Color(255, 0, 0));
+                graphics.setFont(new Font(null, Font.PLAIN, 70));
+                fm = graphics.getFontMetrics();
+                graphics.drawString(LOSE_STRING, (viewDimensions.width / 2) - (fm.stringWidth(LOSE_STRING) / 2), viewDimensions.height / 2);
+            }
         }
     }
     

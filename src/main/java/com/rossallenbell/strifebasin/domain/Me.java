@@ -119,13 +119,13 @@ public class Me implements Player {
             }
         }
         
-        synchronized (units) {
-            Iterator<PlayerUnit> unitsI = units.values().iterator();
-            while (unitsI.hasNext()) {
-                PlayerUnit unit = unitsI.next();
-                if (unit.getHealth() > 0) {
-                    unit.update(updateTime);
-                } else if (unit.getHealth() <= 0) {
+            synchronized (units) {
+        Iterator<PlayerUnit> unitsI = units.values().iterator();
+        while (unitsI.hasNext()) {
+            PlayerUnit unit = unitsI.next();
+            if (unit.getHealth() > 0) {
+                unit.update(updateTime);
+            } else if (unit.getHealth() <= 0) {
                     unitsI.remove();
                 }
             }

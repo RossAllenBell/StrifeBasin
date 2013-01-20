@@ -1,7 +1,9 @@
 package com.rossallenbell.strifebasin.connection.domain;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.rossallenbell.strifebasin.connection.CommObject;
 import com.rossallenbell.strifebasin.domain.Me;
@@ -16,7 +18,7 @@ public class NetworkPlayer extends CommObject implements Player {
     
     private final Map<Long, NetworkBuilding> buildings;
     private final Map<Long, NetworkUnit> units;
-
+    
     public NetworkPlayer() {
         buildings = new HashMap<Long, NetworkBuilding>();
         units = new HashMap<Long, NetworkUnit>();
@@ -48,13 +50,52 @@ public class NetworkPlayer extends CommObject implements Player {
                 return building;
             }
         }
-        assert false;
         return null;
     }
-
-    public void update(long updateTime) {        
-        for (NetworkUnit unit : getUnits().values()) {
-            unit.update(updateTime);
+    
+    public void update(long updateTime) {
+        synchronized (units) {
+            for (NetworkUnit unit : units.values()) {
+                unit.update(updateTime);
+            }
+        }
+    }
+    
+    public void applyRemotePlayerData(NetworkPlayer networkPlayer) {
+        synchronized (buildings) {
+            Iterator<Entry<Long, NetworkBuilding>> previouslyKnownBuildings = buildings.entrySet().iterator();
+            while (previouslyKnownBuildings.hasNext()) {
+                Entry<Long, NetworkBuilding> building = previouslyKnownBuildings.next();
+                if (!networkPlayer.buildings.containsKey(building.getKey())) {
+                    previouslyKnownBuildings.remove();
+                }
+            }
+            for (NetworkBuilding building : networkPlayer.getBuildings().values()) {
+                if (buildings.containsKey(building.getAssetId())) {
+                    buildings.get(building.getAssetId()).applyRemoteAssetData(building);
+                } else {
+                    building.mirror();
+                    buildings.put(building.getAssetId(), building);
+                }
+            }
+        }
+        
+        synchronized (units) {
+            Iterator<Entry<Long, NetworkUnit>> previouslyKnownUnits = units.entrySet().iterator();
+            while (previouslyKnownUnits.hasNext()) {
+                Entry<Long, NetworkUnit> unit = previouslyKnownUnits.next();
+                if (!networkPlayer.units.containsKey(unit.getKey())) {
+                    previouslyKnownUnits.remove();
+                }
+            }
+            for (NetworkUnit unit : networkPlayer.getUnits().values()) {
+                if (units.containsKey(unit.getAssetId())) {
+                    units.get(unit.getAssetId()).applyRemoteAssetData(unit);
+                } else {
+                    unit.mirror();
+                    units.put(unit.getAssetId(), unit);
+                }
+            }
         }
     }
     

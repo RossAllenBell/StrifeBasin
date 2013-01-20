@@ -16,5 +16,11 @@ public class NetworkBuilding extends NetworkAsset {
     public Point2D.Double getHitLocation() {
         return new Point2D.Double(getLocation().x + (getSize() / 2), getLocation().y + (getSize() / 2));
     }
+
+    @Override
+    public void mirror() {
+        getLocation().setLocation(getLocation().x + getSize(), getLocation().y);
+        super.mirror();
+    }
     
 }

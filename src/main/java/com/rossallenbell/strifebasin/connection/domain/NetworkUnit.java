@@ -11,23 +11,26 @@ import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 
 public class NetworkUnit extends NetworkAsset implements Unit {
     
-    private static final long serialVersionUID = 1L;   
+    private static final long serialVersionUID = 1L;
     
-    private final double damage;    
-    private final Point2D.Double destination;    
-    private final double speed;    
-    private final double range;    
-    private final double aggroRange;    
-    private final double attackSpeed;    
-    private final long targetId;
-    private final int animationFrame;
+    private final double damage;
+    private final double speed;
+    private final double range;
+    private final double aggroRange;
+    private final double attackSpeed;
     private final Class<? extends Effect> attackEffect;
-    private final List<Point2D.Double> route;
+    
+    private Point2D.Double destination;
+    private long targetId;
+    private int animationFrame;
+    private List<Point2D.Double> route;
     
     private long lastUpdateTime;
+    private long lastAnimationFrameSwitch;
     
     public NetworkUnit(PlayerUnit originalUnit) {
         super(originalUnit);
@@ -41,6 +44,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         animationFrame = originalUnit.getAnimationFrame();
         attackEffect = originalUnit.getAttackEffect();
         route = new ArrayList<Point2D.Double>(originalUnit.getRoute());
+        lastAnimationFrameSwitch = originalUnit.getLastAnimationFrameSwitch();
     }
     
     @Override
@@ -92,9 +96,9 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     public Class<? extends Asset> getAnimationClass() {
         return this.getOriginalAssetClass();
     }
-
+    
     public void update(long updateTime) {
-        if(lastUpdateTime == 0) {
+        if (lastUpdateTime == 0) {
             lastUpdateTime = updateTime;
         }
         
@@ -119,11 +123,16 @@ public class NetworkUnit extends NetworkAsset implements Unit {
                 newLocation = new Point2D.Double(currentLocation.x + dx, currentLocation.y + dy);
             }
             
-            if(newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
+            if (newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
                 getLocation().setLocation(newLocation);
-            }            
+            }
         }
-
+        
+        if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
+            animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
+            lastAnimationFrameSwitch = updateTime;
+        }
+        
         Pathing.getInstance().updatePathingMap(this);
         
         lastUpdateTime = updateTime;
@@ -137,6 +146,30 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     @Override
     public List<Double> getRoute() {
         return route;
+    }
+    
+    @Override
+    public void mirror() {
+        super.mirror();
+        getCurrentDestination().setLocation(Game.getMirroredLocation(getCurrentDestination()));
+    }
+    
+    @Override
+    public void applyRemoteAssetData(NetworkAsset asset) {
+        if (!this.getClass().isAssignableFrom(asset.getClass())) {
+            throw new IllegalArgumentException();
+        }
+        NetworkUnit networkUnit = (NetworkUnit) asset;
+        
+        destination = Game.getMirroredLocation(networkUnit.getCurrentDestination());
+        targetId = networkUnit.targetId;
+        
+        synchronized (route) {
+            route.clear();
+            for (Point2D.Double routePoint : networkUnit.route) {
+                route.add(Game.getMirroredLocation(routePoint));
+            }
+        }
     }
     
 }

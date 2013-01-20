@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
 import com.rossallenbell.strifebasin.connection.domain.NetworkBuilding;
 import com.rossallenbell.strifebasin.connection.domain.NetworkPlayer;
 import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
@@ -111,16 +110,8 @@ public class Game {
         return them.getUnits();
     }
     
-    public void updateTheirUnitsAndBuildings(NetworkPlayer networkPlayer) {
-        them = networkPlayer;
-        for (NetworkAsset building : them.getBuildings().values()) {
-            building.getLocation().setLocation(building.getLocation().x + building.getSize(), building.getLocation().y);
-            building.getLocation().setLocation(Game.getMirroredLocation(building.getLocation()));
-        }
-        for (NetworkUnit unit : them.getUnits().values()) {
-            unit.getLocation().setLocation(Game.getMirroredLocation(unit.getLocation()));
-            unit.getCurrentDestination().setLocation(Game.getMirroredLocation(unit.getCurrentDestination()));
-        }
+    public void applyTheirRemoteData(NetworkPlayer networkPlayer) {
+        them.applyRemotePlayerData(networkPlayer);
     }
     
     public void attackEvent(AttackEvent attackEvent) {

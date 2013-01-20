@@ -47,21 +47,27 @@ public class Pathing {
     public Asset getClosestAggroableAsset(Unit unit, Player theOtherPlayer) {
         Asset target = null;
         
-        for (Unit theirUnit : theOtherPlayer.getUnits().values()) {
-            double distanceToTheirUnit = theirUnit.getHitLocation().distance(unit.getLocation());
-            if (distanceToTheirUnit <= unit.getAggroRange()) {
-                if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirUnit) {
-                    target = theirUnit;
+        Map<Long, ? extends Unit> theirUnits = theOtherPlayer.getUnits();
+        synchronized (theirUnits) {
+            for (Unit theirUnit : theirUnits.values()) {
+                double distanceToTheirUnit = theirUnit.getHitLocation().distance(unit.getLocation());
+                if (distanceToTheirUnit <= unit.getAggroRange()) {
+                    if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirUnit) {
+                        target = theirUnit;
+                    }
                 }
             }
         }
         
         if (target == null) {
-            for (Asset building : theOtherPlayer.getBuildings().values()) {
-                double distanceToTheirBuilding = building.getHitLocation().distance(unit.getLocation());
-                if (distanceToTheirBuilding <= unit.getAggroRange()) {
-                    if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirBuilding) {
-                        target = building;
+            Map<Long, ? extends Asset> theirBuildings = theOtherPlayer.getBuildings();
+            synchronized (theirBuildings) {
+                for (Asset building : theirBuildings.values()) {
+                    double distanceToTheirBuilding = building.getHitLocation().distance(unit.getLocation());
+                    if (distanceToTheirBuilding <= unit.getAggroRange()) {
+                        if (target == null || target.getHitLocation().distance(unit.getLocation()) > distanceToTheirBuilding) {
+                            target = building;
+                        }
                     }
                 }
             }
@@ -122,7 +128,7 @@ public class Pathing {
             Double currentFScore = openSet.firstKey();
             current = openSet.get(currentFScore);
             
-            if(bestFail == null || Point.distance(bestFail.x, bestFail.y, goal.x, goal.y) > Point.distance(current.x, current.y, goal.x, goal.y)) {
+            if (bestFail == null || Point.distance(bestFail.x, bestFail.y, goal.x, goal.y) > Point.distance(current.x, current.y, goal.x, goal.y)) {
                 bestFail = current;
             }
             
@@ -142,6 +148,10 @@ public class Pathing {
                     continue;
                 }
                 double tentativeGScore = gScores.get(current) + 1;
+                if (neighbor.x == current.x) {
+                    // prefer east/west movement
+                    tentativeGScore += 0.001;
+                }
                 
                 if (!openSet.containsValue(neighbor) || tentativeGScore <= gScores.get(neighbor)) {
                     predecessors.put(neighbor, current);
@@ -194,7 +204,7 @@ public class Pathing {
         
         for (int i = westBounds; i <= eastBounds; i++) {
             for (int j = northBounds; j <= southBounds; j++) {
-                PATHING_MAP[i][j] = unit.isMine()? PATHING_MAP_ME : PATHING_MAP_THEM;
+                PATHING_MAP[i][j] = unit.isMine() ? PATHING_MAP_ME : PATHING_MAP_THEM;
             }
         }
     }
@@ -214,7 +224,7 @@ public class Pathing {
         }
         return false;
     }
-
+    
     private double distanceToHitTarget(Unit unit, Asset target) {
         return unit.getRange() + (target.getSize() / 2);
     }

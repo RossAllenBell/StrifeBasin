@@ -38,7 +38,7 @@ public class CommSocketListener extends StoppableThread {
                     if (commInput instanceof ConnectionAccepted) {
                         ConnectionToOpponent.getInstance().theyAccepted();
                     } else if (commInput instanceof NetworkPlayer) {
-                        Game.getInstance().updateTheirUnitsAndBuildings((NetworkPlayer) commInput);
+                        Game.getInstance().applyTheirRemoteData((NetworkPlayer) commInput);
                     } else if (commInput instanceof AttackEvent) {
                         Game.getInstance().attackEvent((AttackEvent) commInput);
                     } else if (commInput instanceof Ping) {
