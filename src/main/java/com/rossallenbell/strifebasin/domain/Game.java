@@ -115,15 +115,17 @@ public class Game {
     }
     
     public void attackEvent(AttackEvent attackEvent) {
-        PlayerAsset myAsset = me.getAssetById(attackEvent.getTarget().getAssetId());
+        PlayerAsset myAsset = me.getAssetById(attackEvent.targetId);
         if (myAsset != null) {
-            NetworkUnit attackingUnit = attackEvent.getUnit();
-            myAsset.takeDamage(attackingUnit);
-
-            attackingUnit.getLocation().setLocation(Game.getMirroredLocation(attackingUnit.getLocation()));
-            Effect effect = EffectsFactory.getInstance().buildEffect(attackingUnit, myAsset);
-            if (effect != null) {
-                EffectsManager.getInstance().addEffect(effect);
+            NetworkUnit attackingUnit = (NetworkUnit) them.getAssetById(attackEvent.unitId);
+            if (attackingUnit != null) {
+                myAsset.takeDamage(attackingUnit);
+                
+                attackingUnit.getLocation().setLocation(Game.getMirroredLocation(attackingUnit.getLocation()));
+                Effect effect = EffectsFactory.getInstance().buildEffect(attackingUnit, myAsset);
+                if (effect != null) {
+                    EffectsManager.getInstance().addEffect(effect);
+                }
             }
         }
     }
@@ -151,7 +153,7 @@ public class Game {
             }
             
             buildingPreview.setLocation(gamePoint.x, gamePoint.y);
-            for(Building otherBuilding : me.getBuildings().values()) {
+            for (Building otherBuilding : me.getBuildings().values()) {
                 if (Pathing.getInstance().buildingsOverlap(buildingPreview, otherBuilding)) {
                     return false;
                 }

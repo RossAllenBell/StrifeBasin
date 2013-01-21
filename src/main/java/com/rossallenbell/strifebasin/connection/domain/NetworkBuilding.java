@@ -19,7 +19,7 @@ public class NetworkBuilding extends NetworkAsset {
 
     @Override
     public void mirror() {
-        getLocation().setLocation(getLocation().x + getSize(), getLocation().y);
+        location.x = location.x + getSize();
         super.mirror();
     }
     

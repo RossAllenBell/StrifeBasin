@@ -1,7 +1,7 @@
+tint unit color according to friendly or enemy
 impassable terrain
 animations for standing still and attacking
 death effect
-tint unit color according to friendly or enemy
 splash damage
 flying units
 defensive buildings

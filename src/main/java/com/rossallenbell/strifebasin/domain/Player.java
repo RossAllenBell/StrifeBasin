@@ -10,4 +10,6 @@ public interface Player {
     
     public Map<Long, ? extends Asset> getBuildings();
     
+    public Asset getAssetById(long assetId);
+    
 }

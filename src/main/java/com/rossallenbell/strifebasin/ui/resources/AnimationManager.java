@@ -13,7 +13,7 @@ import org.reflections.Reflections;
 
 public class AnimationManager {
     
-    public static final long DEFAULT_FRAME_DURATION = 250;
+    public static final long DEFAULT_FRAME_DURATION = 150;
     
     private Map<Class<?>, ArrayList<BufferedImage>> images;
     

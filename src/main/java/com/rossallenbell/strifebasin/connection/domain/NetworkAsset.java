@@ -1,7 +1,6 @@
 package com.rossallenbell.strifebasin.connection.domain;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.io.Serializable;
 
 import com.rossallenbell.strifebasin.domain.Asset;
@@ -18,7 +17,7 @@ public abstract class NetworkAsset implements Asset, Serializable {
     private final int maxHealth;
     
     private int health;
-    private Point2D.Double location;
+    protected Point2D.Double location;
     
     public NetworkAsset(Asset originalAsset) {
         originalAssetClass = originalAsset.getClass();
@@ -90,13 +89,12 @@ public abstract class NetworkAsset implements Asset, Serializable {
     }
 
     public void applyRemoteAssetData(NetworkAsset asset) {
-        Double mirroredLocation = Game.getMirroredLocation(asset.getLocation());
-        location = new Point2D.Double(mirroredLocation.x, mirroredLocation.y);
+        location = asset.getLocation();
         health = Math.min(health, asset.getHealth());
     }
 
     public void mirror() {
-        getLocation().setLocation(Game.getMirroredLocation(getLocation()));
+        location = Game.getMirroredLocation(location);
     }
     
 }

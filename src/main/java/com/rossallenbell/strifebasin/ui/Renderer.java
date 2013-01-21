@@ -441,12 +441,18 @@ public class Renderer {
         }
         
         graphics.setColor(new Color(255, 0, 0));
-        for (NetworkAsset building : Game.getInstance().getTheirBuildings().values()) {
-            drawMinimapAsset(graphics, building);
+        Map<Long, NetworkBuilding> theirBuildings = Game.getInstance().getTheirBuildings();
+        synchronized (theirBuildings) {
+            for (NetworkAsset building : theirBuildings.values()) {
+                drawMinimapAsset(graphics, building);
+            }
         }
         
-        for (NetworkUnit unit : Game.getInstance().getTheirUnits().values()) {
-            drawMinimapAsset(graphics, unit);
+        Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
+        synchronized (theirUnits) {
+            for (NetworkUnit unit : theirUnits.values()) {
+                drawMinimapAsset(graphics, unit);
+            }
         }
         
         graphics.setTransform(oldXForm);

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
@@ -172,21 +173,21 @@ public class Pathing {
     private Collection<Point2D.Double> neighbors(Unit unit, Point2D.Double currentLocation) {
         Collection<Point2D.Double> neighbors = new HashSet<Point2D.Double>();
         
-        Point2D.Double north = new Point2D.Double(currentLocation.x, currentLocation.y - 1);
-        if (canMove(unit, north) && Point.distance(unit.getLocation().x, unit.getLocation().y, north.x, north.y) <= REROUTE_RANGE) {
-            neighbors.add(north);
-        }
         Point2D.Double east = new Point2D.Double(currentLocation.x + 1, currentLocation.y);
         if (canMove(unit, east) && Point.distance(unit.getLocation().x, unit.getLocation().y, east.x, east.y) <= REROUTE_RANGE) {
             neighbors.add(east);
         }
-        Point2D.Double south = new Point2D.Double(currentLocation.x, currentLocation.y + 1);
-        if (canMove(unit, south) && Point.distance(unit.getLocation().x, unit.getLocation().y, south.x, south.y) <= REROUTE_RANGE) {
-            neighbors.add(south);
-        }
         Point2D.Double west = new Point2D.Double(currentLocation.x - 1, currentLocation.y);
         if (canMove(unit, west) && Point.distance(unit.getLocation().x, unit.getLocation().y, west.x, west.y) <= REROUTE_RANGE) {
             neighbors.add(west);
+        }
+        Point2D.Double north = new Point2D.Double(currentLocation.x, currentLocation.y - 1);
+        if (canMove(unit, north) && Point.distance(unit.getLocation().x, unit.getLocation().y, north.x, north.y) <= REROUTE_RANGE) {
+            neighbors.add(north);
+        }
+        Point2D.Double south = new Point2D.Double(currentLocation.x, currentLocation.y + 1);
+        if (canMove(unit, south) && Point.distance(unit.getLocation().x, unit.getLocation().y, south.x, south.y) <= REROUTE_RANGE) {
+            neighbors.add(south);
         }
         
         return neighbors;
@@ -243,6 +244,20 @@ public class Pathing {
         Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
         synchronized (myUnits) {
             for (Unit myUnit : myUnits.values()) {
+                if (myUnit.getAssetId() != unit.getAssetId()) {
+                    double newDistance = newLocation.distance(myUnit.getLocation());
+                    if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
+                        if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
+        synchronized (theirUnits) {
+            for (Unit myUnit : theirUnits.values()) {
                 if (myUnit.getAssetId() != unit.getAssetId()) {
                     double newDistance = newLocation.distance(myUnit.getLocation());
                     if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {

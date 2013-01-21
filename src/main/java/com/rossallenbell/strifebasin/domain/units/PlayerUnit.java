@@ -28,7 +28,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     public static final double MINIMUM_AGGRO_RANGE = 10;
     
-    public static final long TARGET_ASSESSMENT_COOLDOWN = 500;
+    public static final long TARGET_ASSESSMENT_COOLDOWN = 250;
     public static final long ROUTE_ASSESSMENT_COOLDOWN = 500;
     
     private List<Point2D.Double> route;
@@ -112,13 +112,15 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
                 newLocation = new Point2D.Double(currentLocation.x + dx, currentLocation.y + dy);
             }
             
-            if(newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
+            if (newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
                 getLocation().setLocation(newLocation);
             }
         }
         
         // attack
         if (Pathing.getInstance().canHitAsset(this, target) && lastAttackTime + getAttackSpeed() <= updateTime) {
+            route.clear();
+            
             Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
             if (attackEffect != null) {
                 EffectsManager.getInstance().addEffect(attackEffect);
@@ -143,10 +145,6 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         return route;
     }
     
-    public void setRoute(List<Point2D.Double> route) {
-        this.route = route;
-    }
-    
     @Override
     public long getTargetId() {
         return targetId;
@@ -167,13 +165,15 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             route.remove(0);
         }
         
-        Asset target = getTarget();
         if (!route.isEmpty()) {
             return route.get(0);
-        } else if (target != null) {
-            return target.getHitLocation();
         } else {
-            return getLocation();
+            Asset target = getTarget();
+            if (target != null) {
+                return target.getHitLocation();
+            } else {
+                return getLocation();
+            }
         }
     }
     
@@ -191,7 +191,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     public Class<? extends Effect> getAttackEffect() {
         return null;
     }
-
+    
     public long getLastAnimationFrameSwitch() {
         return lastAnimationFrameSwitch;
     }

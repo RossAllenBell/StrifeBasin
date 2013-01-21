@@ -71,10 +71,10 @@ public class NetworkPlayer extends CommObject implements Player {
                 }
             }
             for (NetworkBuilding building : networkPlayer.getBuildings().values()) {
+                building.mirror();
                 if (buildings.containsKey(building.getAssetId())) {
                     buildings.get(building.getAssetId()).applyRemoteAssetData(building);
                 } else {
-                    building.mirror();
                     buildings.put(building.getAssetId(), building);
                 }
             }
@@ -89,14 +89,23 @@ public class NetworkPlayer extends CommObject implements Player {
                 }
             }
             for (NetworkUnit unit : networkPlayer.getUnits().values()) {
+                unit.mirror();
                 if (units.containsKey(unit.getAssetId())) {
                     units.get(unit.getAssetId()).applyRemoteAssetData(unit);
                 } else {
-                    unit.mirror();
                     units.put(unit.getAssetId(), unit);
                 }
             }
         }
+    }
+    
+    @Override
+    public NetworkAsset getAssetById(long assetId) {
+        NetworkAsset asset = getBuildings().get(assetId);
+        if (asset == null) {
+            asset = getUnits().get(assetId);
+        }
+        return asset;
     }
     
 }

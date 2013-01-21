@@ -151,25 +151,24 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     @Override
     public void mirror() {
         super.mirror();
-        getCurrentDestination().setLocation(Game.getMirroredLocation(getCurrentDestination()));
+        destination = Game.getMirroredLocation(destination);
+        for (int i=0; i<route.size(); i++) {
+            route.set(i, Game.getMirroredLocation(route.get(i)));
+        }
     }
     
     @Override
     public void applyRemoteAssetData(NetworkAsset asset) {
+        super.applyRemoteAssetData(asset);
+        
         if (!this.getClass().isAssignableFrom(asset.getClass())) {
             throw new IllegalArgumentException();
         }
         NetworkUnit networkUnit = (NetworkUnit) asset;
         
-        destination = Game.getMirroredLocation(networkUnit.getCurrentDestination());
+        destination = networkUnit.getCurrentDestination();
         targetId = networkUnit.targetId;
-        
-        synchronized (route) {
-            route.clear();
-            for (Point2D.Double routePoint : networkUnit.route) {
-                route.add(Game.getMirroredLocation(routePoint));
-            }
-        }
+        route = networkUnit.route;
     }
     
 }

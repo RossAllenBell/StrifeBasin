@@ -8,20 +8,12 @@ public class AttackEvent extends CommObject {
     
     private static final long serialVersionUID = 1L;
     
-    private final NetworkUnit unit;
-    private final Asset target;
+    public final long unitId;
+    public final long targetId;
     
     public AttackEvent(NetworkUnit unit, Asset target) {
-        this.unit = unit;
-        this.target = target;
-    }
-    
-    public NetworkUnit getUnit() {
-        return unit;
-    }
-    
-    public Asset getTarget() {
-        return target;
+        unitId = unit.getAssetId();
+        targetId = target.getAssetId();
     }
     
 }
