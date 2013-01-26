@@ -19,7 +19,7 @@ public class NetworkBuilding extends NetworkAsset {
 
     @Override
     public void mirror() {
-        location.x = location.x + getSize();
+        setLocation(new Point2D.Double(getLocation().x + getSize(), getLocation().y));
         super.mirror();
     }
     

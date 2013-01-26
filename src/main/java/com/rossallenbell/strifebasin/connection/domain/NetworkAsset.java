@@ -17,7 +17,7 @@ public abstract class NetworkAsset implements Asset, Serializable {
     private final int maxHealth;
     
     private int health;
-    protected Point2D.Double location;
+    private Point2D.Double location;
     
     public NetworkAsset(Asset originalAsset) {
         originalAssetClass = originalAsset.getClass();
@@ -43,12 +43,22 @@ public abstract class NetworkAsset implements Asset, Serializable {
     
     @Override
     public Point2D.Double getLocation() {
-        return location;
+        return (Point2D.Double) location.clone();
     }
 
     @Override
     public Point2D.Double getHitLocation() {
-        return location;
+        return getLocation();
+    }
+    
+    @Override
+    public void setLocation(Point2D.Double newLocation) {
+        double distance = Point2D.distance(location.x, location.y, newLocation.x, newLocation.y);
+        if(getClass() == NetworkUnit.class && location.x > newLocation.x && distance > 3) {
+            throw new IllegalArgumentException("" + distance);
+        }
+        
+        location = newLocation;
     }
     
     @Override
@@ -89,7 +99,7 @@ public abstract class NetworkAsset implements Asset, Serializable {
     }
 
     public void applyRemoteAssetData(NetworkAsset asset) {
-        location = asset.getLocation();
+        setLocation(asset.getLocation());
         health = Math.min(health, asset.getHealth());
     }
 

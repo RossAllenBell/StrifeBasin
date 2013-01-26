@@ -27,11 +27,6 @@ public class Pathing {
     public static final double REROUTE_DIRECTION_TEST_STEP = Math.PI * 2.0 / 4.0;
     public static final double REROUTE_MOVE_TEST_BY_SIZE = 0.5;
     
-    public static final byte[][] PATHING_MAP = new byte[Game.BOARD_WIDTH][Game.BOARD_HEIGHT];
-    public static final byte PATHING_MAP_EMPTY = 0;
-    public static final byte PATHING_MAP_ME = 1;
-    public static final byte PATHING_MAP_THEM = 2;
-    
     private static Pathing theInstance;
     
     public static Pathing getInstance() {
@@ -191,31 +186,6 @@ public class Pathing {
         }
         
         return neighbors;
-    }
-    
-    public void updatePathingMap(Unit unit) {
-        double x = unit.getLocation().x;
-        double y = unit.getLocation().y;
-        double radius = unit.getSize() / 2;
-        
-        int northBounds = Math.max(0, (int) Math.floor(y - radius));
-        int southBounds = Math.min(PATHING_MAP[0].length - 1, (int) Math.floor(y + radius));
-        int westBounds = Math.max(0, (int) Math.floor(x - radius));
-        int eastBounds = Math.min(PATHING_MAP.length - 1, (int) Math.floor(x + radius));
-        
-        for (int i = westBounds; i <= eastBounds; i++) {
-            for (int j = northBounds; j <= southBounds; j++) {
-                PATHING_MAP[i][j] = unit.isMine() ? PATHING_MAP_ME : PATHING_MAP_THEM;
-            }
-        }
-    }
-    
-    public void clearPathingMap() {
-        for (int i = 0; i < PATHING_MAP.length; i++) {
-            for (int j = 0; j < PATHING_MAP[0].length; j++) {
-                PATHING_MAP[i][j] = PATHING_MAP_EMPTY;
-            }
-        }
     }
     
     public boolean canHitAsset(Unit unit, Asset target) {

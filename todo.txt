@@ -1,3 +1,4 @@
+make pathfinding prefer lateral movement
 tint unit color according to friendly or enemy
 impassable terrain
 animations for standing still and attacking

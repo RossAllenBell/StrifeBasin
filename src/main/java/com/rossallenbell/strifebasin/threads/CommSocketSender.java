@@ -27,7 +27,7 @@ public class CommSocketSender extends StoppableThread {
     @Override
     public void run() {
         while (isRunning()) {
-            while (!sendQueue.isEmpty()) {
+            while (!sendQueue.isEmpty() && isRunning()) {
                 ConnectionToOpponent.getInstance().sendObjectToThem(sendQueue.remove(0));
             }
             

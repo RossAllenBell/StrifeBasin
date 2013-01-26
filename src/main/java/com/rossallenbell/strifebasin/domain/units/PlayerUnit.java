@@ -113,7 +113,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             }
             
             if (newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
-                getLocation().setLocation(newLocation);
+                setLocation(newLocation);
             }
         }
         
@@ -134,8 +134,6 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
             lastAnimationFrameSwitch = updateTime;
         }
-        
-        Pathing.getInstance().updatePathingMap(this);
         
         lastUpdateTime = updateTime;
         

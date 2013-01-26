@@ -117,10 +117,6 @@ public class Renderer {
             drawBackground(graphics);
             drawContent(graphics);
             
-            if (StrifeBasin.DEBUG) {
-                drawPathingMap(graphics);
-            }
-            
             destinationGraphics.drawImage(image, 0, 0, viewDimensions.width - 1, viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
             
             drawOverlay(destinationGraphics);
@@ -130,23 +126,6 @@ public class Renderer {
                     loopTimes.remove(0);
                 }
                 loopTimes.add(currentTime);
-            }
-        }
-    }
-    
-    private void drawPathingMap(Graphics2D graphics) {
-        Color me = new Color(0, 255, 0, 64);
-        Color them = new Color(255, 255, 0, 64);
-        for (int x = 0; x < Pathing.PATHING_MAP.length; x++) {
-            for (int y = 0; y < Pathing.PATHING_MAP[x].length; y++) {
-                if (Pathing.PATHING_MAP[x][y] != Pathing.PATHING_MAP_EMPTY) {
-                    if (Pathing.PATHING_MAP[x][y] == Pathing.PATHING_MAP_ME) {
-                        graphics.setColor(me);
-                    } else {
-                        graphics.setColor(them);
-                    }
-                    graphics.fillRect(x * PIXELS_PER_BOARD_UNIT, y * PIXELS_PER_BOARD_UNIT, PIXELS_PER_BOARD_UNIT, PIXELS_PER_BOARD_UNIT);
-                }
             }
         }
     }

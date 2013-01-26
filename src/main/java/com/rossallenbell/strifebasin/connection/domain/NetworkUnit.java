@@ -43,7 +43,12 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         targetId = originalUnit.getTargetId();
         animationFrame = originalUnit.getAnimationFrame();
         attackEffect = originalUnit.getAttackEffect();
-        route = new ArrayList<Point2D.Double>(originalUnit.getRoute());
+        
+        route = new ArrayList<Point2D.Double>();
+        for (Point2D.Double routePoint : originalUnit.getRoute()) {
+            route.add((Point2D.Double) routePoint.clone());
+        }
+        
         lastAnimationFrameSwitch = originalUnit.getLastAnimationFrameSwitch();
     }
     
@@ -110,8 +115,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         }
         if (target != null && !Pathing.getInstance().canHitAsset(this, target)) {
             Point2D.Double destination = getCurrentDestination();
-            Point2D.Double location = getLocation();
-            double distanceToDestination = destination.distance(location);
+            double distanceToDestination = destination.distance(getLocation());
             Point2D.Double newLocation = null;
             if (distanceToDestination <= moveDistance) {
                 newLocation = destination;
@@ -124,7 +128,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
             }
             
             if (newLocation != null && Pathing.getInstance().canMove(this, newLocation)) {
-                getLocation().setLocation(newLocation);
+                setLocation(newLocation);
             }
         }
         
@@ -132,8 +136,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
             animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
             lastAnimationFrameSwitch = updateTime;
         }
-        
-        Pathing.getInstance().updatePathingMap(this);
         
         lastUpdateTime = updateTime;
     }
@@ -144,16 +146,19 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     }
     
     @Override
-    public List<Double> getRoute() {
+    public List<Point2D.Double> getRoute() {
         return route;
     }
     
     @Override
     public void mirror() {
         super.mirror();
+        
         destination = Game.getMirroredLocation(destination);
-        for (int i=0; i<route.size(); i++) {
-            route.set(i, Game.getMirroredLocation(route.get(i)));
+        
+        List<Double> mirroredRoute = new ArrayList<Point2D.Double>();
+        for (Point2D.Double routePoint : route) {
+            mirroredRoute.add(Game.getMirroredLocation(routePoint));
         }
     }
     
@@ -168,7 +173,11 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         
         destination = networkUnit.getCurrentDestination();
         targetId = networkUnit.targetId;
-        route = networkUnit.route;
+        
+        route.clear();
+        for (Point2D.Double routePoint : networkUnit.route) {
+            route.add((Point2D.Double) routePoint.clone());
+        }
     }
     
 }
