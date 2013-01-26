@@ -119,6 +119,8 @@ public class Pathing {
         gScores.put(start, 0.0);
         fScores.put(start, gScores.get(start) + Point.distance(start.x, start.y, goal.x, goal.y));
         
+        double verticalMovementCost = 0;
+        
         Point2D.Double current;
         while (!openSet.isEmpty()) {
             Double currentFScore = openSet.firstKey();
@@ -146,7 +148,7 @@ public class Pathing {
                 double tentativeGScore = gScores.get(current) + 1;
                 if (neighbor.x == current.x) {
                     // prefer east/west movement
-                    tentativeGScore += 0.001;
+                    tentativeGScore += verticalMovementCost;
                 }
                 
                 if (!openSet.containsValue(neighbor) || tentativeGScore <= gScores.get(neighbor)) {
@@ -158,6 +160,8 @@ public class Pathing {
                     }
                 }
             }
+            
+            verticalMovementCost -= 0.001;
         }
         
         List<Point2D.Double> bestFailList = new ArrayList<Point2D.Double>();
