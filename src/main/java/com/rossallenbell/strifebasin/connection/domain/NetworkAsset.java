@@ -52,12 +52,7 @@ public abstract class NetworkAsset implements Asset, Serializable {
     }
     
     @Override
-    public void setLocation(Point2D.Double newLocation) {
-        double distance = Point2D.distance(location.x, location.y, newLocation.x, newLocation.y);
-        if(getClass() == NetworkUnit.class && location.x > newLocation.x && distance > 3) {
-            throw new IllegalArgumentException("" + distance);
-        }
-        
+    public void setLocation(Point2D.Double newLocation) {        
         location = newLocation;
     }
     
