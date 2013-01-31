@@ -1,4 +1,5 @@
 tint unit color according to friendly or enemy
+    since it's inefficient to tint the sprites on the fly, make the Image and Animation Managers load and create separate images for both players
 impassable terrain
 animations for standing still and attacking
 death effect
