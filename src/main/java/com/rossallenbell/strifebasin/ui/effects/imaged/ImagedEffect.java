@@ -14,7 +14,7 @@ public abstract class ImagedEffect extends Effect {
 
     @Override
     public BufferedImage getImage() {
-        return ImageManager.getInstance().getImage(this.getClass());
+        return ImageManager.getInstance().getImage(this.getClass(), true);
     }
     
 }

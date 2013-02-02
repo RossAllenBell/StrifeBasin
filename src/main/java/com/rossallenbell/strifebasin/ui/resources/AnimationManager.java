@@ -15,7 +15,8 @@ public class AnimationManager {
     
     public static final long DEFAULT_FRAME_DURATION = 150;
     
-    private Map<Class<?>, ArrayList<BufferedImage>> images;
+    private Map<Class<?>, ArrayList<BufferedImage>> myImages;
+    private Map<Class<?>, ArrayList<BufferedImage>> theirImages;
     
     private static AnimationManager theInstance;
     
@@ -27,17 +28,24 @@ public class AnimationManager {
     }
     
     private AnimationManager() {
-        images = new HashMap<Class<?>, ArrayList<BufferedImage>>();
+        myImages = new HashMap<Class<?>, ArrayList<BufferedImage>>();
+        theirImages = new HashMap<Class<?>, ArrayList<BufferedImage>>();
         
         try {
             Reflections reflections = new Reflections("com.rossallenbell.strifebasin");
             for (Class<?> imagedClass : reflections.getTypesAnnotatedWith(HasAnimation.class)) {
-                images.put(imagedClass, new ArrayList<BufferedImage>());
+                myImages.put(imagedClass, new ArrayList<BufferedImage>());
+                theirImages.put(imagedClass, new ArrayList<BufferedImage>());
                 String folderPath = "images/" + imagedClass.getSimpleName().toLowerCase() + "/";
-                for(int i=0; ImageManager.class.getClassLoader().getResource(folderPath + i + ".png") != null; i++) {
-                    URL resourceURL = ImageManager.class.getClassLoader().getResource(folderPath + i + ".png");           
+                for (int i = 0; ImageManager.class.getClassLoader().getResource(folderPath + i + ".png") != null; i++) {
+                    URL resourceURL = ImageManager.class.getClassLoader().getResource(folderPath + i + ".png");
                     BufferedImage image = ImageIO.read(resourceURL);
-                    images.get(imagedClass).add(image);         
+                    BufferedImage myImage = ImageManager.deepCopy(image);
+                    BufferedImage theirImage = ImageManager.deepCopy(image);
+                    ImageManager.tintImage(myImage, ImageManager.MY_TINT);
+                    ImageManager.tintImage(theirImage, ImageManager.THEIR_TINT);
+                    myImages.get(imagedClass).add(myImage);
+                    theirImages.get(imagedClass).add(theirImage);
                 }
             }
         } catch (IOException e) {
@@ -46,15 +54,15 @@ public class AnimationManager {
     }
     
     public int getFrameCount(Class<?> clazz) {
-        return images.get(clazz).size();
+        return myImages.get(clazz).size();
     }
     
-    public BufferedImage getFrame(Class<?> clazz, int frameNumber) {
-        if (!images.containsKey(clazz) || getFrameCount(clazz) <= frameNumber) {
+    public BufferedImage getFrame(Class<?> clazz, int frameNumber, boolean isMine) {
+        if (!myImages.containsKey(clazz) || getFrameCount(clazz) <= frameNumber) {
             return null;
         }
         
-        return images.get(clazz).get(frameNumber);
+        return isMine? myImages.get(clazz).get(frameNumber) : theirImages.get(clazz).get(frameNumber);
     }
     
 }

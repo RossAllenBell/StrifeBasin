@@ -139,7 +139,7 @@ public class Renderer {
         synchronized (myBuildings) {
             for (Building building : myBuildings.values()) {
                 graphics.setColor(new Color(0, 255, 0));
-                drawBuilding(graphics, building);
+                drawBuilding(graphics, building, true);
             }
         }
         
@@ -147,7 +147,7 @@ public class Renderer {
         synchronized (theirBuildings) {
             for (NetworkAsset building : theirBuildings.values()) {
                 graphics.setColor(new Color(255, 0, 0));
-                drawBuilding(graphics, building);
+                drawBuilding(graphics, building, false);
             }
         }
         
@@ -155,7 +155,7 @@ public class Renderer {
         synchronized (myUnits) {
             for (PlayerUnit unit : myUnits.values()) {
                 graphics.setColor(new Color(0, 255, 0));
-                drawUnit(graphics, unit);
+                drawUnit(graphics, unit, true);
             }
         }
         
@@ -163,7 +163,7 @@ public class Renderer {
         synchronized (theirUnits) {
             for (NetworkUnit unit : theirUnits.values()) {
                 graphics.setColor(new Color(255, 0, 0));
-                drawUnit(graphics, unit);
+                drawUnit(graphics, unit, false);
             }
         }
         
@@ -192,17 +192,17 @@ public class Renderer {
         graphics.setTransform(oldXForm);
     }
     
-    private void drawBuilding(Graphics2D graphics, Asset building) {
-        drawBuilding(graphics, building, (int) (building.getLocation().x * PIXELS_PER_BOARD_UNIT), (int) (building.getLocation().y * PIXELS_PER_BOARD_UNIT));
+    private void drawBuilding(Graphics2D graphics, Asset building, boolean isMine) {
+        drawBuilding(graphics, building, (int) (building.getLocation().x * PIXELS_PER_BOARD_UNIT), (int) (building.getLocation().y * PIXELS_PER_BOARD_UNIT), isMine);
     }
     
-    private void drawBuilding(Graphics2D graphics, Asset building, int displayX, int displayY) {
+    private void drawBuilding(Graphics2D graphics, Asset building, int displayX, int displayY, boolean isMine) {
         int width = (int) (building.getSize() * PIXELS_PER_BOARD_UNIT);
         int height = (int) (building.getSize() * PIXELS_PER_BOARD_UNIT);
         
         Class<? extends Asset> imagedClass = building.getImageClass();
         if (imagedClass.isAnnotationPresent(HasImage.class)) {
-            BufferedImage image = ImageManager.getInstance().getImage(imagedClass);
+            BufferedImage image = ImageManager.getInstance().getImage(imagedClass, isMine);
             graphics.drawImage(image, displayX, displayY, displayX + width, displayY + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
         } else {
             graphics.fillRect(displayX, displayY, width, height);
@@ -213,7 +213,7 @@ public class Renderer {
         }
     }
     
-    private void drawUnit(Graphics2D graphics, Unit unit) {
+    private void drawUnit(Graphics2D graphics, Unit unit, Boolean isMine) {
         int x = (int) (unit.getLocation().x * PIXELS_PER_BOARD_UNIT);
         int y = (int) (unit.getLocation().y * PIXELS_PER_BOARD_UNIT);
         int width = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
@@ -225,7 +225,7 @@ public class Renderer {
         y = y - (height / 2);
         
         Class<? extends Asset> animatedClass = unit.getAnimationClass();
-        BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame());
+        BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame(), isMine);
         graphics.drawImage(image, x, y, x + width, y + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
         
         graphics.setTransform(oldXForm);
@@ -329,7 +329,7 @@ public class Renderer {
                 graphics.setColor(new Color(255, 0, 0, 128));
             }
             
-            drawBuilding(graphics, building, selectionPoint.x, selectionPoint.y);
+            drawBuilding(graphics, building, selectionPoint.x, selectionPoint.y, true);
             graphics.fillRect(selectionPoint.x, selectionPoint.y, PIXELS_PER_BOARD_UNIT * dimension.width, PIXELS_PER_BOARD_UNIT * dimension.height);
         }
     }
