@@ -12,7 +12,7 @@ public class ConnectionListener implements Runnable {
     
     public static ConnectionListener getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (ConnectionListener.class) {
                 if (theInstance == null) {
                     theInstance = new ConnectionListener();
                 }

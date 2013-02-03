@@ -22,7 +22,7 @@ public class AnimationManager {
     
     public static AnimationManager getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (AnimationManager.class) {
                 if (theInstance == null) {
                     theInstance = new AnimationManager();
                 }

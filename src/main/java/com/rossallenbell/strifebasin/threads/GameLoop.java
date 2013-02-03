@@ -18,7 +18,7 @@ public class GameLoop extends StoppableThread {
     
     public static GameLoop getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (GameLoop.class) {
                 if (theInstance == null) {
                     theInstance = new GameLoop();
                 }

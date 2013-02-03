@@ -18,7 +18,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +79,7 @@ public class Renderer {
     
     public static Renderer getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (Renderer.class) {
                 if (theInstance == null) {
                     theInstance = new Renderer();
                 }
@@ -96,7 +95,7 @@ public class Renderer {
         viewCornerPixelX = 0;
         viewCornerPixelY = 0;
         
-        loopTimes = Collections.synchronizedList(new ArrayList<Long>(FPS_HISTORY));
+        loopTimes = new ArrayList<Long>(FPS_HISTORY);
     }
     
     public void render(Graphics2D destinationGraphics) {
@@ -126,12 +125,10 @@ public class Renderer {
             
             drawOverlay(destinationGraphics);
             
-            synchronized (loopTimes) {
-                if (loopTimes.size() > FPS_HISTORY - 1) {
-                    loopTimes.remove(0);
-                }
-                loopTimes.add(currentTime);
+            if (loopTimes.size() > FPS_HISTORY - 1) {
+                loopTimes.remove(0);
             }
+            loopTimes.add(currentTime);
         }
     }
     
@@ -577,14 +574,12 @@ public class Renderer {
         }
     }
     
-    public long getFps() {
+    private long getFps() {
         if (loopTimes.size() < 2) {
             return 0;
         }
         
-        synchronized (loopTimes) {
-            return 1000 / ((loopTimes.get(loopTimes.size() - 1) - loopTimes.get(0)) / (loopTimes.size() - 1));
-        }
+        return 1000 / ((loopTimes.get(loopTimes.size() - 1) - loopTimes.get(0)) / (loopTimes.size() - 1));
     }
     
 }

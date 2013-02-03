@@ -35,7 +35,7 @@ public class Game {
     
     public static Game getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (Game.class) {
                 if (theInstance == null) {
                     theInstance = new Game();
                 }

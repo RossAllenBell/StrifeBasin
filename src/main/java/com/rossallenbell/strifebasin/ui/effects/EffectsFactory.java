@@ -10,7 +10,7 @@ public class EffectsFactory {
     
     public static EffectsFactory getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (EffectsFactory.class) {
                 if (theInstance == null) {
                     theInstance = new EffectsFactory();
                 }

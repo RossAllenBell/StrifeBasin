@@ -12,7 +12,7 @@ public class EffectsManager {
     
     public static EffectsManager getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (EffectsManager.class) {
                 if (theInstance == null) {
                     theInstance = new EffectsManager();
                 }

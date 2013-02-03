@@ -1,6 +1,5 @@
 package com.rossallenbell.strifebasin.domain;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,8 +21,8 @@ public class Me implements Player {
     public Me() {
         assetId = 0;
         money = 0;
-        buildings = Collections.synchronizedMap(new HashMap<Long, Building>());
-        units = Collections.synchronizedMap(new HashMap<Long, PlayerUnit>());
+        buildings = new HashMap<Long, Building>();
+        units = new HashMap<Long, PlayerUnit>();
     }
     
     public Sanctuary getSanctuary() {

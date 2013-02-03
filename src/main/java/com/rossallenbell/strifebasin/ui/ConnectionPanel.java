@@ -29,7 +29,7 @@ public class ConnectionPanel extends JPanel implements ActionListener {
     
     public static ConnectionPanel getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (ConnectionPanel.class) {
                 if (theInstance == null) {
                     theInstance = new ConnectionPanel();
                 }

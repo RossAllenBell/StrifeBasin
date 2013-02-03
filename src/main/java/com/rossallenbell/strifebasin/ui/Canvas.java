@@ -16,7 +16,7 @@ public class Canvas extends JComponent {
     
     public static Canvas getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (Canvas.class) {
                 if (theInstance == null) {
                     theInstance = new Canvas();
                 }

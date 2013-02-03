@@ -26,7 +26,7 @@ public class ImageManager {
     
     public static ImageManager getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (ImageManager.class) {
                 if (theInstance == null) {
                     theInstance = new ImageManager();
                 }

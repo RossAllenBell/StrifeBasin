@@ -2,7 +2,6 @@ package com.rossallenbell.strifebasin.domain.units;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.rossallenbell.strifebasin.connection.domain.NetworkAsset;
@@ -44,7 +43,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     public PlayerUnit(Me owner) {
         super(owner);
-        route = Collections.synchronizedList(new ArrayList<Point2D.Double>());
+        route = new ArrayList<Point2D.Double>();
     }
     
     @Override

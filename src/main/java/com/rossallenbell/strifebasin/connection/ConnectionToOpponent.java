@@ -34,7 +34,7 @@ public class ConnectionToOpponent {
     
     public static ConnectionToOpponent getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (ConnectionToOpponent.class) {
                 if (theInstance == null) {
                     theInstance = new ConnectionToOpponent();
                 }

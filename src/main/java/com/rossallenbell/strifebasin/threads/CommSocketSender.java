@@ -1,6 +1,5 @@
 package com.rossallenbell.strifebasin.threads;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,13 +8,13 @@ import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 
 public class CommSocketSender extends StoppableThread {
     
-    private List<CommObject> sendQueue = Collections.synchronizedList(new LinkedList<CommObject>());
+    private List<CommObject> sendQueue = new LinkedList<CommObject>();
     
     private static CommSocketSender theInstance;
     
     public static CommSocketSender getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (CommSocketSender.class) {
                 if (theInstance == null) {
                     theInstance = new CommSocketSender();
                 }
@@ -33,8 +32,10 @@ public class CommSocketSender extends StoppableThread {
         Thread.currentThread().setName(getClass().getSimpleName());
         
         while (isRunning()) {
-            while (!sendQueue.isEmpty() && isRunning()) {
-                ConnectionToOpponent.getInstance().sendObjectToThem(sendQueue.remove(0));
+            synchronized (CommSocketSender.class) {
+                while (!sendQueue.isEmpty() && isRunning()) {
+                    ConnectionToOpponent.getInstance().sendObjectToThem(sendQueue.remove(0));
+                }
             }
             
             try {
@@ -46,7 +47,9 @@ public class CommSocketSender extends StoppableThread {
     }
     
     public void enqueue(CommObject object) {
-        sendQueue.add(object);
+        synchronized (CommSocketSender.class) {
+            sendQueue.add(object);
+        }
     }
     
 }

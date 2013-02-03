@@ -18,7 +18,7 @@ public class CommSocketListener extends StoppableThread {
     
     public static CommSocketListener getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (CommSocketListener.class) {
                 if (theInstance == null) {
                     theInstance = new CommSocketListener();
                 }

@@ -31,7 +31,7 @@ public class Pathing {
     
     public static Pathing getInstance() {
         if (theInstance == null) {
-            synchronized (theInstance) {
+            synchronized (Pathing.class) {
                 if (theInstance == null) {
                     theInstance = new Pathing();
                 }
