@@ -1,4 +1,5 @@
-impassable terrain
+fix direction rendering issue when unit is attacking building or when network units occasional face backwards
+make units able to path diagonally
 animations for standing still and attacking
 death effect
 splash damage
