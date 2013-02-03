@@ -23,7 +23,7 @@ import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Pathing {
     
-    public static final int REROUTE_RANGE = 10;
+    public static final int REROUTE_RANGE = 20;
     public static final double REROUTE_DIRECTION_TEST_STEP = Math.PI * 2.0 / 4.0;
     public static final double REROUTE_MOVE_TEST_BY_SIZE = 0.5;
     
@@ -77,17 +77,9 @@ public class Pathing {
         Point2D.Double targetHitLocation = target.getHitLocation();
         route.add(targetHitLocation);
         
-        Point2D.Double currentLocation = unit.getLocation();
-        double direction = getDirection(currentLocation, route.get(0));
-        double moveDistance = REROUTE_MOVE_TEST_BY_SIZE * unit.getSize();
-        double dx = Math.sin(direction) * moveDistance;
-        double dy = -Math.cos(direction) * moveDistance;
-        Point2D.Double newLocation = new Point2D.Double(currentLocation.x + dx, currentLocation.y + dy);
-        if (!canMove(unit, newLocation) || Point.distance(currentLocation.x, currentLocation.y, targetHitLocation.x, targetHitLocation.y) <= REROUTE_RANGE) {
-            double desiredDistanceToTarget = distanceToHitTarget(unit, target);
-            List<Point2D.Double> reroute = reroute(unit, route.get(0), desiredDistanceToTarget);
-            route.addAll(0, reroute);
-        }
+        double desiredDistanceToTarget = distanceToHitTarget(unit, target);
+        List<Point2D.Double> reroute = reroute(unit, route.get(0), desiredDistanceToTarget);
+        route.addAll(0, reroute);
         
         return route;
     }
@@ -164,9 +156,12 @@ public class Pathing {
             verticalMovementCost -= 0.001;
         }
         
-        List<Point2D.Double> bestFailList = new ArrayList<Point2D.Double>();
-        bestFailList.add(bestFail);
-        return bestFailList;
+        List<Point2D.Double> solution = new ArrayList<Point2D.Double>();
+        solution.add(bestFail);
+        while (predecessors.containsKey(solution.get(0))) {
+            solution.add(0, predecessors.get(solution.get(0)));
+        }
+        return solution;
     }
     
     private Collection<Point2D.Double> neighbors(Unit unit, Point2D.Double currentLocation) {
@@ -215,6 +210,14 @@ public class Pathing {
     }
     
     public boolean canMove(Unit unit, Point2D.Double newLocation) {
+        if(newLocation.x < 0 || newLocation.x > Game.BOARD_WIDTH + 1 || newLocation.y < 0 || newLocation.y > Game.BOARD_HEIGHT + 1) {
+            return false;
+        }
+        
+        if (newLocation.x > Game.BUILD_ZONE_WIDTH && newLocation.x < Game.BOARD_WIDTH - Game.BUILD_ZONE_WIDTH && (newLocation.y < (Game.BOARD_HEIGHT / 2) - (Game.MIDDLE_PATH_WIDTH / 2) || newLocation.y > (Game.BOARD_HEIGHT / 2) + (Game.MIDDLE_PATH_WIDTH / 2))) {
+            return false;
+        }
+        
         Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
         synchronized (myUnits) {
             for (Unit myUnit : myUnits.values()) {
