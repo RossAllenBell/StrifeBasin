@@ -24,6 +24,7 @@ public class Game {
     public static final double STARTING_INCOME = 10;
     public static final long INCOME_COOLDOWN = 10000;
     public static final int BUILD_ZONE_WIDTH = (int) (BOARD_WIDTH * 0.15);
+    public static final int MIDDLE_PATH_WIDTH = BOARD_HEIGHT / 5;
     
     private final Me me;
     private NetworkPlayer them;
