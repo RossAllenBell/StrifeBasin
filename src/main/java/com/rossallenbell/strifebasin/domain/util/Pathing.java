@@ -210,7 +210,7 @@ public class Pathing {
     }
     
     public boolean canMove(Unit unit, Point2D.Double newLocation) {
-        if(newLocation.x < 0 || newLocation.x > Game.BOARD_WIDTH + 1 || newLocation.y < 0 || newLocation.y > Game.BOARD_HEIGHT + 1) {
+        if (newLocation.x < 0 || newLocation.x > Game.BOARD_WIDTH + 1 || newLocation.y < 0 || newLocation.y > Game.BOARD_HEIGHT + 1) {
             return false;
         }
         
@@ -218,28 +218,30 @@ public class Pathing {
             return false;
         }
         
-        Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
-        synchronized (myUnits) {
-            for (Unit myUnit : myUnits.values()) {
-                if (myUnit.getAssetId() != unit.getAssetId()) {
-                    double newDistance = newLocation.distance(myUnit.getLocation());
-                    if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
-                        if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
-                            return false;
+        if (unit.isMine()) {
+            Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
+            synchronized (myUnits) {
+                for (Unit myUnit : myUnits.values()) {
+                    if (myUnit.getAssetId() != unit.getAssetId()) {
+                        double newDistance = newLocation.distance(myUnit.getLocation());
+                        if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
+                            if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
+                                return false;
+                            }
                         }
                     }
                 }
             }
-        }
-        
-        Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
-        synchronized (theirUnits) {
-            for (Unit myUnit : theirUnits.values()) {
-                if (myUnit.getAssetId() != unit.getAssetId()) {
-                    double newDistance = newLocation.distance(myUnit.getLocation());
-                    if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
-                        if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
-                            return false;
+        } else {            
+            Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
+            synchronized (theirUnits) {
+                for (Unit myUnit : theirUnits.values()) {
+                    if (myUnit.getAssetId() != unit.getAssetId()) {
+                        double newDistance = newLocation.distance(myUnit.getLocation());
+                        if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
+                            if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
+                                return false;
+                            }
                         }
                     }
                 }

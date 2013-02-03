@@ -10,7 +10,6 @@ more buildings/units
 add descriptions to buildings/units
 allow connections outside of a firewall
 sanctuary abilities
-create builder unit that replaces insta build
 zoom in/out
 sound
 3+ players in teams
