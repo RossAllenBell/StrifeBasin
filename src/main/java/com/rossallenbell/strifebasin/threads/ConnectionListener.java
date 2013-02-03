@@ -12,26 +12,30 @@ public class ConnectionListener implements Runnable {
     
     public static ConnectionListener getInstance() {
         if (theInstance == null) {
-            theInstance = new ConnectionListener();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new ConnectionListener();
+                }
+            }
         }
         return theInstance;
     }
     
     private ConnectionListener() {
-
+        
     }
-
+    
     @Override
     public void run() {
         Thread.currentThread().setName(getClass().getSimpleName());
         
         Socket socket;
         try {
-            if((socket = ConnectionToOpponent.getInstance().getListeningSocket().accept()) != null){
+            if ((socket = ConnectionToOpponent.getInstance().getListeningSocket().accept()) != null) {
                 ConnectionToOpponent.getInstance().incomingConnection(socket);
             }
         } catch (SocketException e) {
-            //we invited somebody
+            // we invited somebody
         } catch (IOException e) {
             e.printStackTrace();
         }

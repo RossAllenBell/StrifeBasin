@@ -14,9 +14,13 @@ public class InputListener implements MouseListener, KeyListener, MouseWheelList
     
     private static InputListener theInstance;
     
-    public static InputListener  getInstance() {
-        if(theInstance == null){
-            theInstance = new InputListener();
+    public static InputListener getInstance() {
+        if (theInstance == null) {
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new InputListener();
+                }
+            }
         }
         return theInstance;
     }

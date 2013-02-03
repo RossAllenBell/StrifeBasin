@@ -26,7 +26,11 @@ public class ImageManager {
     
     public static ImageManager getInstance() {
         if (theInstance == null) {
-            theInstance = new ImageManager();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new ImageManager();
+                }
+            }
         }
         return theInstance;
     }
@@ -68,8 +72,8 @@ public class ImageManager {
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 int pixelColorInt = image.getRGB(x, y);
-                if(pixelColorInt >> 24 != 0x00) {
-                    Color pixelColor = new Color(pixelColorInt, true);                    
+                if (pixelColorInt >> 24 != 0x00) {
+                    Color pixelColor = new Color(pixelColorInt, true);
                     Color newPixelColor = new Color(Math.min(255, tint.getRed() + pixelColor.getRed()), Math.min(255, tint.getGreen() + pixelColor.getGreen()), Math.min(255, tint.getBlue() + pixelColor.getBlue()), pixelColor.getAlpha());
                     image.setRGB(x, y, newPixelColor.getRGB());
                 }

@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 
 @SuppressWarnings("serial")
-public class ConnectionPanel extends JPanel implements ActionListener{
+public class ConnectionPanel extends JPanel implements ActionListener {
     
     private JButton reservePortButton;
     private JTextField myPortInput;
@@ -27,19 +27,23 @@ public class ConnectionPanel extends JPanel implements ActionListener{
     
     private static ConnectionPanel theInstance;
     
-    public static ConnectionPanel  getInstance() {
-        if(theInstance == null){
-            theInstance = new ConnectionPanel();
+    public static ConnectionPanel getInstance() {
+        if (theInstance == null) {
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new ConnectionPanel();
+                }
+            }
         }
         return theInstance;
     }
-
+    
     private ConnectionPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         JPanel reservePortPanel = new JPanel();
         int portToUse = ConnectionToOpponent.DEFAULT_MY_PORT;
-        if(!ConnectionToOpponent.portAvailable(portToUse)) {
+        if (!ConnectionToOpponent.portAvailable(portToUse)) {
             portToUse++;
         }
         myPortInput = new JTextField(Integer.toString(portToUse), 7);
@@ -97,19 +101,19 @@ public class ConnectionPanel extends JPanel implements ActionListener{
         
         Window.getInstance().pack();
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent action) {
-        if("reservePort".equals(action.getActionCommand())){
+        if ("reservePort".equals(action.getActionCommand())) {
             ConnectionToOpponent.getInstance().reservePort(Integer.parseInt(myPortInput.getText()));
             afterPortReserved();
-        } else if("invite".equals(action.getActionCommand())){
+        } else if ("invite".equals(action.getActionCommand())) {
             ConnectionToOpponent.getInstance().invite(theirIP.getText(), Integer.parseInt(theirPort.getText()));
-        } else if("accept".equals(action.getActionCommand())){
+        } else if ("accept".equals(action.getActionCommand())) {
             ConnectionToOpponent.getInstance().accept();
         }
     }
-
+    
     public void incomingConnection(String hostName, int port) {
         incomingIP.setText(hostName);
         incomingPort.setText(Integer.toString(port));

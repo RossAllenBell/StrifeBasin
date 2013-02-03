@@ -18,7 +18,11 @@ public class CommSocketListener extends StoppableThread {
     
     public static CommSocketListener getInstance() {
         if (theInstance == null) {
-            theInstance = new CommSocketListener();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new CommSocketListener();
+                }
+            }
         }
         return theInstance;
     }
@@ -59,7 +63,7 @@ public class CommSocketListener extends StoppableThread {
                 }
             }
         } catch (SocketException | EOFException e) {
-            //somebody DCed
+            // somebody DCed
         } catch (Exception e) {
             e.printStackTrace();
         }

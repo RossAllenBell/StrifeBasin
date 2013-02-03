@@ -21,7 +21,11 @@ public class Window extends JFrame {
     
     public static Window getInstance() {
         if (theInstance == null) {
-            theInstance = new Window();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new Window();
+                }
+            }
         }
         return theInstance;
     }

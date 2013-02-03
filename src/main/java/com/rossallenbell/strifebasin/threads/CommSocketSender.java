@@ -15,7 +15,11 @@ public class CommSocketSender extends StoppableThread {
     
     public static CommSocketSender getInstance() {
         if (theInstance == null) {
-            theInstance = new CommSocketSender();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new CommSocketSender();
+                }
+            }
         }
         return theInstance;
     }

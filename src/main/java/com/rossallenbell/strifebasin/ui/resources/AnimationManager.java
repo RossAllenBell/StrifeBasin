@@ -22,7 +22,11 @@ public class AnimationManager {
     
     public static AnimationManager getInstance() {
         if (theInstance == null) {
-            theInstance = new AnimationManager();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new AnimationManager();
+                }
+            }
         }
         return theInstance;
     }
@@ -62,7 +66,7 @@ public class AnimationManager {
             return null;
         }
         
-        return isMine? myImages.get(clazz).get(frameNumber) : theirImages.get(clazz).get(frameNumber);
+        return isMine ? myImages.get(clazz).get(frameNumber) : theirImages.get(clazz).get(frameNumber);
     }
     
 }

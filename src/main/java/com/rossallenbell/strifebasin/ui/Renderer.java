@@ -80,7 +80,11 @@ public class Renderer {
     
     public static Renderer getInstance() {
         if (theInstance == null) {
-            theInstance = new Renderer();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new Renderer();
+                }
+            }
         }
         return theInstance;
     }

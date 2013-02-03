@@ -12,7 +12,11 @@ public class EffectsManager {
     
     public static EffectsManager getInstance() {
         if (theInstance == null) {
-            theInstance = new EffectsManager();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new EffectsManager();
+                }
+            }
         }
         return theInstance;
     }
@@ -22,26 +26,26 @@ public class EffectsManager {
     }
     
     public void update(long updateTime) {
-        synchronized(effects) {
+        synchronized (effects) {
             Iterator<Effect> effectsI = effects.iterator();
-            while(effectsI.hasNext()) {
+            while (effectsI.hasNext()) {
                 Effect effect = effectsI.next();
                 effect.update(updateTime);
-                if(effect.isComplete()) {
+                if (effect.isComplete()) {
                     effectsI.remove();
                 }
             }
         }
     }
-
+    
     public List<Effect> getEffects() {
         return effects;
     }
-
+    
     public void addEffect(Effect newAttackEffect) {
-        synchronized(effects) {
+        synchronized (effects) {
             effects.add(newAttackEffect);
-        }        
+        }
     }
     
 }

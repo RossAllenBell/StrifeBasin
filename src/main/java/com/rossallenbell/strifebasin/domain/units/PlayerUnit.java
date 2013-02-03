@@ -81,7 +81,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         }
         
         // target
-        Asset target = Game.getInstance().getThem().getUnits().get(targetId);
+        Asset target = Game.getInstance().getThem().getAssetById(targetId);
         if (target == null || target.getHealth() <= 0 || lastTargetAssessment + TARGET_ASSESSMENT_COOLDOWN <= updateTime) {
             target = Pathing.getInstance().getClosestAggroableAsset(this, Game.getInstance().getThem());
             if (target == null) {

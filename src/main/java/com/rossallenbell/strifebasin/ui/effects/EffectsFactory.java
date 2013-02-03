@@ -10,19 +10,23 @@ public class EffectsFactory {
     
     public static EffectsFactory getInstance() {
         if (theInstance == null) {
-            theInstance = new EffectsFactory();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new EffectsFactory();
+                }
+            }
         }
         return theInstance;
     }
-
+    
     public Effect buildEffect(Unit unit, Asset target) {
         return buildEffect(unit, target, System.currentTimeMillis());
     }
-
+    
     public Effect buildEffect(Unit unit, Asset target, long updateTime) {
         Class<? extends Effect> attackEffect = unit.getAttackEffect();
-        if(attackEffect != null) {
-            if(attackEffect == Arrow.class) {
+        if (attackEffect != null) {
+            if (attackEffect == Arrow.class) {
                 return new Arrow(updateTime, unit.getLocation(), target.getHitLocation());
             }
         }

@@ -30,7 +30,11 @@ public class BuildMenu extends Menu {
     
     public static BuildMenu getInstance() {
         if (theInstance == null) {
-            theInstance = new BuildMenu();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new BuildMenu();
+                }
+            }
         }
         return theInstance;
     }

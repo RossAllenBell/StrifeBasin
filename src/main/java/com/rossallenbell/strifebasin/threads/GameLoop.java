@@ -7,7 +7,7 @@ import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 
 public class GameLoop extends StoppableThread {
     
-    private static final double DESIRED_FRAME_DURATION = 1000.0/60.0;
+    private static final double DESIRED_FRAME_DURATION = 1000.0 / 60.0;
     private static final long COMM_UPDATE_INTERVAL = 250;
     private static final long PING_INTERVAL = 1000;
     
@@ -18,7 +18,11 @@ public class GameLoop extends StoppableThread {
     
     public static GameLoop getInstance() {
         if (theInstance == null) {
-            theInstance = new GameLoop();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new GameLoop();
+                }
+            }
         }
         return theInstance;
     }

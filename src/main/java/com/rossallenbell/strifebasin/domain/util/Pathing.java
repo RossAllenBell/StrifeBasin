@@ -31,7 +31,11 @@ public class Pathing {
     
     public static Pathing getInstance() {
         if (theInstance == null) {
-            theInstance = new Pathing();
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new Pathing();
+                }
+            }
         }
         return theInstance;
     }
@@ -232,7 +236,7 @@ public class Pathing {
                     }
                 }
             }
-        } else {            
+        } else {
             Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
             synchronized (theirUnits) {
                 for (Unit myUnit : theirUnits.values()) {

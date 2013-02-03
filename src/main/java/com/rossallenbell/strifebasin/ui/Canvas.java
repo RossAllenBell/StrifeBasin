@@ -14,24 +14,30 @@ public class Canvas extends JComponent {
     
     private static Canvas theInstance;
     
-    public static Canvas  getInstance() {
-        if(theInstance == null){
-            theInstance = new Canvas();
+    public static Canvas getInstance() {
+        if (theInstance == null) {
+            synchronized (theInstance) {
+                if (theInstance == null) {
+                    theInstance = new Canvas();
+                }
+            }
         }
         return theInstance;
     }
     
-    private Canvas(){
+    private Canvas() {
         renderer = Renderer.getInstance();
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                if(renderer != null) renderer.setViewDimensions(getSize());
+                if (renderer != null)
+                    renderer.setViewDimensions(getSize());
             }
         });
     }
     
     public void paintComponent(Graphics g) {
-        if(renderer != null) renderer.render((Graphics2D) g);
+        if (renderer != null)
+            renderer.render((Graphics2D) g);
     }
     
 }
