@@ -45,7 +45,7 @@ public class Game {
         them = new NetworkPlayer();
         
         Sanctuary mySantuary = new Sanctuary(me);
-        mySantuary.setLocation(0, BOARD_HEIGHT / 2 - mySantuary.getShape().height);
+        mySantuary.setLocation(0, BOARD_HEIGHT / 2 - (mySantuary.getShape().height / 2));
         mySantuary.setAssetId(me.getNextAssetId());
         me.addBuilding(mySantuary);
     }
