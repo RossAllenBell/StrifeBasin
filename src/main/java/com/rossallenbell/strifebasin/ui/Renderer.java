@@ -169,6 +169,22 @@ public class Renderer {
             }
         }
         
+        synchronized (myUnits) {
+            for (PlayerUnit unit : myUnits.values()) {
+                if (unit.getHealthRatio() < 1) {
+                    drawHealthbar(graphics, unit);
+                }
+            }
+        }
+        
+        synchronized (theirUnits) {
+            for (NetworkUnit unit : theirUnits.values()) {
+                if (unit.getHealthRatio() < 1) {
+                    drawHealthbar(graphics, unit);
+                }
+            }
+        }
+        
         List<Effect> effects = EffectsManager.getInstance().getEffects();
         synchronized (effects) {
             for (Effect effect : effects) {
@@ -235,10 +251,6 @@ public class Renderer {
         graphics.drawImage(image, renderX, renderY, renderX2, renderY2, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
         
         graphics.setTransform(oldXForm);
-        
-        if (unit.getHealthRatio() < 1) {
-            drawHealthbar(graphics, unit);
-        }
         
         if (StrifeBasin.DEBUG) {
             graphics.setColor(new Color(255, 255, 0, 128));
