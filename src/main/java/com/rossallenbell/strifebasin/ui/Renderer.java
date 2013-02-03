@@ -490,16 +490,21 @@ public class Renderer {
         
         String imagePath = "images/sand.png";
         URL resourceURL = Renderer.class.getClassLoader().getResource(imagePath);
+        BufferedImage sand = null;
         try {
-            BufferedImage sand = ImageIO.read(resourceURL);
-            for (int i = 0; i < background.getWidth(); i += sand.getWidth()) {
-                for (int j = 0; j < background.getHeight(); j += sand.getHeight()) {
-                    graphics.drawImage(sand, i, j, null);
-                }
-            }
+            sand = ImageIO.read(resourceURL);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        for (int i = 0; i < background.getWidth(); i += sand.getWidth()) {
+            for (int j = 0; j < background.getHeight(); j += sand.getHeight()) {
+                graphics.drawImage(sand, i, j, null);
+            }
+        }
+        
+        graphics.clearRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, 0, (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
+        graphics.clearRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) + (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2), (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
         
         if (StrifeBasin.DEBUG) {
             graphics.setColor(new Color(60, 60, 60));
