@@ -62,8 +62,8 @@ public class NetworkPlayer extends CommObject implements Player {
     }
     
     public void applyRemotePlayerData(NetworkPlayer networkPlayer) {
+        Iterator<Entry<Long, NetworkBuilding>> previouslyKnownBuildings = buildings.entrySet().iterator();
         synchronized (buildings) {
-            Iterator<Entry<Long, NetworkBuilding>> previouslyKnownBuildings = buildings.entrySet().iterator();
             while (previouslyKnownBuildings.hasNext()) {
                 Entry<Long, NetworkBuilding> building = previouslyKnownBuildings.next();
                 if (!networkPlayer.buildings.containsKey(building.getKey())) {
@@ -80,8 +80,8 @@ public class NetworkPlayer extends CommObject implements Player {
             }
         }
         
+        Iterator<Entry<Long, NetworkUnit>> previouslyKnownUnits = units.entrySet().iterator();
         synchronized (units) {
-            Iterator<Entry<Long, NetworkUnit>> previouslyKnownUnits = units.entrySet().iterator();
             while (previouslyKnownUnits.hasNext()) {
                 Entry<Long, NetworkUnit> unit = previouslyKnownUnits.next();
                 if (!networkPlayer.units.containsKey(unit.getKey())) {

@@ -1,7 +1,6 @@
 package com.rossallenbell.strifebasin.connection.domain;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     private final double attackSpeed;
     private final Class<? extends Effect> attackEffect;
     
-    private Point2D.Double destination;
     private long targetId;
     private int animationFrame;
     private List<Point2D.Double> route;
@@ -35,7 +33,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     public NetworkUnit(PlayerUnit originalUnit) {
         super(originalUnit);
         damage = originalUnit.getDamage();
-        destination = new Point2D.Double(originalUnit.getCurrentDestination().x, originalUnit.getCurrentDestination().y);
         speed = originalUnit.getSpeed();
         range = originalUnit.getRange();
         aggroRange = originalUnit.getAggroRange();
@@ -59,7 +56,22 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     
     @Override
     public Point2D.Double getCurrentDestination() {
-        return destination;
+        synchronized (route) {
+            if (!route.isEmpty() && route.get(0).equals(getLocation())) {
+                route.remove(0);
+            }
+            
+            if (!route.isEmpty()) {
+                return route.get(0);
+            } else {
+                Asset target = getTarget();
+                if (target != null) {
+                    return target.getHitLocation();
+                } else {
+                    return getLocation();
+                }
+            }
+        }
     }
     
     @Override
@@ -154,11 +166,12 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     public void mirror() {
         super.mirror();
         
-        destination = Game.getMirroredLocation(destination);
-        
-        List<Double> mirroredRoute = new ArrayList<Point2D.Double>();
-        for (Point2D.Double routePoint : route) {
-            mirroredRoute.add(Game.getMirroredLocation(routePoint));
+        List<Point2D.Double> mirroredRoute = new ArrayList<Point2D.Double>();
+        synchronized (route) {
+            for (Point2D.Double routePoint : route) {
+                mirroredRoute.add(Game.getMirroredLocation(routePoint));
+            }
+            route = mirroredRoute;
         }
     }
     
@@ -171,12 +184,13 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         }
         NetworkUnit networkUnit = (NetworkUnit) asset;
         
-        destination = networkUnit.getCurrentDestination();
         targetId = networkUnit.targetId;
         
-        route.clear();
-        for (Point2D.Double routePoint : networkUnit.route) {
-            route.add((Point2D.Double) routePoint.clone());
+        synchronized (route) {
+            route.clear();
+            for (Point2D.Double routePoint : networkUnit.route) {
+                route.add((Point2D.Double) routePoint.clone());
+            }
         }
     }
     

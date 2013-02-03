@@ -29,6 +29,8 @@ public class GameLoop extends StoppableThread {
     
     @Override
     public void run() {
+        Thread.currentThread().setName(getClass().getSimpleName());
+        
         while (isRunning()) {
             try {
                 long loopStartTime = System.currentTimeMillis();

@@ -22,7 +22,10 @@ public abstract class NetworkAsset implements Asset, Serializable {
     public NetworkAsset(Asset originalAsset) {
         originalAssetClass = originalAsset.getClass();
         assetId = originalAsset.getAssetId();
-        location = new Point2D.Double(originalAsset.getLocation().x, originalAsset.getLocation().y);
+        
+        Point2D.Double originalLocation = originalAsset.getLocation();
+        location = new Point2D.Double(originalLocation.x, originalLocation.y);
+        
         size = originalAsset.getSize();
         health = originalAsset.getHealth();
         maxHealth = originalAsset.getMaxHealth();

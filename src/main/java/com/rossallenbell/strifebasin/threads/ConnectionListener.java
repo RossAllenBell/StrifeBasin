@@ -23,6 +23,8 @@ public class ConnectionListener implements Runnable {
 
     @Override
     public void run() {
+        Thread.currentThread().setName(getClass().getSimpleName());
+        
         Socket socket;
         try {
             if((socket = ConnectionToOpponent.getInstance().getListeningSocket().accept()) != null){

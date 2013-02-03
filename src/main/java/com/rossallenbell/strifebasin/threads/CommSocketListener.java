@@ -29,6 +29,8 @@ public class CommSocketListener extends StoppableThread {
     
     @Override
     public void run() {
+        Thread.currentThread().setName(getClass().getSimpleName());
+        
         ObjectInputStream in;
         try {
             in = new ObjectInputStream(ConnectionToOpponent.getInstance().getCommSocket().getInputStream());

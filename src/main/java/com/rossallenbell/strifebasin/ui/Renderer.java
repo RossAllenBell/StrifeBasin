@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -232,14 +231,18 @@ public class Renderer {
     }
     
     private void drawUnit(Graphics2D graphics, Unit unit, Boolean isMine) {
-        int x = (int) (unit.getLocation().x * PIXELS_PER_BOARD_UNIT);
-        int y = (int) (unit.getLocation().y * PIXELS_PER_BOARD_UNIT);
+        Point2D.Double location = unit.getLocation();
+        
+        int x = (int) (location.x * PIXELS_PER_BOARD_UNIT);
+        int y = (int) (location.y * PIXELS_PER_BOARD_UNIT);
         int width = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
         int height = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
         
         AffineTransform oldXForm = graphics.getTransform();
         
-        graphics.rotate(Pathing.getInstance().getDirection(unit.getLocation(), unit.getCurrentDestination()), x, y);
+        Point2D.Double currentDestination = unit.getCurrentDestination();
+        double direction = Pathing.getInstance().getDirection(location, currentDestination);
+        graphics.rotate(direction, x, y);
         x = x - (width / 2);
         y = y - (height / 2);
         
@@ -263,8 +266,8 @@ public class Renderer {
             
             if (unit.isMine()) {
                 graphics.setColor(new Color(0, 255, 255, 128));
-                Point2D.Double current = unit.getLocation();
-                List<Double> route = unit.getRoute();
+                Point2D.Double current = location;
+                List<Point2D.Double> route = unit.getRoute();
                 synchronized (route) {
                     for (Point2D.Double point : route) {
                         int x1 = (int) (current.x * PIXELS_PER_BOARD_UNIT);
