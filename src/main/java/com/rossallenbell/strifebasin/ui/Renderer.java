@@ -56,6 +56,8 @@ public class Renderer {
     private static final int PIXELS_PER_BOARD_UNIT = 15;
     private static final int PIXELS_PER_PAN_TICK = PIXELS_PER_BOARD_UNIT * 2;
     
+    private static final double UNIT_RENDER_OVERFLOW = 0.1;
+    
     private static final int FPS_HISTORY = 10;
     
     private final BufferedImage image;
@@ -226,7 +228,11 @@ public class Renderer {
         
         Class<? extends Asset> animatedClass = unit.getAnimationClass();
         BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame(), isMine);
-        graphics.drawImage(image, x, y, x + width, y + height, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
+        int renderX = (int) (x - (width * UNIT_RENDER_OVERFLOW / 2));
+        int renderY = (int) (y - (height * UNIT_RENDER_OVERFLOW / 2));
+        int renderX2 = (int) (x + (width * UNIT_RENDER_OVERFLOW / 2) + width);
+        int renderY2 = (int) (y + (height * UNIT_RENDER_OVERFLOW / 2) + height);
+        graphics.drawImage(image, renderX, renderY, renderX2, renderY2, 0, 0, image.getWidth() - 1, image.getHeight() - 1, null);
         
         graphics.setTransform(oldXForm);
         
