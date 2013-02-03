@@ -238,6 +238,7 @@ public class Renderer {
         int height = (int) (unit.getSize() * PIXELS_PER_BOARD_UNIT);
         
         AffineTransform oldXForm = graphics.getTransform();
+        
         graphics.rotate(Pathing.getInstance().getDirection(unit.getLocation(), unit.getCurrentDestination()), x, y);
         x = x - (width / 2);
         y = y - (height / 2);

@@ -150,7 +150,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
     @Override
     public Asset getTarget() {
-        return Game.getInstance().getThem().getUnits().get(targetId);
+        return Game.getInstance().getThem().getAssetById(targetId);
     }
     
     public void setTarget(NetworkAsset target) {

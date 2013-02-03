@@ -1,5 +1,6 @@
-fix direction rendering issue when unit is attacking building or when network units occasional face backwards
+fix direction rendering when network units occasional face backwards
 make units able to path diagonally
+make units move straight to target if not blocked
 animations for standing still and attacking
 death effect
 splash damage
