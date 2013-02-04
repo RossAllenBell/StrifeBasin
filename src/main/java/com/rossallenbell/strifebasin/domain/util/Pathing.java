@@ -1,9 +1,12 @@
 package com.rossallenbell.strifebasin.domain.util;
 
 import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,13 +15,11 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.rossallenbell.strifebasin.connection.domain.NetworkUnit;
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
-import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Pathing {
@@ -98,6 +99,10 @@ public class Pathing {
             desiredDistanceToTarget = unit.getSize() * 2;
         }
         
+        if (canMove(unit, destination)) {
+            return Collections.singletonList(destination);
+        }
+        
         return getLocalRoute(unit, destination, desiredDistanceToTarget);
     }
     
@@ -114,8 +119,6 @@ public class Pathing {
         
         gScores.put(start, 0.0);
         fScores.put(start, gScores.get(start) + Point.distance(start.x, start.y, goal.x, goal.y));
-        
-        double verticalMovementCost = 0;
         
         Point2D.Double current;
         while (!openSet.isEmpty()) {
@@ -138,14 +141,10 @@ public class Pathing {
             openSet.remove(currentFScore);
             closedSet.add(current);
             for (Point2D.Double neighbor : neighbors(unit, current)) {
-                if (closedSet.contains(neighbor)) {
+                if (closedSet.contains(neighbor) || neighbor.distance(start) > REROUTE_RANGE) {
                     continue;
                 }
-                double tentativeGScore = gScores.get(current) + 1;
-                if (neighbor.x == current.x) {
-                    // prefer east/west movement
-                    tentativeGScore += verticalMovementCost;
-                }
+                double tentativeGScore = gScores.get(current) + neighbor.distance(current);
                 
                 if (!openSet.containsValue(neighbor) || tentativeGScore <= gScores.get(neighbor)) {
                     predecessors.put(neighbor, current);
@@ -156,8 +155,6 @@ public class Pathing {
                     }
                 }
             }
-            
-            verticalMovementCost -= 0.001;
         }
         
         List<Point2D.Double> solution = new ArrayList<Point2D.Double>();
@@ -172,20 +169,37 @@ public class Pathing {
         Collection<Point2D.Double> neighbors = new HashSet<Point2D.Double>();
         
         Point2D.Double east = new Point2D.Double(currentLocation.x + 1, currentLocation.y);
-        if (canMove(unit, east) && Point.distance(unit.getLocation().x, unit.getLocation().y, east.x, east.y) <= REROUTE_RANGE) {
+        if (canMove(unit, currentLocation, east)) {
             neighbors.add(east);
         }
         Point2D.Double west = new Point2D.Double(currentLocation.x - 1, currentLocation.y);
-        if (canMove(unit, west) && Point.distance(unit.getLocation().x, unit.getLocation().y, west.x, west.y) <= REROUTE_RANGE) {
+        if (canMove(unit, currentLocation, west)) {
             neighbors.add(west);
         }
         Point2D.Double north = new Point2D.Double(currentLocation.x, currentLocation.y - 1);
-        if (canMove(unit, north) && Point.distance(unit.getLocation().x, unit.getLocation().y, north.x, north.y) <= REROUTE_RANGE) {
+        if (canMove(unit, currentLocation, north)) {
             neighbors.add(north);
         }
         Point2D.Double south = new Point2D.Double(currentLocation.x, currentLocation.y + 1);
-        if (canMove(unit, south) && Point.distance(unit.getLocation().x, unit.getLocation().y, south.x, south.y) <= REROUTE_RANGE) {
+        if (canMove(unit, currentLocation, south)) {
             neighbors.add(south);
+        }
+        
+        Point2D.Double northEast = new Point2D.Double(currentLocation.x + 1, currentLocation.y - 1);
+        if (canMove(unit, currentLocation, northEast)) {
+            neighbors.add(northEast);
+        }
+        Point2D.Double northWest = new Point2D.Double(currentLocation.x - 1, currentLocation.y + 1);
+        if (canMove(unit, currentLocation, northWest)) {
+            neighbors.add(northWest);
+        }
+        Point2D.Double southEast = new Point2D.Double(currentLocation.x + 1, currentLocation.y + 1);
+        if (canMove(unit, currentLocation, southEast)) {
+            neighbors.add(southEast);
+        }
+        Point2D.Double southWest = new Point2D.Double(currentLocation.x - 1, currentLocation.y - 1);
+        if (canMove(unit, currentLocation, southWest)) {
+            neighbors.add(southWest);
         }
         
         return neighbors;
@@ -213,39 +227,37 @@ public class Pathing {
         return buildingPreview.getLocation().x < otherBuilding.getLocation().x + otherBuilding.getSize() && buildingPreview.getLocation().x + buildingPreview.getSize() > otherBuilding.getLocation().x && buildingPreview.getLocation().y < otherBuilding.getLocation().y + otherBuilding.getSize() && buildingPreview.getLocation().y + buildingPreview.getSize() > otherBuilding.getLocation().y;
     }
     
+    private final static Line2D.Double northBorder = new Line2D.Double(0, 0, Game.BOARD_WIDTH, 0);
+    private final static Line2D.Double eastBorder = new Line2D.Double(Game.BOARD_WIDTH, 0, Game.BOARD_WIDTH, Game.BOARD_HEIGHT);
+    private final static Line2D.Double southBorder = new Line2D.Double(Game.BOARD_WIDTH, Game.BOARD_HEIGHT, 0, Game.BOARD_HEIGHT);
+    private final static Line2D.Double westBorder = new Line2D.Double(0, Game.BOARD_HEIGHT, 0, 0);
+    
+    private final static Rectangle2D.Double northUnplayableZone = new Rectangle2D.Double(Game.BUILD_ZONE_WIDTH, 0, Game.BOARD_WIDTH - (2 * Game.BUILD_ZONE_WIDTH), (Game.BOARD_HEIGHT / 2) - (Game.MIDDLE_PATH_WIDTH / 2));
+    private final static Rectangle2D.Double southUnplayableZone = new Rectangle2D.Double(Game.BUILD_ZONE_WIDTH, (Game.BOARD_HEIGHT / 2) + (Game.MIDDLE_PATH_WIDTH / 2), Game.BOARD_WIDTH - (2 * Game.BUILD_ZONE_WIDTH), (Game.BOARD_HEIGHT / 2) - (Game.MIDDLE_PATH_WIDTH / 2));
+    
     public boolean canMove(Unit unit, Point2D.Double newLocation) {
-        if (newLocation.x < 0 || newLocation.x > Game.BOARD_WIDTH + 1 || newLocation.y < 0 || newLocation.y > Game.BOARD_HEIGHT + 1) {
+        return canMove(unit, unit.getLocation(), newLocation);
+    }
+    
+    public boolean canMove(Unit unit, Point2D.Double startLocation, Point2D.Double newLocation) {
+        Line2D.Double segment = new Line2D.Double(startLocation, newLocation);
+        
+        if (segment.intersectsLine(northBorder) || segment.intersectsLine(eastBorder) || segment.intersectsLine(southBorder) || segment.intersectsLine(westBorder) || segment.intersects(northUnplayableZone) || segment.intersects(southUnplayableZone)) {
             return false;
         }
         
-        if (newLocation.x > Game.BUILD_ZONE_WIDTH && newLocation.x < Game.BOARD_WIDTH - Game.BUILD_ZONE_WIDTH && (newLocation.y < (Game.BOARD_HEIGHT / 2) - (Game.MIDDLE_PATH_WIDTH / 2) || newLocation.y > (Game.BOARD_HEIGHT / 2) + (Game.MIDDLE_PATH_WIDTH / 2))) {
-            return false;
-        }
-        
-        if (unit.isMine()) {
-            Map<Long, PlayerUnit> myUnits = Game.getInstance().getMyUnits();
-            synchronized (myUnits) {
-                for (Unit myUnit : myUnits.values()) {
-                    if (myUnit.getAssetId() != unit.getAssetId()) {
-                        double newDistance = newLocation.distance(myUnit.getLocation());
-                        if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
-                            if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            Map<Long, NetworkUnit> theirUnits = Game.getInstance().getTheirUnits();
-            synchronized (theirUnits) {
-                for (Unit myUnit : theirUnits.values()) {
-                    if (myUnit.getAssetId() != unit.getAssetId()) {
-                        double newDistance = newLocation.distance(myUnit.getLocation());
-                        if (newDistance < (unit.getSize() / 2) + (myUnit.getSize() / 2)) {
-                            if (newDistance < unit.getLocation().distance(myUnit.getLocation())) {
-                                return false;
-                            }
+        Map<Long, ? extends Unit> collidableUnits = unit.isMine() ? Game.getInstance().getMyUnits() : Game.getInstance().getTheirUnits();
+        synchronized (collidableUnits) {
+            for (Unit otherUnit : collidableUnits.values()) {
+                if (otherUnit.getAssetId() != unit.getAssetId()) {
+                    Point2D.Double otherUnitLocation = otherUnit.getLocation();
+                    double closestDistanceOnSegment = segment.ptSegDist(otherUnitLocation);
+                    double minAllowedDistance = (unit.getSize() / 2) + (otherUnit.getSize() / 2);
+                    if (closestDistanceOnSegment < minAllowedDistance) {
+                        double dirToOtherUnit = getDirection(startLocation, otherUnitLocation);
+                        double dirToNewLocation = getDirection(startLocation, newLocation);
+                        if (angleBetweenDirections(dirToOtherUnit, dirToNewLocation) < Math.PI / 2 && !startLocation.equals(otherUnitLocation)) {
+                            return false;
                         }
                     }
                 }
@@ -253,6 +265,14 @@ public class Pathing {
         }
         
         return true;
+    }
+    
+    private double angleBetweenDirections(double dirToOtherUnit, double dirToNewLocation) {
+        double difference = Math.abs(dirToOtherUnit - dirToNewLocation);
+        if (difference > Math.PI) {
+            difference = (Math.PI * 2) - difference;
+        }
+        return difference;
     }
     
 }

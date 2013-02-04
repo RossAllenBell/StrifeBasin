@@ -276,6 +276,7 @@ public class Renderer {
                         int x2 = (int) (point.x * PIXELS_PER_BOARD_UNIT);
                         int y2 = (int) (point.y * PIXELS_PER_BOARD_UNIT);
                         graphics.drawLine(x1, y1, x2, y2);
+                        graphics.fillOval(x2, y2, 3, 3);
                         current = point;
                     }
                 }

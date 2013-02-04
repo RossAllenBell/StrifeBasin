@@ -1,5 +1,4 @@
-make units able to path diagonally
-make units move straight to target if not blocked
+increase performance when there are many units in play
 animations for standing still and attacking
 death effect
 splash damage
