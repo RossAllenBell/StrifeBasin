@@ -119,6 +119,8 @@ public class NetworkUnit extends NetworkAsset implements Unit {
             lastUpdateTime = updateTime;
         }
         
+        Point2D.Double originalLocation = getLocation();
+        
         double moveDistance = ((updateTime - lastUpdateTime) / 1000.0) * getSpeed();
         Asset target = Game.getInstance().getMe().getAssetById(getTargetId());
         if (target == null) {
@@ -144,7 +146,10 @@ public class NetworkUnit extends NetworkAsset implements Unit {
             }
         }
         
-        if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
+        if (originalLocation.equals(getLocation())) {
+            animationFrame = 0;
+            lastAnimationFrameSwitch = updateTime;
+        } else if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
             animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
             lastAnimationFrameSwitch = updateTime;
         }

@@ -79,6 +79,8 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             lastUpdateTime = updateTime;
         }
         
+        Point2D.Double originalLocation = getLocation();
+        
         // target
         Asset target = Game.getInstance().getThem().getAssetById(targetId);
         if (target == null || target.getHealth() <= 0 || lastTargetAssessment + TARGET_ASSESSMENT_COOLDOWN <= updateTime) {
@@ -117,19 +119,24 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         }
         
         // attack
-        if (Pathing.getInstance().canHitAsset(this, target) && lastAttackTime + getAttackSpeed() <= updateTime) {
-            route.clear();
-            
-            Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
-            if (attackEffect != null) {
-                EffectsManager.getInstance().addEffect(attackEffect);
+        if (Pathing.getInstance().canHitAsset(this, target)) {
+            if (lastAttackTime + getAttackSpeed() <= updateTime) {
+                route.clear();
+                
+                Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
+                if (attackEffect != null) {
+                    EffectsManager.getInstance().addEffect(attackEffect);
+                }
+                CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
+                target.takeDamage(this);
+                lastAttackTime = updateTime;
             }
-            CommSocketSender.getInstance().enqueue(new AttackEvent(new NetworkUnit(this), target));
-            target.takeDamage(this);
-            lastAttackTime = updateTime;
         }
         
-        if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
+        if (originalLocation.equals(getLocation())) {
+            animationFrame = 0;
+            lastAnimationFrameSwitch = updateTime;
+        } else if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
             animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
             lastAnimationFrameSwitch = updateTime;
         }

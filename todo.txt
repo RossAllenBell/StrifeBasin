@@ -1,8 +1,6 @@
-show game stats: kills
-fog of war
 animations for attacking
-animations for standing still
 death effect
+fog of war
 splash damage
 flying units
 defensive buildings

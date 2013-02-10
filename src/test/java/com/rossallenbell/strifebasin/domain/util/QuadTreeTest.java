@@ -40,10 +40,7 @@ public class QuadTreeTest {
         for (int i = 0; i < UPDATE_LOOPS; i++) {
             quadTree.clear();
             for (PlayerUnit unit : units) {
-//                quadTree.remove(unit);
-                
                 unit.setLocation(Math.random() * MAX_X, Math.random() * MAX_Y);
-                
                 quadTree.insert(unit);
             }
             

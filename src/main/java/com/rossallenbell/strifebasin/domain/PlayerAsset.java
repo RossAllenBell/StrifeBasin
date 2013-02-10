@@ -26,7 +26,7 @@ public abstract class PlayerAsset implements Asset {
     }
     
     public void setLocation(double x, double y) {
-        location.setLocation(x, y);
+        location = new Point2D.Double(x, y);
     }
     
     public void setLocation(Point2D.Double location) {
