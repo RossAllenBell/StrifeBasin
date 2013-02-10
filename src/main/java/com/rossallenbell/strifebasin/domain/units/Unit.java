@@ -7,6 +7,8 @@ import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
 
 public interface Unit extends Asset {
+    
+    public static final double MAX_SIZE = PlayerUnit.DEFAULT_SIZE;
 
     public Point2D.Double getCurrentDestination();
 

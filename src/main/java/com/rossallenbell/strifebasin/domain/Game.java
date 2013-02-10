@@ -79,6 +79,7 @@ public class Game {
     }
     
     public void update(long updateTime) {
+        Pathing.getInstance().clearQuadTrees();
         me.update(updateTime);
         them.update(updateTime);
     }

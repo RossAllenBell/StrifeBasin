@@ -20,13 +20,17 @@ import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
+import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 
 public class Pathing {
     
-    public static final int REROUTE_RANGE = 20;
+    public static final int REROUTE_RANGE = 10;
     public static final double REROUTE_DIRECTION_TEST_STEP = Math.PI * 2.0 / 4.0;
     public static final double REROUTE_MOVE_TEST_BY_SIZE = 0.5;
+    
+    private final QuadTree<Unit> myUnitsQuadTree;
+    private final QuadTree<Unit> theirUnitsQuadTree;
     
     private static Pathing theInstance;
     
@@ -42,7 +46,8 @@ public class Pathing {
     }
     
     private Pathing() {
-        
+        myUnitsQuadTree = new QuadTree<Unit>();
+        theirUnitsQuadTree = new QuadTree<Unit>();
     }
     
     public Asset getClosestAggroableAsset(Unit unit, Player theOtherPlayer) {
@@ -77,7 +82,7 @@ public class Pathing {
         return target;
     }
     
-    public List<Point2D.Double> getRoute(Unit unit, Asset target) {
+    public List<Point2D.Double> getRoute(PlayerUnit unit, Asset target) {
         List<Point2D.Double> route = new ArrayList<Point2D.Double>();
         Point2D.Double targetHitLocation = target.getHitLocation();
         route.add(targetHitLocation);
@@ -89,7 +94,7 @@ public class Pathing {
         return route;
     }
     
-    private List<Point2D.Double> reroute(Unit unit, Point2D.Double destination, double desiredDistanceToTarget) {
+    private List<Point2D.Double> reroute(PlayerUnit unit, Point2D.Double destination, double desiredDistanceToTarget) {
         Point2D.Double location = unit.getLocation();
         if (location.distance(destination) > REROUTE_RANGE) {
             double direction = getDirection(location, destination);
@@ -106,7 +111,7 @@ public class Pathing {
         return getLocalRoute(unit, destination, desiredDistanceToTarget);
     }
     
-    private List<Point2D.Double> getLocalRoute(Unit unit, Point2D.Double destination, double desiredDistanceToTarget) {
+    private List<Point2D.Double> getLocalRoute(PlayerUnit unit, Point2D.Double destination, double desiredDistanceToTarget) {
         Point2D.Double goal = new Point2D.Double(destination.x, destination.y);
         Point2D.Double start = new Point2D.Double(unit.getLocation().x, unit.getLocation().y);
         Point2D.Double bestFail = new Point2D.Double(unit.getLocation().x, unit.getLocation().y);
@@ -165,7 +170,7 @@ public class Pathing {
         return solution;
     }
     
-    private Collection<Point2D.Double> neighbors(Unit unit, Point2D.Double currentLocation) {
+    private Collection<Point2D.Double> neighbors(PlayerUnit unit, Point2D.Double currentLocation) {
         Collection<Point2D.Double> neighbors = new HashSet<Point2D.Double>();
         
         Point2D.Double east = new Point2D.Double(currentLocation.x + 1, currentLocation.y);
@@ -246,9 +251,11 @@ public class Pathing {
             return false;
         }
         
-        Map<Long, ? extends Unit> collidableUnits = unit.isMine() ? Game.getInstance().getMyUnits() : Game.getInstance().getTheirUnits();
-        synchronized (collidableUnits) {
-            for (Unit otherUnit : collidableUnits.values()) {
+        Map<Long, ? extends Unit> whoseUnits = unit.isMine() ? Game.getInstance().getMyUnits() : Game.getInstance().getTheirUnits();
+        synchronized (whoseUnits) {
+            Rectangle2D.Double rect = new Rectangle2D.Double(unit.getLocation().x - REROUTE_RANGE, unit.getLocation().y - REROUTE_RANGE, REROUTE_RANGE * 2, REROUTE_RANGE * 2);
+            List<Unit> collidableUnits = unit.isMine() ? myUnitsQuadTree.query(rect) : theirUnitsQuadTree.query(rect);
+            for (Unit otherUnit : collidableUnits) {
                 if (otherUnit.getAssetId() != unit.getAssetId()) {
                     Point2D.Double otherUnitLocation = otherUnit.getLocation();
                     double closestDistanceOnSegment = segment.ptSegDist(otherUnitLocation);
@@ -273,6 +280,27 @@ public class Pathing {
             difference = (Math.PI * 2) - difference;
         }
         return difference;
+    }
+    
+//    public void removeFromQuadTree(Unit unit) {
+//        if(unit.isMine()) {
+//            myUnitsQuadTree.remove(unit);
+//        } else {
+//            theirUnitsQuadTree.remove(unit);
+//        }
+//    }
+    
+    public void clearQuadTrees() {
+        myUnitsQuadTree.clear();
+        theirUnitsQuadTree.clear();
+    }
+    
+    public void putInQuadTree(Unit unit) {
+        if(unit.isMine()) {
+            myUnitsQuadTree.insert(unit);
+        } else {
+            theirUnitsQuadTree.insert(unit);
+        }
     }
     
 }

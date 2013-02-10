@@ -11,6 +11,7 @@ import com.rossallenbell.strifebasin.domain.Player;
 import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.nonbuildable.Sanctuary;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
+import com.rossallenbell.strifebasin.domain.util.Pathing;
 
 public class NetworkPlayer extends CommObject implements Player {
     
@@ -55,6 +56,10 @@ public class NetworkPlayer extends CommObject implements Player {
     
     public void update(long updateTime) {
         synchronized (units) {
+            for(NetworkUnit unit : units.values()) {
+                Pathing.getInstance().putInQuadTree(unit);
+            }
+            
             for (NetworkUnit unit : units.values()) {
                 unit.update(updateTime);
             }

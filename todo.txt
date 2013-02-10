@@ -1,5 +1,7 @@
-increase performance when there are many units in play
-animations for standing still and attacking
+show game stats: kills
+fog of war
+animations for attacking
+animations for standing still
 death effect
 splash damage
 flying units

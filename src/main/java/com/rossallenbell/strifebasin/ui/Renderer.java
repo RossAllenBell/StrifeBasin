@@ -266,7 +266,6 @@ public class Renderer {
             graphics.drawString(unit.getAssetId() + "", x, y);
             
             if (unit.isMine()) {
-                graphics.setColor(new Color(0, 255, 255, 128));
                 Point2D.Double current = location;
                 List<Point2D.Double> route = unit.getRoute();
                 synchronized (route) {
@@ -275,7 +274,9 @@ public class Renderer {
                         int y1 = (int) (current.y * PIXELS_PER_BOARD_UNIT);
                         int x2 = (int) (point.x * PIXELS_PER_BOARD_UNIT);
                         int y2 = (int) (point.y * PIXELS_PER_BOARD_UNIT);
+                        graphics.setColor(new Color(0, 255, 255, 64));
                         graphics.drawLine(x1, y1, x2, y2);
+                        graphics.setColor(new Color(252, 149, 45, 128));
                         graphics.fillOval(x2, y2, 3, 3);
                         current = point;
                     }
@@ -513,7 +514,7 @@ public class Renderer {
         graphics.clearRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) + (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2), (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
         
         if (StrifeBasin.DEBUG) {
-            graphics.setColor(new Color(60, 60, 60));
+            graphics.setColor(new Color(60, 60, 60, 64));
             for (int i = 1; i < Game.BOARD_WIDTH; i++) {
                 graphics.drawLine(i * background.getWidth() / Game.BOARD_WIDTH, 0, i * background.getWidth() / Game.BOARD_WIDTH, background.getHeight() - 1);
             }
