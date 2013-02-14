@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.rossallenbell.strifebasin.domain.Asset;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.resources.FrameHelper;
 
 public interface Unit extends Asset {
     
@@ -28,7 +29,7 @@ public interface Unit extends Asset {
     
     public Point2D.Double getLocation(); 
     
-    public int getAnimationFrame();
+    public FrameHelper getFrameHelper();
     
     public Class<? extends Asset> getAnimationClass();
     

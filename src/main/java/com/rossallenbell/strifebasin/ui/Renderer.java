@@ -39,7 +39,6 @@ import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
 import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
 import com.rossallenbell.strifebasin.ui.menus.BuildMenu;
-import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 import com.rossallenbell.strifebasin.ui.resources.HasImage;
 import com.rossallenbell.strifebasin.ui.resources.ImageManager;
 
@@ -247,8 +246,7 @@ public class Renderer {
         x = x - (width / 2);
         y = y - (height / 2);
         
-        Class<? extends Asset> animatedClass = unit.getAnimationClass();
-        BufferedImage image = AnimationManager.getInstance().getFrame(animatedClass, unit.getAnimationFrame(), isMine);
+        BufferedImage image = unit.getFrameHelper().getCurrentFrame();
         int renderX = (int) (x - (width * UNIT_RENDER_OVERFLOW / 2));
         int renderY = (int) (y - (height * UNIT_RENDER_OVERFLOW / 2));
         int renderX2 = (int) (x + (width * UNIT_RENDER_OVERFLOW / 2) + width);

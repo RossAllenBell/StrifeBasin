@@ -16,7 +16,7 @@ import com.rossallenbell.strifebasin.threads.CommSocketSender;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
 import com.rossallenbell.strifebasin.ui.effects.EffectsFactory;
 import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
-import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
+import com.rossallenbell.strifebasin.ui.resources.FrameHelper;
 
 public abstract class PlayerUnit extends PlayerAsset implements Unit {
     
@@ -37,13 +37,13 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     private long lastRouteAssessment;
     private long lastUpdateTime;
     private long lastAttackTime;
-    private long lastAnimationFrameSwitch;
     
-    private int animationFrame;
+    private FrameHelper frameHelper;
     
     public PlayerUnit(Me owner) {
         super(owner);
         route = new ArrayList<Point2D.Double>();
+        frameHelper = new FrameHelper(this.getAnimationClass(), this.isMine());
     }
     
     @Override
@@ -118,11 +118,17 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             }
         }
         
+        if (originalLocation.equals(getLocation())) {
+            frameHelper.setAction(FrameHelper.Action.IDLING, updateTime);
+        } else {
+            frameHelper.setAction(FrameHelper.Action.MOVING, updateTime);
+        }
+        
         // attack
         if (Pathing.getInstance().canHitAsset(this, target)) {
+            route.clear();
             if (lastAttackTime + getAttackSpeed() <= updateTime) {
-                route.clear();
-                
+                frameHelper.setAction(FrameHelper.Action.ATTACKING, updateTime);
                 Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
                 if (attackEffect != null) {
                     EffectsManager.getInstance().addEffect(attackEffect);
@@ -133,13 +139,7 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
             }
         }
         
-        if (originalLocation.equals(getLocation())) {
-            animationFrame = 0;
-            lastAnimationFrameSwitch = updateTime;
-        } else if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
-            animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
-            lastAnimationFrameSwitch = updateTime;
-        }
+        frameHelper.update(updateTime);
         
         lastUpdateTime = updateTime;
         
@@ -182,8 +182,8 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     }
     
     @Override
-    public int getAnimationFrame() {
-        return animationFrame;
+    public FrameHelper getFrameHelper() {
+        return frameHelper;
     }
     
     @Override
@@ -194,10 +194,6 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
     @Override
     public Class<? extends Effect> getAttackEffect() {
         return null;
-    }
-    
-    public long getLastAnimationFrameSwitch() {
-        return lastAnimationFrameSwitch;
     }
     
 }

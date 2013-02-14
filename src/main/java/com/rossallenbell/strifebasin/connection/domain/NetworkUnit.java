@@ -10,7 +10,7 @@ import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
-import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
+import com.rossallenbell.strifebasin.ui.resources.FrameHelper;
 
 public class NetworkUnit extends NetworkAsset implements Unit {
     
@@ -24,11 +24,11 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     private final Class<? extends Effect> attackEffect;
     
     private long targetId;
-    private int animationFrame;
     private List<Point2D.Double> route;
     
     private long lastUpdateTime;
-    private long lastAnimationFrameSwitch;
+    
+    private FrameHelper frameHelper;
     
     public NetworkUnit(PlayerUnit originalUnit) {
         super(originalUnit);
@@ -38,7 +38,6 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         aggroRange = originalUnit.getAggroRange();
         attackSpeed = originalUnit.getAttackSpeed();
         targetId = originalUnit.getTargetId();
-        animationFrame = originalUnit.getAnimationFrame();
         attackEffect = originalUnit.getAttackEffect();
         
         route = new ArrayList<Point2D.Double>();
@@ -46,7 +45,7 @@ public class NetworkUnit extends NetworkAsset implements Unit {
             route.add((Point2D.Double) routePoint.clone());
         }
         
-        lastAnimationFrameSwitch = originalUnit.getLastAnimationFrameSwitch();
+        frameHelper = new FrameHelper(originalUnit.getAnimationClass(), !originalUnit.isMine());
     }
     
     @Override
@@ -105,8 +104,8 @@ public class NetworkUnit extends NetworkAsset implements Unit {
     }
     
     @Override
-    public int getAnimationFrame() {
-        return animationFrame;
+    public FrameHelper getFrameHelper() {
+        return frameHelper;
     }
     
     @Override
@@ -147,12 +146,12 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         }
         
         if (originalLocation.equals(getLocation())) {
-            animationFrame = 0;
-            lastAnimationFrameSwitch = updateTime;
-        } else if (lastAnimationFrameSwitch + AnimationManager.DEFAULT_FRAME_DURATION <= updateTime) {
-            animationFrame = ++animationFrame % AnimationManager.getInstance().getFrameCount(getAnimationClass());
-            lastAnimationFrameSwitch = updateTime;
+            frameHelper.setAction(FrameHelper.Action.IDLING, updateTime);
+        } else {
+            frameHelper.setAction(FrameHelper.Action.MOVING, updateTime);
         }
+        
+        frameHelper.update(updateTime);
         
         lastUpdateTime = updateTime;
     }
