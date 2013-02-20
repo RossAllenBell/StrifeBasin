@@ -5,6 +5,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.rossallenbell.strifebasin.connection.ConnectionToOpponent;
 import com.rossallenbell.strifebasin.threads.CommSocketListener;
@@ -32,6 +34,15 @@ public class Window extends JFrame {
     
     private Window() {
         super("Strife Basin");
+        
+        try {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {}
         
         connection = ConnectionToOpponent.getInstance();
         connPanel = ConnectionPanel.getInstance();
