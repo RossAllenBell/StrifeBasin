@@ -1,4 +1,4 @@
-animations for attacking
+fix issue where a unit stuck between two units can get permanently stuck
 death effect
 fog of war
 splash damage

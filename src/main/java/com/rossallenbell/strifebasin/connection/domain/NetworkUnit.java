@@ -10,6 +10,7 @@ import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.domain.units.Unit;
 import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
+import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 import com.rossallenbell.strifebasin.ui.resources.FrameHelper;
 
 public class NetworkUnit extends NetworkAsset implements Unit {
@@ -146,9 +147,9 @@ public class NetworkUnit extends NetworkAsset implements Unit {
         }
         
         if (originalLocation.equals(getLocation())) {
-            frameHelper.setAction(FrameHelper.Action.IDLING, updateTime);
+            frameHelper.setAction(AnimationManager.Action.IDLING, updateTime);
         } else {
-            frameHelper.setAction(FrameHelper.Action.MOVING, updateTime);
+            frameHelper.setAction(AnimationManager.Action.MOVING, updateTime);
         }
         
         frameHelper.update(updateTime);

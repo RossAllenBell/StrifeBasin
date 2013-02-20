@@ -16,6 +16,7 @@ import com.rossallenbell.strifebasin.domain.util.Pathing;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
 import com.rossallenbell.strifebasin.ui.effects.EffectsFactory;
 import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
+import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 
 public class Game {
     
@@ -126,6 +127,7 @@ public class Game {
             NetworkUnit attackingUnit = (NetworkUnit) them.getAssetById(attackEvent.unitId);
             if (attackingUnit != null) {
                 myAsset.takeDamage(attackingUnit);
+                attackingUnit.getFrameHelper().setAction(AnimationManager.Action.ATTACKING);
                 
                 attackingUnit.getLocation().setLocation(Game.getMirroredLocation(attackingUnit.getLocation()));
                 Effect effect = EffectsFactory.getInstance().buildEffect(attackingUnit, myAsset);

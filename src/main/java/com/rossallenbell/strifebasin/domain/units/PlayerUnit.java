@@ -16,6 +16,7 @@ import com.rossallenbell.strifebasin.threads.CommSocketSender;
 import com.rossallenbell.strifebasin.ui.effects.Effect;
 import com.rossallenbell.strifebasin.ui.effects.EffectsFactory;
 import com.rossallenbell.strifebasin.ui.effects.EffectsManager;
+import com.rossallenbell.strifebasin.ui.resources.AnimationManager;
 import com.rossallenbell.strifebasin.ui.resources.FrameHelper;
 
 public abstract class PlayerUnit extends PlayerAsset implements Unit {
@@ -119,16 +120,16 @@ public abstract class PlayerUnit extends PlayerAsset implements Unit {
         }
         
         if (originalLocation.equals(getLocation())) {
-            frameHelper.setAction(FrameHelper.Action.IDLING, updateTime);
+            frameHelper.setAction(AnimationManager.Action.IDLING, updateTime);
         } else {
-            frameHelper.setAction(FrameHelper.Action.MOVING, updateTime);
+            frameHelper.setAction(AnimationManager.Action.MOVING, updateTime);
         }
         
         // attack
         if (Pathing.getInstance().canHitAsset(this, target)) {
             route.clear();
             if (lastAttackTime + getAttackSpeed() <= updateTime) {
-                frameHelper.setAction(FrameHelper.Action.ATTACKING, updateTime);
+                frameHelper.setAction(AnimationManager.Action.ATTACKING, updateTime);
                 Effect attackEffect = EffectsFactory.getInstance().buildEffect(this, target, updateTime);
                 if (attackEffect != null) {
                     EffectsManager.getInstance().addEffect(attackEffect);
