@@ -59,6 +59,7 @@ public class Renderer {
     
     private final BufferedImage image;
     private final BufferedImage background;
+    private final BufferedImage fogOfWar;
     
     private Dimension viewDimensions;
     private int viewCornerPixelX;
@@ -90,6 +91,8 @@ public class Renderer {
     private Renderer() {
         image = new BufferedImage(Game.BOARD_WIDTH * PIXELS_PER_BOARD_UNIT, Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT, BufferedImage.TYPE_INT_ARGB);
         background = buildBackground();
+        fogOfWar = ImageManager.deepCopy(background);
+        ImageManager.tintImage(fogOfWar, new Color(32, 32, 32, 32), false);
         
         viewCornerPixelX = 0;
         viewCornerPixelY = 0;
@@ -119,6 +122,23 @@ public class Renderer {
             
             drawBackground(graphics);
             drawContent(graphics);
+            
+            byte[][] fogOfWarVisibility = Game.getInstance().getFogOfWar();
+            synchronized (fogOfWarVisibility) {
+                for (int i = (int) (Game.BUILD_ZONE_WIDTH + PlayerUnit.MINIMUM_AGGRO_RANGE); i < fogOfWarVisibility.length; i++) {
+                    for (int j = 0; j < fogOfWarVisibility[0].length; j++) {
+                        if (fogOfWarVisibility[i][j] != Game.FogOfWar.VISIBLE) {
+                            int x1 = i * PIXELS_PER_BOARD_UNIT;
+                            int x2 = (i + 1) * PIXELS_PER_BOARD_UNIT;
+                            int y1 = j * PIXELS_PER_BOARD_UNIT;
+                            int y2 = (j + 1) * PIXELS_PER_BOARD_UNIT;
+                            if (x1 < viewCornerPixelX + viewDimensions.width || x2 > viewCornerPixelX || y1 < viewCornerPixelY + viewDimensions.height || y2 < viewCornerPixelY) {
+                                graphics.drawImage(fogOfWar, x1, y1, x2, y2, x1, y1, x2, y2, null);
+                            }
+                        }
+                    }
+                }
+            }
             
             destinationGraphics.drawImage(image, 0, 0, viewDimensions.width - 1, viewDimensions.height - 1, viewCornerPixelX, viewCornerPixelY, viewCornerPixelX + viewDimensions.width - 1, viewCornerPixelY + viewDimensions.height - 1, null);
             
@@ -508,8 +528,9 @@ public class Renderer {
             }
         }
         
-        graphics.clearRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, 0, (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
-        graphics.clearRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) + (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2), (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
+        graphics.setColor(new Color(50,50,100));
+        graphics.fillRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, 0, (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
+        graphics.fillRect(Game.BUILD_ZONE_WIDTH * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) + (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2), (Game.BOARD_WIDTH - (Game.BUILD_ZONE_WIDTH * 2)) * PIXELS_PER_BOARD_UNIT, (Game.BOARD_HEIGHT * PIXELS_PER_BOARD_UNIT / 2) - (Game.MIDDLE_PATH_WIDTH * PIXELS_PER_BOARD_UNIT / 2));
         
         if (StrifeBasin.DEBUG) {
             graphics.setColor(new Color(60, 60, 60, 64));

@@ -30,6 +30,14 @@ public class Game {
     private final Me me;
     private NetworkPlayer them;
     
+    public static final class FogOfWar {
+        public static final byte UNEXPLORED = (byte) 0;
+        public static final byte EXPLORED = (byte) 1;
+        public static final byte VISIBLE = (byte) 2;
+    }
+    
+    private final byte[][] fogOfWar;
+    
     private static Game theInstance;
     
     private BuildableBuilding buildingPreview;
@@ -53,6 +61,18 @@ public class Game {
         mySantuary.setLocation(0, BOARD_HEIGHT / 2 - (mySantuary.getShape().height / 2));
         mySantuary.setAssetId(me.getNextAssetId());
         me.addBuilding(mySantuary);
+        
+        fogOfWar = new byte[BOARD_WIDTH][BOARD_HEIGHT];
+        for(int i=0; i<BUILD_ZONE_WIDTH + PlayerUnit.MINIMUM_AGGRO_RANGE; i++) {
+            for(int j=0; j<fogOfWar[0].length; j++) {
+                fogOfWar[i][j] = FogOfWar.VISIBLE;
+            }
+        }
+        for(int i=(int) (BUILD_ZONE_WIDTH + PlayerUnit.MINIMUM_AGGRO_RANGE); i<fogOfWar.length; i++) {
+            for(int j=0; j<fogOfWar[0].length; j++) {
+                fogOfWar[i][j] = FogOfWar.UNEXPLORED;
+            }
+        }
     }
     
     public Me getMe() {
@@ -61,6 +81,10 @@ public class Game {
     
     public NetworkPlayer getThem() {
         return them;
+    }
+    
+    public byte[][] getFogOfWar() {
+        return fogOfWar;
     }
     
     public void wheelIn() {
@@ -83,6 +107,26 @@ public class Game {
         Pathing.getInstance().clearQuadTrees();
         me.update(updateTime);
         them.update(updateTime);
+    }
+
+    public void clearVisibility() {
+        for(int i=BUILD_ZONE_WIDTH; i<fogOfWar.length; i++) {
+            for(int j=0; j<fogOfWar[0].length; j++) {
+                if(fogOfWar[i][j] == FogOfWar.VISIBLE) {
+                    fogOfWar[i][j] = FogOfWar.EXPLORED;
+                }
+            }
+        }
+    }
+
+    public void setVisibility(PlayerUnit unit) {
+        int originX = (int) Math.round(unit.getLocation().x);
+        int originY = (int) Math.round(unit.getLocation().y);
+        for(int i=Math.max(0, (int) (originX - unit.getAggroRange())); i < Math.min(fogOfWar.length, originX + unit.getAggroRange()); i++) {
+            for(int j=Math.max(0, (int) (originY - unit.getAggroRange())); j < Math.min(fogOfWar[0].length, originY + unit.getAggroRange()); j++) {
+                fogOfWar[i][j] = FogOfWar.VISIBLE;
+            }
+        }
     }
     
     public void buildingPlaced(Point buildLocation) {

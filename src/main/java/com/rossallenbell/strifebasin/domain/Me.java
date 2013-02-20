@@ -133,6 +133,14 @@ public class Me implements Player {
                     unitsI.remove();
                 }
             }
+            
+        }
+        
+        synchronized (Game.getInstance().getFogOfWar()) {
+            Game.getInstance().clearVisibility();
+            for(PlayerUnit unit : units.values()) {
+                Game.getInstance().setVisibility(unit);
+            }
         }
         
     }

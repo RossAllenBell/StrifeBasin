@@ -69,12 +69,17 @@ public class ImageManager {
     }
     
     public static void tintImage(BufferedImage image, Color tint) {
+        tintImage(image, tint, true);
+    }
+
+    public static void tintImage(BufferedImage image, Color tint, boolean additive) {
+        int tintDirection = additive? 1 : -1;
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 int pixelColorInt = image.getRGB(x, y);
                 if (pixelColorInt >> 24 != 0x00) {
                     Color pixelColor = new Color(pixelColorInt, true);
-                    Color newPixelColor = new Color(Math.min(255, tint.getRed() + pixelColor.getRed()), Math.min(255, tint.getGreen() + pixelColor.getGreen()), Math.min(255, tint.getBlue() + pixelColor.getBlue()), pixelColor.getAlpha());
+                    Color newPixelColor = new Color(Math.max(0, Math.min(255, (tintDirection * tint.getRed()) + pixelColor.getRed())), Math.max(0, Math.min(255, (tintDirection * tint.getGreen()) + pixelColor.getGreen())), Math.max(0, Math.min(255, (tintDirection * tint.getBlue()) + pixelColor.getBlue())), pixelColor.getAlpha());
                     image.setRGB(x, y, newPixelColor.getRGB());
                 }
             }

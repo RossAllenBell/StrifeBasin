@@ -1,6 +1,6 @@
-fog of war
+fix lower fps from fog of war rendering
+allow connections outside of a firewall?
 more buildings/units
-allow connections outside of a firewall
 add descriptions to buildings/units
 death effect
 splash damage
