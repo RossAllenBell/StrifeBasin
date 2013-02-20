@@ -1,13 +1,12 @@
-fix issue where a unit stuck between two units can get permanently stuck
-death effect
 fog of war
+more buildings/units
+allow connections outside of a firewall
+add descriptions to buildings/units
+death effect
 splash damage
 flying units
-defensive buildings
 buffing units
-more buildings/units
-add descriptions to buildings/units
-allow connections outside of a firewall
+defensive buildings
 sanctuary abilities
 zoom in/out
 sound
