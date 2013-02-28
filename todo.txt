@@ -1,6 +1,6 @@
-fix lower fps from fog of war rendering
-allow connections outside of a firewall?
+refactor units so they're expressed in tabular format, rather than classes
 more buildings/units
+allow connections outside of a firewall?
 add descriptions to buildings/units
 death effect
 splash damage
