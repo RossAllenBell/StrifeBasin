@@ -1,6 +1,7 @@
-refactor units so they're expressed in tabular format, rather than classes
 more buildings/units
 allow connections outside of a firewall?
+make fog of war show seen buildings
+make minimap respect fog of war
 add descriptions to buildings/units
 death effect
 splash damage

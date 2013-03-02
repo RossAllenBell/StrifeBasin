@@ -14,7 +14,7 @@ public class Bowman extends PlayerUnit {
     
     @Override
     public int getMaxHealth() {
-        return 5;
+        return 10;
     }
     
     @Override
@@ -24,7 +24,7 @@ public class Bowman extends PlayerUnit {
     
     @Override
     public double getRange() {
-        return 5;
+        return 10;
     }
     
     @Override

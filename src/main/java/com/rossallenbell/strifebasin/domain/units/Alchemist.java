@@ -12,7 +12,7 @@ public class Alchemist extends PlayerUnit {
 
     @Override
     public int getMaxHealth() {
-        return 10;
+        return 20;
     }
     
     @Override
