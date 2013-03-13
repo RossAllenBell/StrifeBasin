@@ -1,0 +1,1 @@
+java -ea -jar target/StrifeBasin-1.0.jar units
