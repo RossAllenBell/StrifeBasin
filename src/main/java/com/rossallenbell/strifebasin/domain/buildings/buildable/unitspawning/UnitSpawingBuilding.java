@@ -1,5 +1,6 @@
 package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 
 import com.rossallenbell.strifebasin.domain.Me;
@@ -45,5 +46,15 @@ public abstract class UnitSpawingBuilding extends BuildableBuilding {
     }
     
     protected abstract Class<? extends PlayerUnit> getUnit();
+
+    @Override
+    public int getMaxHealth() {
+        return 100;
+    }
+
+    @Override
+    public Dimension getShape() {
+        return new Dimension(4,4);
+    }
     
 }

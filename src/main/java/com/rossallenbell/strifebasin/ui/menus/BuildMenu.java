@@ -10,7 +10,6 @@ import org.reflections.Reflections;
 
 import com.rossallenbell.strifebasin.domain.Game;
 import com.rossallenbell.strifebasin.domain.Me;
-import com.rossallenbell.strifebasin.domain.buildings.Building;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BuildableBuilding;
@@ -21,8 +20,8 @@ public class BuildMenu extends Menu {
         CLOSED, TYPE, BASIC, ADVANCED
     };
     
-    private List<Class<? extends BuildableBuilding>> basicBuildings;
-    private List<Class<? extends BuildableBuilding>> advancedBuildings;
+    private List<BuildableBuilding> basicBuildings;
+    private List<BuildableBuilding> advancedBuildings;
     
     private State state;
     
@@ -39,19 +38,23 @@ public class BuildMenu extends Menu {
         return theInstance;
     }
     
-    @SuppressWarnings("unchecked")
     private BuildMenu() {
         state = State.CLOSED;
         
-        basicBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
-        advancedBuildings = new ArrayList<Class<? extends BuildableBuilding>>();
+        basicBuildings = new ArrayList<>();
+        advancedBuildings = new ArrayList<>();
         
         Reflections reflections = new Reflections("com.rossallenbell.strifebasin.domain.buildings.buildable");
-        for (Class<?> clazz : reflections.getTypesAnnotatedWith(BasicBuilding.class)) {
-            basicBuildings.add((Class<? extends BuildableBuilding>) clazz);
-        }
-        for (Class<?> clazz : reflections.getTypesAnnotatedWith(AdvancedBuilding.class)) {
-            advancedBuildings.add((Class<? extends BuildableBuilding>) clazz);
+        try {
+            for (Class<?> clazz : reflections.getTypesAnnotatedWith(BasicBuilding.class)) {
+                basicBuildings.add((BuildableBuilding) clazz.getConstructor(Me.class).newInstance(Game.getInstance().getMe()));
+            }
+            for (Class<?> clazz : reflections.getTypesAnnotatedWith(AdvancedBuilding.class)) {
+                advancedBuildings.add((BuildableBuilding) clazz.getConstructor(Me.class).newInstance(Game.getInstance().getMe()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
         
         Collections.sort(basicBuildings, new CostComparator());
@@ -76,16 +79,16 @@ public class BuildMenu extends Menu {
         if (state == State.BASIC) {
             List<String> basicBuildingNames = new ArrayList<String>();
             int num = 1;
-            for (Class<? extends Building> clazz : basicBuildings) {
-                basicBuildingNames.add("(" + num + ") " + clazz.getSimpleName());
+            for (BuildableBuilding building : basicBuildings) {
+                basicBuildingNames.add(String.format("[%d] - %d - %s", num, building.cost(), building.getClass().getSimpleName()));
                 num++;
             }
             displayStrings.add(basicBuildingNames);
         } else if (state == State.ADVANCED) {
             List<String> advancedBuildingNames = new ArrayList<String>();
             int num = 1;
-            for (Class<? extends Building> clazz : advancedBuildings) {
-                advancedBuildingNames.add("(" + num + ") " + clazz.getSimpleName());
+            for (BuildableBuilding building : advancedBuildings) {
+                advancedBuildingNames.add(String.format("[%d] - %d - %s", num, building.cost(), building.getClass().getSimpleName()));
                 num++;
             }
             displayStrings.add(advancedBuildingNames);
@@ -133,15 +136,10 @@ public class BuildMenu extends Menu {
         }
     }
     
-    public class CostComparator implements Comparator<Class<? extends BuildableBuilding>> {
+    public class CostComparator implements Comparator<BuildableBuilding> {
         @Override
-        public int compare(Class<? extends BuildableBuilding> o1, Class<? extends BuildableBuilding> o2) {
-            try {
-                return new Integer(o1.getConstructor(Me.class).newInstance(Game.getInstance().getMe()).cost()).compareTo(o2.getConstructor(Me.class).newInstance(Game.getInstance().getMe()).cost());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return 0;
+        public int compare(BuildableBuilding o1, BuildableBuilding o2) {
+            return Integer.compare(o1.cost(), o2.cost());
         }
     }
     

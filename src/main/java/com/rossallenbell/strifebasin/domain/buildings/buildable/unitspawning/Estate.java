@@ -4,21 +4,21 @@ import java.awt.Dimension;
 
 import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.AdvancedBuilding;
-import com.rossallenbell.strifebasin.domain.units.Alchemist;
+import com.rossallenbell.strifebasin.domain.units.Duke;
 import com.rossallenbell.strifebasin.domain.units.PlayerUnit;
 import com.rossallenbell.strifebasin.ui.resources.HasImage;
 
 @HasImage
 @AdvancedBuilding
-public class AlchemistLab extends UnitSpawingBuilding {
+public class Estate extends UnitSpawingBuilding {
     
-    public AlchemistLab(Me owner) {
+    public Estate(Me owner) {
         super(owner);
     }
 
     @Override
     public int cost() {
-        return 100;
+        return 300;
     }
 
     @Override
@@ -28,11 +28,7 @@ public class AlchemistLab extends UnitSpawingBuilding {
 
     @Override
     protected Class<? extends PlayerUnit> getUnit() {
-        return Alchemist.class;
-    }
-
-    public int getMaxHealth() {
-        return 100;
+        return Duke.class;
     }
     
 }
