@@ -4,20 +4,20 @@ import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
 
 @HasAnimation
-public class Spearman extends PlayerUnit {
+public class Squire extends PlayerUnit {
     
-    public Spearman(Me owner) {
+    public Squire(Me owner) {
         super(owner);
     }
 
     @Override
     public int getMaxHealth() {
-        return 10;
+        return 50;
     }
     
     @Override
     public double getDamage() {
-        return 3;
+        return 15;
     }
     
 }

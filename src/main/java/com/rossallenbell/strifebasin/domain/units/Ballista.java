@@ -6,25 +6,25 @@ import com.rossallenbell.strifebasin.ui.effects.imaged.Arrow;
 import com.rossallenbell.strifebasin.ui.resources.HasAnimation;
 
 @HasAnimation
-public class Bowman extends PlayerUnit {
+public class Ballista extends PlayerUnit {
     
-    public Bowman(Me owner) {
+    public Ballista(Me owner) {
         super(owner);
     }
-    
+
     @Override
     public int getMaxHealth() {
-        return 10;
+        return 80;
     }
     
     @Override
     public double getDamage() {
-        return 2;
+        return 20;
     }
     
     @Override
-    public double getRange() {
-        return 10;
+    public double getRange(){
+        return 15;
     }
     
     @Override

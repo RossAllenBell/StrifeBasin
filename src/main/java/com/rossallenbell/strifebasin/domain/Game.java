@@ -182,12 +182,8 @@ public class Game {
         }
     }
     
-    public void setBuildingPreview(Class<? extends BuildableBuilding> clazz) {
-        try {
-            buildingPreview = clazz.getConstructor(Me.class).newInstance(Game.getInstance().getMe());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void setBuildingPreview(BuildableBuilding building) {
+        buildingPreview = building;
     }
     
     public void clearBuildingPreview() {

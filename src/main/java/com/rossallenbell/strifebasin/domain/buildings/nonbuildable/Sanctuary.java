@@ -19,7 +19,7 @@ public class Sanctuary extends Building {
     }
 
     public int getMaxHealth() {
-        return 1000;
+        return 2000;
     }
     
 }

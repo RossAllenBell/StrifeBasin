@@ -1,7 +1,5 @@
 package com.rossallenbell.strifebasin.domain.buildings.buildable.unitspawning;
 
-import java.awt.Dimension;
-
 import com.rossallenbell.strifebasin.domain.Me;
 import com.rossallenbell.strifebasin.domain.buildings.buildable.BasicBuilding;
 import com.rossallenbell.strifebasin.domain.units.Bowman;
@@ -22,17 +20,8 @@ public class ArcheryRange extends UnitSpawingBuilding {
     }
 
     @Override
-    public Dimension getShape() {
-        return new Dimension(4,4);
-    }
-
-    @Override
     protected Class<? extends PlayerUnit> getUnit() {
         return Bowman.class;
-    }
-
-    public int getMaxHealth() {
-        return 100;
     }
     
 }
